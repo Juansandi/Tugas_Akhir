@@ -11,18 +11,25 @@ class ProdukController extends Controller
 {
     public function index()
     {
-        $products = Produk::with('category')->latest()->paginate(10);
+        $products = Produk::with('kategori')->latest()->paginate(10);
         return view('admin.products.index', compact('products'));
+    }
+
+    public function create()
+    {
+        $categories = Kategori::all();
+        return view('admin.products.create', compact('categories'));
     }
 
     public function createProduk(Request $request)
     {
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'stock'       => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
+            'nama_produk' => 'required|string|max:255',
+            'jenis'       => 'required|string|max:255', 
+            'deskripsi' => 'nullable|string',
+            'harga'       => 'required|numeric|min:0',
+            'stok'       => 'required|integer|min:0',
+            'kategori_id' => 'required|exists:kategoris,id',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -37,14 +44,21 @@ class ProdukController extends Controller
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
     }
 
+    public function edit(Produk $product)
+    {
+        $categories = Kategori::all();
+        return view('admin.products.edit', compact('product', 'categories'));
+    }
+
     public function update(Request $request, Produk $product)
     {
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'stock'       => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
+            'nama_produk' => 'required|string|max:255',
+            'jenis'       => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'harga'       => 'required|numeric|min:0',
+            'stok'       => 'required|integer|min:0',
+            'kategori_id' => 'required|exists:kategoris,id',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 

@@ -17,15 +17,15 @@ class PromoController extends Controller
     {
         return view('admin.promos.create');
     }
-    
+
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required',
-            'kode' => 'required|unique:promos',
-            'persen_diskon' => 'required|integer|min:0|max:100',
+            'nama_promo' => 'required',
+            'kode_promo' => 'required|unique:promos',
+            'diskon' => 'required|integer|min:0|max:100',
             'mulai' => 'required|date',
-            'berakhir' => 'required|date|after_or_equal:mulai',
+            'akhir' => 'required|date|after_or_equal:mulai',
         ]);
 
         Promo::create($request->all());
@@ -41,11 +41,11 @@ class PromoController extends Controller
     public function update(Request $request, Promo $promo)
     {
         $request->validate([
-            'nama' => 'required',
-            'kode' => 'required|unique:promos,kode,' . $promo->id,
-            'persen_diskon' => 'required|integer|min:0|max:100',
+            'nama_promo' => 'required',
+            'kode_promo' => 'required',
+            'diskon' => 'required|integer|min:0|max:100',
             'mulai' => 'required|date',
-            'berakhir' => 'required|date|after_or_equal:mulai',
+            'akhir' => 'required|date|after_or_equal:mulai',
         ]);
 
         $promo->update($request->all());
