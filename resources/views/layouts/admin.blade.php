@@ -31,23 +31,24 @@
             <div class="collapse navbar-collapse" id="navbarAdmin">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('admin/products') ? 'active' : '' }}" href="{{ route('products.index') }}">Products</a>
+                        <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pesanan</a>
+                        <a class="nav-link {{ request()->is('pesanan*') ? 'active' : '' }}" href="#">Pesanan</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('promos.index') }}">Promo</a>
+                        <a class="nav-link {{ request()->routeIs('promos.*') ? 'active' : '' }}" href="{{ route('promos.index') }}">Promo</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Refund</a>
+                        <a class="nav-link {{ request()->is('refund*') ? 'active' : '' }}" href="#">Refund</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Pengguna</a>
+                        <a class="nav-link {{ request()->routeIs('pengguna.*') ? 'active' : '' }}" href="{{ route('pengguna.index') }}">Pengguna</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Ulasan</a>
+                        <a class="nav-link {{ request()->is('ulasan*') ? 'active' : '' }}" href="#">Ulasan</a>
                     </li>
+
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">

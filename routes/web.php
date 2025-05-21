@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
 
@@ -32,4 +33,6 @@ Route::post('/admin/promos', [PromoController::class, 'store'])->name('promos.st
 Route::get('/admin/promos/{promo}/edit', [PromoController::class, 'edit'])->name('promos.edit');
 Route::put('/admin/promos/{promo}', [PromoController::class, 'update'])->name('promos.update');
 Route::delete('/admin/promos/{promo}', [PromoController::class, 'destroy'])->name('promos.destroy');
+
+Route::get('/admin/pengguna', [PenggunaController::class, 'index'])->name('pengguna.index');
 
