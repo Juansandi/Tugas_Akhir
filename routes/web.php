@@ -19,6 +19,13 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 Route::get('/home', [HomeController::class, 'index'])->middleware('auth')->name('home');
 
 Route::get('/', [HomeController::class, 'index']);
+Route::get('/products', [ProdukController::class, 'showToUser'])->name('user.products');
+
+
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+})->name('admin.dashboard');
+
 
 Route::get('/admin/products', [ProdukController::class, 'index'])->name('products.index');
 Route::get('/admin/products/create', [ProdukController::class, 'create'])->name('products.create');

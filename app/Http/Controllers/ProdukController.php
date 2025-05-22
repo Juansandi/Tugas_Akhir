@@ -87,4 +87,11 @@ class ProdukController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus.');
     }
+
+    public function showToUser()
+    {
+        $products = Produk::with('kategori')->latest()->paginate(12);
+        return view('user.products.index', compact('products'));
+    }
+    
 }

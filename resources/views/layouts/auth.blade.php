@@ -106,7 +106,7 @@
         <div class="container">
             <nav class="navbar navbar-expand-lg navbar-light">
                 <div class="container-fluid">
-                    <a class="navbar-brand" href="#">
+                    <a class="navbar-brand" href="/">
                         <svg width="50" height="30" viewBox="0 0 50 30" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M25 0C29.7 0 34.5 4 34.5 8.6C39.5 8.6 43.5 12.6 43.5 17.6C43.5 22.6 39.5 26.6 34.5 26.6H15.5C10.5 26.6 6.5 22.6 6.5 17.6C6.5 12.6 10.5 8.6 15.5 8.6C15.5 4 20.3 0 25 0Z" fill="#000"/>
                         </svg>
@@ -117,7 +117,7 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Home</a>
+                                <a class="nav-link" href="/">Home</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#">Products</a>

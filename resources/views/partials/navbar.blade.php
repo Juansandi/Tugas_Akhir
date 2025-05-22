@@ -11,7 +11,7 @@
                     <a class="nav-link" href="{{ route('home') }}">Beranda</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Produk</a>
+                    <a class="nav-link" href="{{ route('user.products') }}">Produk</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Kategori</a>
@@ -24,15 +24,24 @@
                         <a class="nav-link" href="{{ route('login.form') }}">Login</a>
                     </li>
                 @else
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">{{ Auth::user()->username }}</a>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ Auth::user()->username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Profil</a></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item" style="border: none; background: none; width: 100%; text-align: left;">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                            @csrf
-                            <button class="btn btn-link nav-link" type="submit">Logout</button>
-                        </form>
-                    </li>
+                </ul>
                 @endguest
             </ul>
         </div>

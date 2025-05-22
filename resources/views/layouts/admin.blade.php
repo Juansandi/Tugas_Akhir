@@ -20,7 +20,7 @@
     {{-- Navbar --}}
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#"> 
+            <a class="navbar-brand fw-bold" href="{{ route('admin.dashboard') }}"> 
                 <img src="https://cdn-icons-png.flaticon.com/512/591/591788.png" width="30" class="me-2">
                 Admin Panel
             </a>
@@ -57,7 +57,7 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#">Profil</a></li>
-                            <li><a class="dropdown-item" href="#">Keluar</a></li>
+                            <li><a class="dropdown-item" href="/">Keluar</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -68,6 +68,7 @@
     {{-- Konten --}}
     <main class="py-4">
         @yield('content')
+        @yield('scripts')
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

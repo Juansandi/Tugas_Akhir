@@ -14,44 +14,36 @@
 {{-- Produk Pilihan Hari Ini --}}
 <div class="container py-5" id="products">
     <h2 class="text-center mb-4">Produk Pilihan Hari Ini</h2>
-    <div class="row justify-content-center">
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow">
-                <img src="https://img.id.my-best.com/product_images/e24d156116ac2427abefe9ac214e2250.jpeg?ixlib=rails-4.3.1&q=70&lossless=0&w=800&h=800&fit=clip&s=a055992ba7c8bdb30e059241c440930d" class="card-img-top" alt="Beras Merah">
-                <div class="card-body">
-                    <h5 class="card-title">Beras Merah</h5>
-                    <p class="card-text">Rp 50.000</p>
+    @if($featuredProducts->count() > 0)
+        <div class="row justify-content-center">
+            @foreach($featuredProducts as $product)
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 shadow">
+                    @if($product->image)
+                        <img src="{{ asset('storage/' . $product->image) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
+                    @else
+                        <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
+                    @endif
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ $product->nama_produk }}</h5>
+                        <p class="card-text text-muted mb-1">{{ Str::limit($product->deskripsi, 50) }}</p>
+                        <p class="card-text"><strong>Rp {{ number_format($product->harga, 0, ',', '.') }}</strong></p>
+                        <p class="card-text"><small class="text-muted">Stok: {{ $product->stok }}</small></p>
+                        
+                    </div>
                 </div>
             </div>
+            @endforeach
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow">
-                <img src="https://cdn1-production-images-kly.akamaized.net/B_BCrWc2E2aZj_dFoTKcz5O6oB4=/1200x1200/smart/filters:quality(75):strip_icc():format(webp)/kly-media-production/medias/4021819/original/011012800_1652430132-grain-that-is-cup-wooden-floor.jpg" class="card-img-top" alt="Beras Putih Premium">
-                <div class="card-body">
-                    <h5 class="card-title">Beras Putih Premium</h5>
-                    <p class="card-text">Rp 60.000</p>
-                </div>
-            </div>
+        <div class="text-center mt-4">
+            <a href="{{ route('user.products') }}" class="btn btn-outline-primary">Lihat Semua Produk</a>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow">
-                <img src="https://i0.wp.com/raisa.aeonstore.id/wp-content/uploads/2023/04/801898.jpeg?fit=500%2C500&ssl=1" class="card-img-top" alt="Sawi Putih">
-                <div class="card-body">
-                    <h5 class="card-title">Sawi Putih</h5>
-                    <p class="card-text">Rp 5.000</p>
-                </div>
-            </div>
+    @else
+        <div class="text-center">
+            <p class="text-muted">Belum ada produk tersedia.</p>
+            <a href="{{ route('user.products') }}" class="btn btn-outline-primary">Cek Produk Lainnya</a>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card h-100 shadow">
-                <img src="https://cdn.rri.co.id/berita/Lhokseumawe/o/1715440226853-1000038210/fqm7dorm11p3y0j.jpeg" class="card-img-top" alt="Sayur Bayam">
-                <div class="card-body">
-                    <h5 class="card-title">Sayur Bayam</h5>
-                    <p class="card-text">Rp 3.000</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    @endif
 </div>
 
 {{-- Kategori Produk --}}
