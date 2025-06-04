@@ -111,7 +111,12 @@ b. Fitur Admin:
 Fitur-fitur yang sudah dikerjakan:
 - Login User
 - Register User
-- Homepage User (masih dummy)
+- Homepage User
 - Backend Admin (Produk)
 - Backend Admin (Promo)
 - Backend Admin (Kategori)
+- Dashboard admin
+- View manajemen produk admin
+- View manajemen promo admin
+- View manajemen pengguna admin
+- 
