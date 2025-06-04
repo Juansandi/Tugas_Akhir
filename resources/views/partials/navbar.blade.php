@@ -14,10 +14,13 @@
                     <a class="nav-link" href="{{ route('user.products') }}">Produk</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Kategori</a>
+                    <a class="nav-link" href="#">Tentang</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Tentang</a>
+                    <a class="nav-link" href="{{ route('wishlist.index') }}"><i class="bi bi-heart"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('cart.index') }}"><i class="bi bi-cart"></i></a>
                 </li>
                 @guest
                     <li class="nav-item">
@@ -26,10 +29,11 @@
                 @else
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle"></i> {{ Auth::user()->username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Edit Profile</a></li>
                             <li><a class="dropdown-item" href="#">Profil</a></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">

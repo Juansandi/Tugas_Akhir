@@ -7,6 +7,9 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\WishlistController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -20,6 +23,27 @@ Route::get('/home', [HomeController::class, 'index'])->middleware('auth')->name(
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/products', [ProdukController::class, 'showToUser'])->name('user.products');
+Route::get('/produk/{id}', [ProdukController::class, 'showToUserDetail'])->name('produk.detail');
+Route::get('/produk', [ProdukController::class, 'showToUser'])->name('produk.index');
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/{productId}', [WishlistController::class, 'store'])->name('wishlist.store');
+    Route::delete('/wishlist/{productId}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
+});
 
 
 Route::get('/admin/dashboard', function () {

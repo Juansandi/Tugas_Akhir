@@ -88,10 +88,39 @@ class ProdukController extends Controller
         return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus.');
     }
 
-    public function showToUser()
+    public function showToUser(Request $request)
     {
-        $products = Produk::with('kategori')->latest()->paginate(12);
-        return view('user.products.index', compact('products'));
+        $query = Produk::with('kategori')->latest();
+
+        // Pencarian berdasarkan nama
+        if ($request->filled('search')) {
+            $query->where('nama_produk', 'like', '%' . $request->search . '%');
+        }
+
+        // Filter kategori
+        if ($request->filled('kategori')) {
+            $query->where('kategori_id', $request->kategori);
+        }
+
+        // Filter harga
+        if ($request->filled('min_price')) {
+            $query->where('harga', '>=', $request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('harga', '<=', $request->max_price);
+        }
+
+        $products = $query->paginate(12)->withQueryString();
+        $categories = Kategori::all();
+
+        return view('user.products.index', compact('products', 'categories'));
     }
     
+    public function showToUserDetail($id)
+    {
+        $product = Produk::with('kategori')->findOrFail($id);
+        return view('user.products.show', compact('product'));
+    }
+
 }
