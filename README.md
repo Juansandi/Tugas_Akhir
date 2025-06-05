@@ -119,4 +119,8 @@ Fitur-fitur yang sudah dikerjakan:
 - View manajemen produk admin
 - View manajemen promo admin
 - View manajemen pengguna admin
-- 
+- Fitur edit profile (kurang ganti password)
+- Fitur Keranjang
+- Fitur Wishlist
+- Halaman Produk + Detail Produk
+- Filter Category dan harga serta search by nama
