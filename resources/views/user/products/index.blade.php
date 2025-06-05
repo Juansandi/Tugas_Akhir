@@ -46,16 +46,18 @@
                     <p class="text-muted small mb-3">Stok : {{ $product->stok }}</p>
 
                     <div class="mt-auto d-flex justify-content-between align-items-center">
-                        <a href="{{ route('produk.detail', $product->id) }}" class="btn btn-outline-primary btn-sm" title="Lihat Detail">
-                            <i class="bi bi-info-circle"></i>
-                        </a>
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('produk.detail', $product->id) }}" class="btn btn-outline-primary btn-sm" title="Lihat Detail">
+                                <i class="bi bi-info-circle"></i>
+                            </a>
 
-                         <form action="{{ route('wishlist.store', $product->id) }}" method="POST" class="mb-0 me-2">
-                            @csrf
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Tambah ke Wishlist">
-                                <i class="bi bi-heart"></i>
-                            </button>
-                        </form>
+                            <form action="{{ route('wishlist.store', $product->id) }}" method="POST" class="mb-0">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Tambah ke Wishlist">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                            </form>
+                        </div>
 
                         <form action="{{ route('cart.store') }}" method="POST" class="mb-0">
                             @csrf
@@ -66,6 +68,7 @@
                             </button>
                         </form>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -91,9 +94,7 @@
         const maxPriceInput = document.getElementById('maxPriceInput');
 
         let typingTimer;
-        const typingInterval = 500; // delay waktu untuk search input agar tidak submit terlalu cepat
-
-        // Auto submit saat user mengetik di search input (dengan debounce)
+        const typingInterval = 500; 
         searchInput.addEventListener('keyup', function () {
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => filterForm.submit(), typingInterval);
