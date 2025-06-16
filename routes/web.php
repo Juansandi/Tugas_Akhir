@@ -10,6 +10,7 @@ use App\Http\Controllers\PromoController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -35,8 +36,12 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/profile/password', [ProfileController::class, 'editPassword'])->name('profile.editPassword');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+
 });
 
 Route::middleware('auth')->group(function () {
@@ -45,11 +50,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/wishlist/{productId}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
 });
 
+Route::post('/review', [ReviewController::class, 'store'])->name('review.store');
 
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-})->name('admin.dashboard');
-
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin', function() {
+        return view('admin.dashboard'); // tampilan dashboard admin
+    })->name('admin.dashboard');
+});
+Route::get('/admin/dashboard', [ProdukController::class, 'dashboard'])->name('admin.dashboard');
 
 Route::get('/admin/products', [ProdukController::class, 'index'])->name('products.index');
 Route::get('/admin/products/create', [ProdukController::class, 'create'])->name('products.create');
@@ -57,6 +65,9 @@ Route::post('/admin/products', [ProdukController::class, 'createProduk'])->name(
 Route::get('/admin/products/{product}/edit', [ProdukController::class, 'edit'])->name('products.edit');
 Route::put('/admin/products/{product}', [ProdukController::class, 'update'])->name('products.update');
 Route::delete('/admin/products/{product}', [ProdukController::class, 'destroy'])->name('products.destroy');
+Route::get('/admin/products/{id}/reviews', [ProdukController::class, 'showReviews'])->name('products.reviews');
+Route::delete('/admin/reviews/{id}', [ProdukController::class, 'destroyReview'])->name('reviews.destroy');
+
 
 Route::get('/admin/promos', [PromoController::class, 'index'])->name('promos.index');
 Route::get('/admin/promos/create', [PromoController::class, 'create'])->name('promos.create');

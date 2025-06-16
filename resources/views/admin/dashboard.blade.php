@@ -34,6 +34,28 @@
 
     </br>
 
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Total Produk</h5>
+                    <p class="card-text fs-4">{{ $totalProduk }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- Total Pesanan -->
+        <div class="col-md-6">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Pesanan Hari Ini</h5>
+                    <p class="card-text fs-4">{{ $totalPesanan }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </br>
+
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Grafik Penjualan Bulanan</h5>

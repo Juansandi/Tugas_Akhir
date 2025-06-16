@@ -1,6 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="{{ route('home') }}">TokoSayur</a>
+        <a class="navbar-brand" href="{{ route('home') }}">
+            <img src="{{ asset('images/FreshGO.png') }}" alt="TokoSayur" height="40"></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -22,6 +23,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('cart.index') }}"><i class="bi bi-cart"></i></a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="bi bi-bell"></i></a>
+                </li>
                 @guest
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('login.form') }}">Login</a>
@@ -33,8 +37,7 @@
                             <i class="bi bi-person-circle"></i> {{ Auth::user()->username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Edit Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Profil</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.show') }}">Profile</a></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                                     @csrf

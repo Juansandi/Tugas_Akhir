@@ -3,9 +3,9 @@
 @section('content')
 <div class="container-md">
 
-    <div class="row bg-light p-4 rounded shadow-sm">
+    <div class="row bg-light p-4 rounded shadow-sm d-flex align-items-stretch">
         <!-- Product Image -->
-        <div class="col-lg-6 col-md-12 mb-4">
+        <div class="col-lg-6 col-md-12 mb-4 d-flex flex-column">
             <div class="product-image shadow-sm rounded overflow-hidden">
                 @if($product->image)
                     <img src="{{ asset('storage/' . $product->image) }}" class="img-fluid" alt="{{ $product->nama_produk }}">
@@ -16,13 +16,22 @@
         </div>
 
         <!-- Product Info -->
-        <div class="col-lg-6 col-md-12">
+        <div class="col-lg-6 col-md-12 d-flex flex-column">
             <div class="product-info p-4 shadow rounded bg-white">
-                <h2 class="product-title mb-2">{{ $product->nama_produk }}</h2>
-                
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="product-title mb-0">{{ $product->nama_produk }}</h2>
+
+                    <form action="{{ route('wishlist.store', $product->id) }}" method="POST" class="m-0 p-0">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-primary" title="Tambah ke Wishlist" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-heart"></i>
+                        </button>
+                    </form>
+                </div>
+
                 <div class="rating mb-3">
                     <span class="stars">★★★★★</span>
-                    <span class="review-count text-muted">({{ rand(1, 50) }} reviews)</span>
+                    <span class="review-count text-muted">({{ $product->reviews->count() }} ulasan)</span>
                 </div>
 
                 @if($product->kategori)
@@ -37,12 +46,6 @@
                     @else
                         <p>Produk berkualitas tinggi yang tersedia di toko kami. Dapatkan pengalaman berbelanja terbaik dengan produk pilihan.</p>
                     @endif
-                    
-                    <ul class="product-features">
-                        <li>Produk berkualitas tinggi</li>
-                        <li>Tersedia dengan berbagai pilihan</li>
-                        <li>Garansi kepuasan pelanggan</li>
-                    </ul>
                 </div>
 
                 <!-- Quantity and Actions -->
@@ -60,53 +63,34 @@
                         <button type="submit" class="btn btn-dark btn-lg w-100 mb-2">Add to Cart</button>
                         <button type="button" class="btn btn-outline-dark btn-lg w-100">Buy Now</button>
                     </form>
-                    <form action="{{ route('wishlist.store', $product->id) }}" method="POST" class="mt-2">
-                        @csrf
-                        <button type="submit" class="btn btn-outline-primary btn-lg" title="Tambah ke Wishlist" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; padding: 0;">
-                            <i class="bi bi-heart"></i>
-                        </button>
-                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Product Tabs -->
+    <!-- Reviews Section -->
     <div class="row mt-5">
-        <div class="col-12">
-            <ul class="nav nav-tabs" id="productTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Description</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">Reviews</button>
-                </li>
-            </ul>
-            <div class="tab-content mt-4" id="productTabsContent">
-                <div class="tab-pane fade show active" id="description" role="tabpanel">
-                    @if($product->deskripsi)
-                        <p>{{ $product->deskripsi }}</p>
-                    @else
-                        <p>Belum ada deskripsi lengkap untuk produk ini.</p>
-                    @endif
-                    
-                    @if($product->kategori)
-                        <p><strong>Kategori:</strong> {{ $product->kategori->nama_kategori }}</p>
-                    @endif
-                    
-                    <ul>
-                        <li>Produk berkualitas tinggi</li>
-                        <li>Tersedia dengan berbagai pilihan</li>
-                        <li>Garansi kepuasan pelanggan</li>
-                    </ul>
-                </div>
-                <div class="tab-pane fade" id="reviews" role="tabpanel">
-                    <p>Belum ada review untuk produk ini.</p>
-                    <p>Jadilah yang pertama memberikan review untuk <strong>{{ $product->nama_produk }}</strong>.</p>
+    <div class="col-12">
+        <h4>Ulasan Pengguna</h4>
+        @forelse($product->reviews as $review)
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ $review->user->username ?? 'Anonim' }}</strong>
+                        <small class="text-muted">{{ $review->created_at->format('d M Y') }}</small>
+                    </div>
+                    <div class="text-warning">
+                        {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
+                    </div>
+                    <p class="mb-0">{{ $review->comment }}</p>
                 </div>
             </div>
-        </div>
+        @empty
+            <p class="text-muted">Belum ada ulasan untuk produk ini.</p>
+        @endforelse
     </div>
+</div>
+
 </div>
 
 <script>
@@ -129,28 +113,23 @@ function decreaseQty() {
     font-weight: 600;
     color: #333;
 }
-
 .stars {
     color: #ffc107;
     font-size: 1.2rem;
 }
-
 .price {
     font-size: 1.8rem;
     font-weight: 700;
 }
-
 .product-features {
     list-style: none;
     padding-left: 0;
 }
-
 .product-features li {
     padding: 0.25rem 0;
     position: relative;
     padding-left: 1.5rem;
 }
-
 .product-features li:before {
     content: "•";
     color: #28a745;
@@ -158,27 +137,24 @@ function decreaseQty() {
     position: absolute;
     left: 0;
 }
-
 .quantity-selector {
     max-width: 200px;
 }
-
 .product-image img {
     width: 100%;
     max-height: 450px;
     object-fit: cover;
 }
-
-.nav-tabs .nav-link {
-    border: none;
-    border-bottom: 2px solid transparent;
-    color: #6c757d;
+.product-image, .product-info {
+    min-height: 450px; /* agar tinggi seimbang */
+    height: 100%;
 }
 
-.nav-tabs .nav-link.active {
-    background: none;
-    border-bottom: 2px solid #007bff;
-    color: #007bff;
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
+
 </style>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Produk;
 use App\Models\Kategori;
+use App\Models\Review;
 use Illuminate\Support\Facades\Storage;
 
 class ProdukController extends Controller
@@ -123,4 +124,30 @@ class ProdukController extends Controller
         return view('user.products.show', compact('product'));
     }
 
+    public function showReviews($id)
+    {
+        $product = Produk::with(['reviews.user'])->findOrFail($id);
+
+        return view('admin.products.review', compact('product'));
+    }
+
+    public function destroyReview($id)
+    {
+        $review = Review::findOrFail($id);
+        $produkId = $review->produk_id;
+
+        $review->delete();
+
+        return redirect()->route('products.reviews', $produkId)
+            ->with('success', 'Ulasan berhasil dihapus.');
+    }
+
+    public function dashboard()
+    {
+        $totalProduk = \App\Models\Produk::count();
+
+        $totalPesanan = 25; // dummy value
+
+        return view('admin.dashboard', compact('totalProduk', 'totalPesanan'));
+    }
 }

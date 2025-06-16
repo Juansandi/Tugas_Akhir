@@ -26,6 +26,7 @@
                     <th>Stok</th>
                     <th>Deskripsi</th>
                     <th>Aksi</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -52,6 +53,13 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-link text-danger p-0 m-0 align-baseline">Hapus</button>
                             </form>
+                        </td>
+                        <td>
+                            <a href="{{ route('products.reviews', $product->id) }}" 
+                                class="btn btn-sm btn-outline-primary" 
+                                title="Lihat Ulasan">
+                                    <i class="bi bi-chat-left-text"></i>
+                                </a>
                         </td>
                     </tr>
                 @empty

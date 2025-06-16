@@ -30,6 +30,29 @@
                         <p class="card-text"><strong>Rp {{ number_format($product->harga, 0, ',', '.') }}</strong></p>
                         <p class="card-text"><small class="text-muted">Stok: {{ $product->stok }}</small></p>
                         
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('produk.detail', $product->id) }}" class="btn btn-outline-primary btn-sm" title="Lihat Detail">
+                                    <i class="bi bi-info-circle"></i>
+                                </a>
+
+                                <form action="{{ route('wishlist.store', $product->id) }}" method="POST" class="mb-0">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Tambah ke Wishlist">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <form action="{{ route('cart.store') }}" method="POST" class="mb-0">
+                                @csrf
+                                <input type="hidden" name="produk_id" value="{{ $product->id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-sm btn-outline-primary" title="Tambah ke Keranjang">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

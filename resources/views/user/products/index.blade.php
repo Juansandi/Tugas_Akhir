@@ -6,7 +6,7 @@
 
     {{-- Search Bar dan Filter --}}
     <form id="filterForm" action="{{ route('produk.index') }}" method="GET" class="row mb-4 g-2 align-items-center">
-        <div class="col-md-4">
+        <div class="col-md-5">
             <input type="text" name="search" id="searchInput" class="form-control" placeholder="Cari nama produk..." value="{{ request('search') }}">
         </div>
 
@@ -119,4 +119,18 @@
         });
     });
 </script>
+
+<style>
+    #filterForm .form-control,
+    #filterForm .form-select {
+        height: 40px;  /* Atur sesuai kebutuhan, bisa 38px juga */
+        font-size: 1rem;
+    }
+
+    .card-img-top {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+</style>
 @endsection

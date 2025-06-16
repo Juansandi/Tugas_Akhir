@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
+    public function show()
+    {
+        $user = Auth::user();
+        return view('user.profile.show', compact('user'));
+    }
+
     public function edit()
     {
         $user = Auth::user();
@@ -29,5 +35,35 @@ class ProfileController extends Controller
 
         return redirect()->back()->with('success', 'Profil berhasil diperbarui');
     }
+
+    public function editPassword()
+    {
+        return view('user.profile.edit_password'); // Buat view khusus form edit password
+    }
+
+    public function updatePassword(Request $request)
+    {
+        // Validasi password lama dan password baru
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|string|min:6|confirmed', // 'confirmed' cek ada input new_password_confirmation
+        ]);
+
+        $user = Auth::user();
+
+        // Cek password lama
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password lama salah']);
+        }
+
+        // Update password baru (hash terlebih dahulu)
+        DB::table('pengguna')
+            ->where('id', $user->id)
+            ->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+
+        return redirect()->back()->with('success', 'Password berhasil diperbarui');
+    } 
 
 }

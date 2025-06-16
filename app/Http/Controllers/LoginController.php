@@ -21,11 +21,20 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
+        $adminUsername = 'admin';
+        $adminPassword = 'admin';
+
+        // Cek login admin
+        if ($request->username === $adminUsername && $request->password === $adminPassword) {
+            // Set session admin (simple)
+            session(['is_admin' => true, 'admin_username' => $adminUsername]);
+            return redirect('/admin/dashboard');
+        }
         $pengguna = Pengguna::where('username', $request->username)->first();
 
         if ($pengguna && Hash::check($request->password, $pengguna->password)) {
             Auth::login($pengguna);
-            return redirect()->route('home'); 
+            return redirect('/home');
         }
 
         return back()->withErrors([
