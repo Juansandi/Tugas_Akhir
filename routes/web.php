@@ -11,6 +11,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\PesananController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -48,6 +49,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/{productId}', [WishlistController::class, 'store'])->name('wishlist.store');
     Route::delete('/wishlist/{productId}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/checkout', [PesananController::class, 'checkoutForm'])->name('pesanan.checkoutForm');
+    Route::post('/checkout', [PesananController::class, 'store'])->name('pesanan.store');
+    Route::get('/pesanan/history', [PesananController::class, 'history'])->name('pesanan.history');
+    Route::get('/pesanan/{id}', [PesananController::class, 'show'])->name('pesanan.show');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/produk/{produk}/review', [ReviewController::class, 'form'])->name('review.form');
+    Route::post('/review', [ReviewController::class, 'store'])->name('review.store');
+
 });
 
 Route::post('/review', [ReviewController::class, 'store'])->name('review.store');

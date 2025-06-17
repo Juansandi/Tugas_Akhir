@@ -61,7 +61,7 @@
     @if($cartItems->count())
     <div class="card p-3 shadow-sm mt-4">
         <h5>Total: Rp {{ number_format($subtotal, 0, ',', '.') }}</h5>
-        <a href="javascript:void(0)" class="btn btn-dark mt-3" onclick="alert('Fitur checkout belum tersedia.')">Proceed to Checkout</a>
+        <a href="{{ route('pesanan.checkoutForm') }}" class="btn btn-dark mt-3 w-100">Checkout Sekarang</a>
     </div>
     @endif
 </div>

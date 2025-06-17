@@ -6,55 +6,75 @@
 <div class="container py-4">
     <h2 class="fw-bold mb-4">Dashboard Admin</h2>
 
-    <div class="card mt-4">
-        <div class="card-header">Pesanan Terbaru</div>
+<div class="card mt-4">
+    <div class="card-header">Pesanan Terbaru (Belum Selesai)</div>
         <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nama Pembeli</th>
-                        <th>Produk</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Dina</td>
-                        <td>Beras Merah</td>
-                        <td>Rp 50.000</td>
-                        <td><span class="badge bg-success">Selesai</span></td>
-                    </tr>
-                </tbody>
-            </table>
+            @if($pesananTerbaru->isEmpty())
+                <p class="text-center">Tidak ada pesanan terbaru.</p>
+            @else
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nama Pembeli</th>
+                            <th>Produk</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($pesananTerbaru as $index => $pesanan)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
+                                <td>
+                                    @foreach($pesanan->detail as $detail)
+                                        {{ $detail->produk->nama_produk }}@if(!$loop->last), @endif
+                                    @endforeach
+                                </td>
+                                <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {{ $pesanan->status == 'selesai' ? 'bg-success' : 'bg-warning text-dark' }}">
+                                        {{ ucfirst($pesanan->status) }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
         </div>
     </div>
 
-    </br>
-
     <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card text-white bg-primary shadow">
-                <div class="card-body">
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-primary shadow h-100">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
                     <h5 class="card-title">Total Produk</h5>
                     <p class="card-text fs-4">{{ $totalProduk }}</p>
                 </div>
             </div>
         </div>
-        <!-- Total Pesanan -->
-        <div class="col-md-6">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-body">
+
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-success shadow h-100">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
                     <h5 class="card-title">Total Pesanan Hari Ini</h5>
                     <p class="card-text fs-4">{{ $totalPesanan }}</p>
                 </div>
             </div>
         </div>
-    </div>
 
-    </br>
+        <div class="col-md-4">
+            <div class="card text-white bg-info shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Total Penjualan Bulan Ini</h5>
+                    <p class="card-text fs-4">Rp {{ number_format($totalPenjualanBulanIni, 0, ',', '.') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="card">
         <div class="card-body">
@@ -62,50 +82,50 @@
             <canvas id="salesChart" height="100"></canvas>
         </div>
     </div>
-</div>
 
+</div>
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('salesChart');
+const ctx = document.getElementById('salesChart');
 
-    const salesChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-            datasets: [{
-                label: 'Penjualan (Rp)',
-                data: [50000, 70000, 80000, 65000, 90000, 110000, 95000, 120000, 105000, 130000, 100000, 125000],
-                fill: true,
-                borderColor: '#0d6efd',
-                backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Total Penjualan per Bulan (Dummy)'
-                }
+const salesChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+        datasets: [{
+            label: 'Penjualan (Rp)',
+            data: @json($salesDataFull),
+            fill: true,
+            borderColor: '#0d6efd',
+            backgroundColor: 'rgba(13, 110, 253, 0.1)',
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'Rp ' + value.toLocaleString('id-ID');
-                        }
+            title: {
+                display: true,
+                text: 'Total Penjualan per Bulan'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    // Format ke Rupiah di chart y-axis
+                    callback: function(value) {
+                        return 'Rp ' + value.toLocaleString('id-ID');
                     }
                 }
             }
         }
-    });
+    }
+});
 </script>
 @endsection

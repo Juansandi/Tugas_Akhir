@@ -6,7 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Produk;
 use App\Models\Kategori;
 use App\Models\Review;
+use App\Models\Pesanan;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ProdukController extends Controller
 {
@@ -146,8 +149,40 @@ class ProdukController extends Controller
     {
         $totalProduk = \App\Models\Produk::count();
 
-        $totalPesanan = 25; // dummy value
+        $totalPesanan = \App\Models\Pesanan::count();
 
-        return view('admin.dashboard', compact('totalProduk', 'totalPesanan'));
+        $totalPenjualanBulanIni = \App\Models\Pesanan::whereYear('created_at', Carbon::now()->year)
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->sum('total');
+
+        $salesData = \App\Models\Pesanan::select(
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('SUM(total) as total_penjualan')
+            )
+            ->whereYear('created_at', Carbon::now()->year)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total_penjualan', 'month')
+            ->toArray();
+
+        $months = range(1, 12);
+        $salesDataFull = [];
+        foreach ($months as $month) {
+            $salesDataFull[] = $salesData[$month] ?? 0;
+        }
+
+        $pesananTerbaru = \App\Models\Pesanan::where('status', '!=', 'selesai')
+            ->with(['pengguna', 'detail.produk'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'totalProduk',
+            'totalPesanan',
+            'totalPenjualanBulanIni',
+            'salesDataFull',
+            'pesananTerbaru'
+        ));
     }
 }

@@ -37,7 +37,8 @@
                             <i class="bi bi-person-circle"></i> {{ Auth::user()->username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ route('profile.show') }}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.show') }}">Profil</a></li>
+                            <li><a class="dropdown-item" href="{{ route('pesanan.history') }}">Riwayat</a></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                                     @csrf
