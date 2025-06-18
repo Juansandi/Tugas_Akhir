@@ -149,10 +149,13 @@ class ProdukController extends Controller
     {
         $totalProduk = \App\Models\Produk::count();
 
-        $totalPesanan = \App\Models\Pesanan::count();
+        $totalPesanan = \App\Models\Pesanan::whereDate('created_at', Carbon::today())
+            ->where('status', '!=', 'selesai')
+            ->count();
 
         $totalPenjualanBulanIni = \App\Models\Pesanan::whereYear('created_at', Carbon::now()->year)
             ->whereMonth('created_at', Carbon::now()->month)
+            ->where('status', 'selesai')
             ->sum('total');
 
         $salesData = \App\Models\Pesanan::select(
@@ -160,6 +163,7 @@ class ProdukController extends Controller
                 DB::raw('SUM(total) as total_penjualan')
             )
             ->whereYear('created_at', Carbon::now()->year)
+            ->where('status', 'selesai')
             ->groupBy('month')
             ->orderBy('month')
             ->pluck('total_penjualan', 'month')

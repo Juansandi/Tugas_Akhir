@@ -20,21 +20,21 @@ class ReviewController extends Controller
 
     // Simpan review
     public function store(Request $request)
-{
-    $request->validate([
-        'produk_id' => 'required|exists:produks,id',
-        'rating' => 'required|integer|min:1|max:5',
-        'comment' => 'required|string',
-    ]);
+    {
+        $request->validate([
+            'produk_id' => 'required|exists:produks,id',
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'required|string',
+        ]);
 
-    Review::create([
-        'user_id' => Auth::id(),
-        'produk_id' => $request->produk_id,
-        'rating' => $request->rating,
-        'comment' => $request->comment,
-    ]);
+        Review::create([
+            'user_id' => Auth::id(),
+            'produk_id' => $request->produk_id,
+            'rating' => $request->rating,
+            'comment' => $request->comment,
+        ]);
 
-    return redirect()->route('pesanan.history')->with('success', 'Review berhasil dikirim!');
-}
+        return redirect()->route('pesanan.history')->with('success', 'Review berhasil dikirim!');
+    }
 
 }

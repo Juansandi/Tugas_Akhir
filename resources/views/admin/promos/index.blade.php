@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Promo Management</h2>
+        <h2 class="fw-bold">Manajemen Promo</h2>
         <a href="{{ route('promos.create') }}" class="btn btn-dark">Tambah Promo</a>
     </div>
 

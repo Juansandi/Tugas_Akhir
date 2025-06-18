@@ -62,7 +62,6 @@
             <h5>Total Bayar: <strong>Rp <span id="totalBayarText">{{ number_format($subtotal, 0, ',', '.') }}</span></strong></h5>
         </div>
 
-        {{-- optional, tidak dikirim ke controller kecuali kamu ingin --}}
         <input type="hidden" id="totalHidden" name="total_terhitung" value="{{ $subtotal }}">
 
         <button type="submit" class="btn btn-success w-100">Bayar Sekarang</button>
@@ -91,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
             diskonPromo = subtotal * (nilaiDiskon / 100);
         }
 
-        let diskonPoin = poin * 1000;
+        let diskonPoin = poin * 100;
         let total = subtotal - diskonPromo - diskonPoin;
         if (total < 0) total = 0;
 

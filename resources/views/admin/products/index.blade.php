@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'Product Management')
+@section('title', 'Manajemen Produk')
 
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Product Management</h2>
+        <h2 class="fw-bold">Manajemen Produk</h2>
         <a href="{{ route('products.create') }}" class="btn btn-dark">Tambah Produk</a>
     </div>
 

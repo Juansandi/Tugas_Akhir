@@ -12,6 +12,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\PesananController;
+use App\Http\Controllers\AdminPesananController;
+use App\Http\Controllers\RefundController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -56,12 +58,19 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [PesananController::class, 'store'])->name('pesanan.store');
     Route::get('/pesanan/history', [PesananController::class, 'history'])->name('pesanan.history');
     Route::get('/pesanan/{id}', [PesananController::class, 'show'])->name('pesanan.show');
+    Route::post('/pesanan/{id}/update-status', [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
 });
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/refund/create/{pesanan_id}', [RefundController::class, 'create'])->name('refund.create');
+    Route::post('/refund/{pesanan_id}', [RefundController::class, 'store'])->name('refund.store');
+    Route::get('/refund/{id}', [RefundController::class, 'show'])->name('refund.show');
+});
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/produk/{produk}/review', [ReviewController::class, 'form'])->name('review.form');
     Route::post('/review', [ReviewController::class, 'store'])->name('review.store');
-
 });
 
 Route::post('/review', [ReviewController::class, 'store'])->name('review.store');
@@ -91,4 +100,12 @@ Route::put('/admin/promos/{promo}', [PromoController::class, 'update'])->name('p
 Route::delete('/admin/promos/{promo}', [PromoController::class, 'destroy'])->name('promos.destroy');
 
 Route::get('/admin/pengguna', [PenggunaController::class, 'index'])->name('pengguna.index');
+Route::get('/admin/pengguna/{id}/riwayat', [PenggunaController::class, 'riwayat'])->name('pengguna.riwayat');
 
+Route::get('admin/pesanan', [AdminPesananController::class, 'index'])->name('pesanan.index');
+Route::get('admin/pesanan/{id}', [AdminPesananController::class, 'show'])->name('admin.pesanan.show');
+Route::post('admin/pesanan/{id}/update-status', [AdminPesananController::class, 'updateStatus'])->name('admin.pesanan.updateStatus');
+
+Route::get('admin/refund', [RefundController::class, 'adminIndex'])->name('refund.index');
+Route::get('admin/refund/{id}', [RefundController::class, 'adminShow'])->name('admin.refund.show');
+Route::put('admin/refund/{id}', [RefundController::class, 'adminUpdate'])->name('admin.refund.update');

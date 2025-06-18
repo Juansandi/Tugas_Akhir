@@ -79,7 +79,7 @@ class PesananController extends Controller
                 }
             }
 
-            // Diskon dari poin (misal 1 poin = Rp 1000)
+            // Diskon dari poin (misal 1 poin = Rp 100)
             $diskonPoin = $poinDigunakan * 100;
 
             // Total akhir
@@ -92,7 +92,7 @@ class PesananController extends Controller
             $pesanan = Pesanan::create([
                 'user_id' => $user->id,
                 'total' => $totalBayar,
-                'status' => 'diproses',  // Langsung status diproses setelah bayar
+                'status' => 'menunggu konfirmasi',  // Langsung status diproses setelah bayar
                 'metode_pembayaran' => $metode,
                 'poin_digunakan' => $poinDigunakan,
                 'diskon_dari_poin' => $diskonPoin,
@@ -108,6 +108,14 @@ class PesananController extends Controller
                     'quantity' => $item->quantity,
                     'price' => $item->produk->harga,
                 ]);
+
+                // Kurangi stok produk
+                $produk = $item->produk;
+                $produk->stok -= $item->quantity;
+                if ($produk->stok < 0) {
+                    $produk->stok = 0; // optional: agar stok tidak minus
+                }
+                $produk->save();
             }
 
             // Kurangi poin user jika digunakan
@@ -142,9 +150,26 @@ class PesananController extends Controller
     public function history()
     {
         $user = Auth::user();
-        $pesanan = Pesanan::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
-
+        $pesanan = Pesanan::with('refund')->where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
+        
         return view('user.pesanan.history', compact('pesanan'));
     }
+
+    public function updateStatus(Request $request, $id)
+{
+    $pesanan = Pesanan::findOrFail($id);
+
+    // Hanya izinkan perubahan status dari 'dikirim' menjadi 'diterima'
+    if ($pesanan->status === 'dikirim' && $request->status === 'diterima') {
+        $pesanan->status = 'diterima';
+        $pesanan->save();
+
+        return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui menjadi diterima.');
+    }
+
+    return redirect()->back()->with('error', 'Status pesanan tidak dapat diubah.');
+}
+
+
 
 }

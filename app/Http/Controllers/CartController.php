@@ -24,32 +24,46 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $cart = Cart::updateOrCreate(
-            ['user_id' => Auth::id(), 'produk_id' => $request->produk_id],
-            ['quantity' => DB::raw('quantity + ' . $request->quantity)]
-        );
+        $userId = Auth::id();
+        $produkId = $request->produk_id;
+        $qty = $request->quantity;
+
+        $cart = Cart::where('user_id', $userId)->where('produk_id', $produkId)->first();
+
+        if ($cart) {
+            // Produk sudah ada di cart, increment quantity
+            $cart->quantity += $qty;
+            $cart->save();
+        } else {
+            // Produk belum ada, buat baru dengan quantity sesuai request
+            Cart::create([
+                'user_id' => $userId,
+                'produk_id' => $produkId,
+                'quantity' => $qty,
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Produk ditambahkan ke keranjang!');
     }
 
+
     public function update(Request $request, $id)
-{
-    $request->validate([
-        'quantity' => 'required|integer|min:1',
-    ]);
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
 
-    $cartItem = Cart::findOrFail($id);
-    $cartItem->quantity = $request->quantity;
-    $cartItem->save();
+        $cartItem = Cart::findOrFail($id);
+        $cartItem->quantity = $request->quantity;
+        $cartItem->save();
 
-    $total = $cartItem->produk->harga * $cartItem->quantity;
+        $total = $cartItem->produk->harga * $cartItem->quantity;
 
-    return response()->json([
-        'success' => true,
-        'new_total' => number_format($total, 0, ',', '.'),
-    ]);
-}
-
+        return response()->json([
+            'success' => true,
+            'new_total' => number_format($total, 0, ',', '.'),
+        ]);
+    }
 
     public function destroy($id)
     {

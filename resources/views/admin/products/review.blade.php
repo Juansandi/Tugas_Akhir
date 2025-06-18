@@ -2,9 +2,14 @@
 
 @section('content')
 <div class="container py-4">
-    <h2>Ulasan untuk Produk: {{ $product->nama_produk }}</h2>
-
-    <p class="text-muted">Total Ulasan: {{ $product->reviews->count() }}</p>
+    <div class="d-flex align-items-center mb-4">
+        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->nama_produk }}"
+             style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-right: 20px;">
+        <div>
+            <h2 class="mb-1">Ulasan untuk Produk: {{ $product->nama_produk }}</h2>
+            <p class="text-muted mb-0">Total Ulasan: {{ $product->reviews->count() }}</p>
+        </div>
+    </div>
 
     @forelse($product->reviews as $review)
         <div class="card mb-3 shadow-sm">

@@ -28,10 +28,15 @@
                         <td>{{ $pengguna->no_telp }}</td>
                         <td>{{ $pengguna->alamat }}</td>
                         <td>{{ $pengguna->jumlah_poin }}</td>
+                        <td>
+                            <a href="{{ route('pengguna.riwayat', $pengguna->id) }}" class="btn btn-sm btn-primary">
+                                Lihat Riwayat
+                            </a>
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="text-muted">Belum ada pengguna.</td>
+                        <td colspan="6" class="text-muted">Belum ada pengguna.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -39,8 +44,3 @@
     </div>
 </div>
 @endsection
-
-
-
-
-

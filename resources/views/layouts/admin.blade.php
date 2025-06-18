@@ -34,21 +34,17 @@
                         <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('pesanan*') ? 'active' : '' }}" href="#">Pesanan</a>
+                        <a class="nav-link {{ request()->routeIs('pesanan.*') ? 'active' : '' }}" href="{{ route('pesanan.index') }}">Pesanan</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('promos.*') ? 'active' : '' }}" href="{{ route('promos.index') }}">Promo</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->is('refund*') ? 'active' : '' }}" href="#">Refund</a>
+                        <a class="nav-link {{ request()->is('refund.*') ? 'active' : '' }}" href="{{ route('refund.index') }}">Refund</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('pengguna.*') ? 'active' : '' }}" href="{{ route('pengguna.index') }}">Pengguna</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->is('ulasan*') ? 'active' : '' }}" href="#">Ulasan</a>
-                    </li>
-
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
