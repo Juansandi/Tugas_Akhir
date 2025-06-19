@@ -11,6 +11,7 @@ use App\Models\DetailPesanan;
 use App\Models\Produk;
 use App\Models\Cart;
 use App\Models\Promo;
+use App\Models\AdminNotification;
 use Carbon\Carbon;
 
 class PesananController extends Controller
@@ -118,6 +119,25 @@ class PesananController extends Controller
                 $produk->save();
             }
 
+            // Notifikasi pesanan baru
+            AdminNotification::create([
+                'tipe' => 'pesanan_baru',
+                'pesan' => 'Pesanan baru oleh ' . auth()->user()->username . ' (#' . $pesanan->id . ')',
+                'url' => route('admin.pesanan.show', $pesanan->id),
+            ]);
+
+            // Notifikasi stok hampir habis
+            foreach ($pesanan->detail as $detail) {
+                $produk = $detail->produk;
+                if ($produk && $produk->stok <= 5) {
+                    AdminNotification::create([
+                        'tipe' => 'stok_hampir_habis',
+                        'pesan' => 'Stok produk "' . $produk->nama . '" Sisa: ' . $produk->stok,
+                        'url' => route('products.edit', $produk->id),
+                    ]);
+                }
+            }
+
             // Kurangi poin user jika digunakan
             if ($poinDigunakan > 0) {
                 $user->jumlah_poin -= $poinDigunakan;
@@ -156,20 +176,24 @@ class PesananController extends Controller
     }
 
     public function updateStatus(Request $request, $id)
-{
-    $pesanan = Pesanan::findOrFail($id);
+    {
+        $pesanan = Pesanan::findOrFail($id);
 
-    // Hanya izinkan perubahan status dari 'dikirim' menjadi 'diterima'
-    if ($pesanan->status === 'dikirim' && $request->status === 'diterima') {
-        $pesanan->status = 'diterima';
-        $pesanan->save();
+        // Hanya izinkan perubahan status dari 'dikirim' menjadi 'diterima'
+        if ($pesanan->status === 'dikirim' && $request->status === 'diterima') {
+            $pesanan->status = 'diterima';
+            $pesanan->save();
 
-        return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui menjadi diterima.');
+            AdminNotification::create([
+                'tipe' => 'pesanan_diterima_user',
+                'pesan' => 'User ' . auth()->user()->username . ' telah menerima pesanan #' . $pesanan->id,
+                'url' => route('admin.pesanan.show', $pesanan->id),
+            ]);
+
+            return redirect()->back()->with('success', 'Status pesanan berhasil diperbarui menjadi diterima.');
+        }
+
+        return redirect()->back()->with('error', 'Status pesanan tidak dapat diubah.');
     }
-
-    return redirect()->back()->with('error', 'Status pesanan tidak dapat diubah.');
-}
-
-
 
 }

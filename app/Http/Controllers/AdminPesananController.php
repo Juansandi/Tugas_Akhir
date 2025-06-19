@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pesanan;
+use App\Models\UserNotification;
 
 class AdminPesananController extends Controller
 {
@@ -41,6 +42,31 @@ class AdminPesananController extends Controller
                 $pesanan->pengguna->jumlah_poin += $poin;
                 $pesanan->pengguna->save();
             }
+
+            // Notifikasi ke user: pesanan selesai
+            UserNotification::create([
+                'user_id' => $pesanan->user_id,
+                'tipe' => 'pesanan_selesai',
+                'pesan' => 'Pesanan #' . $pesanan->id . ' telah selesai. Terima kasih telah berbelanja!',
+                'url' => route('pesanan.show', $pesanan->id),
+            ]);
+        }
+        
+        // Notifikasi ke user berdasarkan status lainnya
+        if ($status === 'diproses') {
+            UserNotification::create([
+                'user_id' => $pesanan->user_id,
+                'tipe' => 'pesanan_diproses',
+                'pesan' => 'Pesanan #' . $pesanan->id . ' sedang diproses',
+                'url' => route('pesanan.show', $pesanan->id),
+            ]);
+        } elseif ($status === 'dikirim') {
+            UserNotification::create([
+                'user_id' => $pesanan->user_id,
+                'tipe' => 'pesanan_dikirim',
+                'pesan' => 'Pesanan #' . $pesanan->id . ' sedang dikirim ' . $pesanan->no_resi,
+                'url' => route('pesanan.show', $pesanan->id),
+            ]);
         }
 
         $pesanan->save();

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Refund;
 use App\Models\Pesanan;
+use App\Models\AdminNotification;
+use App\Models\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -31,7 +33,15 @@ class RefundController extends Controller
             $data['bukti_foto'] = $request->file('bukti_foto')->store('bukti_refund', 'public');
         }
 
-        Refund::create($data);
+        $refund = Refund::create($data);
+
+        // Buat notifikasi admin bahwa refund diajukan user
+        AdminNotification::create([
+            'tipe' => 'refund_diajukan',
+            'pesan' => 'User ' . Auth::user()->username . ' mengajukan refund untuk pesanan #' . $pesanan_id,
+            'url' => route('admin.refund.show', $refund->id),
+        ]);
+
 
         return redirect()->route('pesanan.history')->with('success', 'Permintaan refund berhasil diajukan.');
     }
@@ -71,6 +81,13 @@ class RefundController extends Controller
         }
 
         $refund->save();
+
+        UserNotification::create([
+            'user_id' => $refund->user_id,
+            'tipe' => $refund->status === 'disetujui' ? 'refund_disetujui' : 'refund_ditolak',
+            'pesan' => 'Permintaan refund untuk pesanan #' . $refund->pesanan_id . '  ' . $refund->status . '.',
+            'url' => route('refund.show', $refund->id),
+        ]);
 
         return redirect()->route('refund.index')->with('success', 'Status refund berhasil diperbarui.');
     }

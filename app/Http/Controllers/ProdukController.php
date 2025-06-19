@@ -7,6 +7,7 @@ use App\Models\Produk;
 use App\Models\Kategori;
 use App\Models\Review;
 use App\Models\Pesanan;
+use App\Models\DetailPesanan;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -180,13 +181,20 @@ class ProdukController extends Controller
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
+        
+        $produkTerlaris = DetailPesanan::select('produk_id', DB::raw('SUM(quantity) as total_terjual'))
+            ->groupBy('produk_id')
+            ->orderByDesc('total_terjual')
+            ->with('produk') // relasi ke model Produk
+            ->first();
 
         return view('admin.dashboard', compact(
             'totalProduk',
             'totalPesanan',
             'totalPenjualanBulanIni',
             'salesDataFull',
-            'pesananTerbaru'
+            'pesananTerbaru',
+            'produkTerlaris'
         ));
     }
 }

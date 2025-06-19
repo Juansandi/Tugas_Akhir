@@ -13,7 +13,10 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\AdminPesananController;
+use App\Http\Controllers\AdminNotificationController;
 use App\Http\Controllers\RefundController;
+use App\Http\Controllers\UserNotificationController;
+use App\Http\Controllers\LaporanController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -67,10 +70,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/refund/{id}', [RefundController::class, 'show'])->name('refund.show');
 });
 
-
 Route::middleware('auth')->group(function () {
     Route::get('/produk/{produk}/review', [ReviewController::class, 'form'])->name('review.form');
     Route::post('/review', [ReviewController::class, 'store'])->name('review.store');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/user/notifications', [UserNotificationController::class, 'index'])->name('user.notifications.index');
+    Route::get('/user/notifications/read/{id}', [UserNotificationController::class, 'markAsRead'])->name('user.notifications.read');
+    Route::post('/user/notifications/read-all', [UserNotificationController::class, 'markAllAsRead'])->name('user.notifications.readAll');
 });
 
 Route::post('/review', [ReviewController::class, 'store'])->name('review.store');
@@ -91,7 +99,6 @@ Route::delete('/admin/products/{product}', [ProdukController::class, 'destroy'])
 Route::get('/admin/products/{id}/reviews', [ProdukController::class, 'showReviews'])->name('products.reviews');
 Route::delete('/admin/reviews/{id}', [ProdukController::class, 'destroyReview'])->name('reviews.destroy');
 
-
 Route::get('/admin/promos', [PromoController::class, 'index'])->name('promos.index');
 Route::get('/admin/promos/create', [PromoController::class, 'create'])->name('promos.create');
 Route::post('/admin/promos', [PromoController::class, 'store'])->name('promos.store');
@@ -109,3 +116,14 @@ Route::post('admin/pesanan/{id}/update-status', [AdminPesananController::class, 
 Route::get('admin/refund', [RefundController::class, 'adminIndex'])->name('refund.index');
 Route::get('admin/refund/{id}', [RefundController::class, 'adminShow'])->name('admin.refund.show');
 Route::put('admin/refund/{id}', [RefundController::class, 'adminUpdate'])->name('admin.refund.update');
+
+// Menampilkan daftar notifikasi admin
+Route::get('admin/notifications', [AdminNotificationController::class, 'index'])->name('admin.notifications.index');
+
+// Menandai satu notifikasi sebagai dibaca (klik dari dropdown notifikasi)
+Route::get('admin/notifications/read/{id}', [AdminNotificationController::class, 'markAsRead'])->name('admin.notifications.read');
+
+// Menandai semua notifikasi sebagai dibaca (dari halaman daftar notifikasi)
+Route::post('admin/notifications/read-all', [AdminNotificationController::class, 'markAllAsRead'])->name('admin.notifications.readAll');
+
+Route::get('/admin/laporan', [LaporanController::class, 'index'])->name('laporan.index');

@@ -6,102 +6,121 @@
 <div class="container py-4">
     <h2 class="fw-bold mb-4">Dashboard Admin</h2>
 
-<div class="card mt-4">
-    <div class="card-header">Pesanan Terbaru (Belum Selesai)</div>
+    {{-- Statistik Singkat --}}
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-box-seam fs-2 mb-2"></i>
+                    <h6>Total Produk</h6>
+                    <h4>{{ $totalProduk }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-cart-check fs-2 mb-2"></i>
+                    <h6>Pesanan Hari Ini</h6>
+                    <h4>{{ $totalPesanan }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-cash-coin fs-2 mb-2"></i>
+                    <h6>Penjualan Bulan Ini</h6>
+                    <h4>Rp {{ number_format($totalPenjualanBulanIni, 0, ',', '.') }}</h4>
+                </div>
+            </div>
+        </div>
+
+        @if($produkTerlaris && $produkTerlaris->produk)
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-star-fill fs-2 mb-2"></i>
+                    <h6>Produk Terlaris</h6>
+                    <p class="mb-0 fw-bold">{{ $produkTerlaris->produk->nama_produk }}</p>
+                    <small>Total Dipesan: {{ $produkTerlaris->total_terjual }}</small>
+                </div>
+            </div>
+        </div>
+        @endif
+    </div>
+
+    {{-- Pesanan Terbaru --}}
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <strong>Pesanan Terbaru (Belum Selesai)</strong>
+        </div>
         <div class="card-body">
             @if($pesananTerbaru->isEmpty())
-                <p class="text-center">Tidak ada pesanan terbaru.</p>
+                <p class="text-center text-muted">Tidak ada pesanan terbaru.</p>
             @else
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nama Pembeli</th>
-                            <th>Produk</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($pesananTerbaru as $index => $pesanan)
-                            @php
-                                $status = strtolower($pesanan->status);
-                                $badgeClass = match($status) {
-                                    'menunggu konfirmasi' => 'bg-secondary text-light',
-                                    'diproses'            => 'bg-primary text-light',
-                                    'dikirim'             => 'bg-info text-dark',
-                                    'diterima'            => 'bg-warning text-dark',
-                                    'selesai'             => 'bg-success text-light',
-                                    default               => 'bg-light text-dark'
-                                };
-                            @endphp
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
                             <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
-                                <td>
-                                    @foreach($pesanan->detail as $detail)
-                                        {{ $detail->produk->nama_produk }}@if(!$loop->last), @endif
-                                    @endforeach
-                                </td>
-                                <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
-                                <td>
-                                    <span class="badge {{ $badgeClass }}">
-                                        {{ ucfirst($pesanan->status) }}
-                                    </span>
-                                </td>
+                                <th>#</th>
+                                <th>Nama Pembeli</th>
+                                <th>Produk</th>
+                                <th>Total</th>
+                                <th>Status</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach($pesananTerbaru as $index => $pesanan)
+                                @php
+                                    $status = strtolower($pesanan->status);
+                                    $badgeClass = match($status) {
+                                        'menunggu konfirmasi' => 'bg-secondary text-light',
+                                        'diproses'            => 'bg-primary text-light',
+                                        'dikirim'             => 'bg-info text-dark',
+                                        'diterima'            => 'bg-warning text-dark',
+                                        'selesai'             => 'bg-success text-light',
+                                        default               => 'bg-light text-dark'
+                                    };
+                                @endphp
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
+                                    <td>
+                                        @foreach($pesanan->detail as $detail)
+                                            {{ $detail->produk->nama_produk }}@if(!$loop->last), @endif
+                                        @endforeach
+                                    </td>
+                                    <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
+                                    <td><span class="badge {{ $badgeClass }}">{{ ucfirst($pesanan->status) }}</span></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             @endif
         </div>
     </div>
 
-    </br>
-
-    <div class="row mb-4">
-        <div class="col-md-4 mb-3">
-            <div class="card text-white bg-primary shadow h-100">
-                <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                    <h5 class="card-title">Total Produk</h5>
-                    <p class="card-text fs-4">{{ $totalProduk }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <div class="card text-white bg-success shadow h-100">
-                <div class="card-body d-flex flex-column justify-content-center align-items-center">
-                    <h5 class="card-title">Total Pesanan Hari Ini</h5>
-                    <p class="card-text fs-4">{{ $totalPesanan }}</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card text-white bg-info shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Total Penjualan Bulan Ini</h5>
-                    <p class="card-text fs-4">Rp {{ number_format($totalPenjualanBulanIni, 0, ',', '.') }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card">
+    {{-- Grafik Penjualan --}}
+    <div class="card shadow-sm">
         <div class="card-body">
-            <h5 class="card-title">Grafik Penjualan Bulanan</h5>
+            <h5 class="card-title mb-3">Grafik Penjualan Bulanan</h5>
             <canvas id="salesChart" height="100"></canvas>
         </div>
     </div>
-
 </div>
 @endsection
+
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- import Chart.js -->
+<!-- Bootstrap Icons (opsional) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    const ctx = document.getElementById('salesChart').getContext('2d'); // pastikan getContext('2d')
+    const ctx = document.getElementById('salesChart').getContext('2d');
     const salesChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -109,16 +128,15 @@
             datasets: [{
                 label: 'Penjualan (Rp)',
                 data: @json($salesDataFull),
-                fill: true,
-                backgroundColor: 'rgba(13, 110, 253, 0.8)',  // opacity 0.8, lebih pekat
+                backgroundColor: 'rgba(13, 110, 253, 0.8)',
                 borderColor: '#0a58ca',
-                tension: 0.4
+                borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { position: 'top' },
+                legend: { display: false },
                 title: { display: true, text: 'Total Penjualan per Bulan' }
             },
             scales: {

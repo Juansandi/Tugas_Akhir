@@ -1,3 +1,14 @@
+@php
+use App\Models\UserNotification;
+
+if (Auth::check()) {
+    $userNotifs = UserNotification::where('user_id', Auth::id())
+        ->where('is_read', false)
+        ->latest()
+        ->get();
+}
+@endphp
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
@@ -23,9 +34,49 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('cart.index') }}"><i class="bi bi-cart"></i></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="bi bi-bell"></i></a>
+                @auth
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle position-relative" href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bell"></i>
+                        @if($userNotifs->count())
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+
+                                {{ $userNotifs->count() }}
+                                <span class="visually-hidden">unread notifications</span>
+                            </span>
+                        @endif
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                        @forelse ($userNotifs as $notif)
+                            <li>
+                                <a class="dropdown-item" href="{{ route('user.notifications.read', $notif->id) }}">
+                                    {{ Str::limit($notif->pesan, 60) }}
+                                    <br>
+                                    <small class="text-muted">{{ $notif->created_at->diffForHumans() }}</small>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                        @empty
+                            <li><span class="dropdown-item text-center">Tidak ada notifikasi</span></li>
+                        @endforelse
+
+                        @if($userNotifs->count())
+                        <li>
+                            <form action="{{ route('user.notifications.readAll') }}" method="POST" class="text-center">
+                                @csrf
+                                <button type="submit" class="btn btn-link btn-sm">Tandai semua sebagai dibaca</button>
+                            </form>
+                        </li>
+                        @endif
+                        <li class="px-3 py-2 text-center">
+                                <a href="{{ route('user.notifications.index') }}" class="btn btn-sm btn-outline-success w-100">
+                                    <i class="bi bi-list"></i> Lihat Semua
+                                </a>
+                            </li>
+                    </ul>
                 </li>
+                @endauth
+
                 @guest
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('login.form') }}">Login</a>
