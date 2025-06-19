@@ -59,26 +59,37 @@
     <div class="card mb-4 shadow-sm">
         <div class="card-body">
             <h5 class="mb-3">Produk dalam Pesanan</h5>
-            @foreach($pesanan->detail as $item)
-                <div class="d-flex justify-content-between align-items-center border-bottom py-3">
-                    <div class="d-flex align-items-center">
-                        <img src="{{ asset('storage/' . $item->produk->image) }}" alt="{{ $item->produk->nama_produk }}" 
-                            class="me-3" style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px;">
-                        <div>
-                            <div class="fw-bold">{{ $item->produk->nama_produk }}</div>
-                            <small class="text-muted">Jumlah: {{ $item->quantity }}</small>
-                        </div>
-                    </div>
-                    <div class="text-end">
-                        <div class="fw-semibold">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</div>
-                        @if($pesanan->status == 'selesai')
-                            <a href="{{ route('review.form', $item->produk->id) }}" class="btn btn-sm btn-outline-success mt-1">
-                                Review
-                            </a>
-                        @endif
-                    </div>
-                </div>
-            @endforeach
+            @php
+    use App\Models\Review;
+
+    // Buat array ID produk yang sudah direview user untuk pesanan ini
+    $userReviewedProdukIds = Review::where('user_id', Auth::id())
+        ->where('pesanan_id', $pesanan->id)
+        ->pluck('produk_id')
+        ->toArray();
+@endphp
+
+@foreach($pesanan->detail as $item)
+    <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+        <div class="d-flex align-items-center">
+            <img src="{{ asset('storage/' . $item->produk->image) }}" alt="{{ $item->produk->nama_produk }}" 
+                class="me-3" style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px;">
+            <div>
+                <div class="fw-bold">{{ $item->produk->nama_produk }}</div>
+                <small class="text-muted">Jumlah: {{ $item->quantity }}</small>
+            </div>
+        </div>
+        <div class="text-end">
+            <div class="fw-semibold">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</div>
+            @if($pesanan->status == 'selesai' && !in_array($item->produk->id, $userReviewedProdukIds))
+                <a href="{{ route('review.form', ['produk' => $item->produk->id, 'pesanan_id' => $pesanan->id]) }}" class="btn btn-success btn-sm">
+                    Review
+                </a>
+            @endif
+        </div>
+    </div>
+@endforeach
+
         </div>
     </div>
 

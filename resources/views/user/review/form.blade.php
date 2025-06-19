@@ -17,6 +17,7 @@
     <form action="{{ route('review.store') }}" method="POST">
         @csrf
         <input type="hidden" name="produk_id" value="{{ $produk->id }}">
+        <input type="hidden" name="pesanan_id" value="{{ request('pesanan_id') }}">
         <div class="mb-3">
             <label for="rating" class="form-label">Rating (1-5)</label>
             <select name="rating" id="rating" class="form-select" required>

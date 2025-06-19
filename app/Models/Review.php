@@ -8,7 +8,8 @@ class Review extends Model
 {
     protected $fillable = [
         'user_id', 
-        'produk_id', 
+        'produk_id',
+        'pesanan_id', 
         'rating', 
         'comment'
     ];
