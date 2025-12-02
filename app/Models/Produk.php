@@ -32,4 +32,10 @@ class Produk extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    public function sizes()
+    {
+        return $this->hasMany(ProductSize::class, 'produk_id');
+    }
+
 }

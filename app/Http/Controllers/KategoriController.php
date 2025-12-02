@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Kategori;
+use Illuminate\Support\Facades\Validator;
+
 
 class KategoriController extends Controller
 {
@@ -13,20 +15,23 @@ class KategoriController extends Controller
         return view('admin.categories.index', compact('categories'));
     }
 
-    public function create()
-    {
-        return view('admin.categories.create');
-    }
-
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|unique:categories,name',
+        $validator = Validator::make($request->all(), [
+            'nama_kategori' => 'required|unique:kategoris,nama_kategori',
             'description' => 'nullable|string',
         ]);
 
-        Kategori::create($request->all());
-        return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan');
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        Kategori::create([
+            'nama_kategori' => $request->nama_kategori,
+            'description' => $request->description,
+        ]);
+
+        return response()->json(['success' => true], 200);
     }
 
     public function edit(Kategori $category)
@@ -37,7 +42,7 @@ class KategoriController extends Controller
     public function update(Request $request, Kategori $category)
     {
         $request->validate([
-            'name' => 'required|unique:categories,name,' . $category->id,
+            'nama_kategori' => 'required|unique:kategoris,name,' . $category->id,
             'description' => 'nullable|string',
         ]);
 

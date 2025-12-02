@@ -8,6 +8,7 @@ use App\Models\Kategori;
 use App\Models\Review;
 use App\Models\Pesanan;
 use App\Models\DetailPesanan;
+use App\Models\ProductSize;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -16,9 +17,12 @@ class ProdukController extends Controller
 {
     public function index()
     {
-        $products = Produk::with('kategori')->latest()->paginate(10);
-        return view('admin.products.index', compact('products'));
+        $products = Produk::with(['kategori', 'sizes'])->latest()->paginate(10);
+        $categories = Kategori::all(); // ⬅ Tambahkan ini
+
+        return view('admin.products.index', compact('products', 'categories'));
     }
+
 
     public function create()
     {
@@ -30,21 +34,45 @@ class ProdukController extends Controller
     {
         $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'jenis'       => 'required|string|max:255', 
+            'jenis'       => 'nullable|string|max:255', 
             'deskripsi' => 'nullable|string',
-            'harga'       => 'required|numeric|min:0',
-            'stok'       => 'required|integer|min:0',
+            'harga'       => 'nullable|numeric|min:0',
+            'stok'       => 'nullable|integer|min:0',
             'kategori_id' => 'required|exists:kategoris,id',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image'       => 'nullable|image|mimes:jpeg,png,jpg',
+
+            'sizes'             => 'nullable|array',
+            'sizes.*.size'      => 'nullable|string',
+            'sizes.*.stok'      => 'nullable|integer|min:0',
+            'sizes.*.harga'     => 'nullable|numeric|min:0',
         ]);
 
-        $data = $request->all();
+         // ambil semua input kecuali sizes
+        $data = $request->except('sizes');
 
+        // default value
+        $data['harga'] = $data['harga'] ?? 0;
+        $data['stok']  = $data['stok']  ?? 0;
+
+        // Simpan gambar
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
         }
 
-        Produk::create($data);
+        $product = Produk::create($data);
+
+        if ($request->sizes) {
+            foreach ($request->sizes as $size) {
+                if (!empty($size['size'])) {
+                    ProductSize::create([
+                        'produk_id' => $product->id,
+                        'size'      => $size['size'],
+                        'stok'      => $size['stok'] ?? 0,
+                        'harga'     => $size['harga'] ?? $product->harga,
+                    ]);
+                }
+            }
+        }
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
     }
@@ -59,17 +87,23 @@ class ProdukController extends Controller
     {
         $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'jenis'       => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
+            'jenis'       => 'nullable|string|max:255',
+            'deskripsi'   => 'nullable|string',
             'harga'       => 'required|numeric|min:0',
-            'stok'       => 'required|integer|min:0',
+            'stok'        => 'required|integer|min:0',
             'kategori_id' => 'required|exists:kategoris,id',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+
+            'sizes'             => 'nullable|array',
+            'sizes.*.id'        => 'nullable|integer|exists:product_sizes,id',
+            'sizes.*.size'      => 'nullable|string',
+            'sizes.*.stok'      => 'nullable|integer|min:0',
+            'sizes.*.harga'     => 'nullable|numeric|min:0',
         ]);
 
-        $data = $request->all();
+        $data = $request->except('sizes');
 
-        // Jika ada gambar baru, hapus yang lama
+        // 1️⃣ Gambar baru → hapus lama
         if ($request->hasFile('image')) {
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
@@ -77,10 +111,41 @@ class ProdukController extends Controller
             $data['image'] = $request->file('image')->store('products', 'public');
         }
 
+        // 2️⃣ Update data produk
         $product->update($data);
 
-        return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui.');
+        // 3️⃣ Update ukuran
+        if ($request->sizes) {
+            foreach ($request->sizes as $sizeData) {
+
+                // update ukuran lama
+                if (!empty($sizeData['id'])) {
+                    $size = ProductSize::find($sizeData['id']);
+
+                    $size->update([
+                        'size'  => $sizeData['size'],
+                        'stok'  => $sizeData['stok'],
+                        'harga' => $sizeData['harga'],
+                    ]);
+
+                } else {
+                    // tambah ukuran baru
+                    if (!empty($sizeData['size'])) {
+                        ProductSize::create([
+                            'produk_id' => $product->id,
+                            'size'      => $sizeData['size'],
+                            'stok'      => $sizeData['stok'] ?? 0,
+                            'harga'     => $sizeData['harga'] ?? $product->harga,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return redirect()->route('products.index')
+            ->with('success', 'Produk berhasil diperbarui.');
     }
+
 
     public function destroy(Produk $product)
     {

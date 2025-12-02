@@ -6,6 +6,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
@@ -98,6 +99,10 @@ Route::put('/admin/products/{product}', [ProdukController::class, 'update'])->na
 Route::delete('/admin/products/{product}', [ProdukController::class, 'destroy'])->name('products.destroy');
 Route::get('/admin/products/{id}/reviews', [ProdukController::class, 'showReviews'])->name('products.reviews');
 Route::delete('/admin/reviews/{id}', [ProdukController::class, 'destroyReview'])->name('reviews.destroy');
+
+Route::get('/admin/categories', [KategoriController::class, 'index'])->name('categories.index');
+Route::post('/admin/categories/store', [KategoriController::class, 'store'])->name('categories.store');
+
 
 Route::get('/admin/promos', [PromoController::class, 'index'])->name('promos.index');
 Route::get('/admin/promos/create', [PromoController::class, 'create'])->name('promos.create');
