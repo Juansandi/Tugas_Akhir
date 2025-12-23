@@ -10,14 +10,20 @@ class PenggunaController extends Controller
 {
     public function index()
     {
-        $penggunas = Pengguna::all();
+        $penggunas = Pengguna::where('role', 'user')->get();
         return view('admin.pengguna.daftar_pengguna', compact('penggunas'));
     }
 
     public function riwayat($id)
     {
-        $pengguna = Pengguna::findOrFail($id);
-        $pesanan = Pesanan::with('detail.produk')->where('user_id', $id)->orderBy('created_at', 'desc')->get();
+        $pengguna = Pengguna::where('id', $id)
+            ->where('role', 'user')
+            ->firstOrFail();
+
+        $pesanan = Pesanan::with('detail.produk')
+            ->where('user_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('admin.pengguna.riwayat', compact('pengguna', 'pesanan'));
     }

@@ -18,6 +18,9 @@ use App\Http\Controllers\AdminNotificationController;
 use App\Http\Controllers\RefundController;
 use App\Http\Controllers\UserNotificationController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ManagementController;
+use App\Http\Controllers\KurirController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -132,3 +135,32 @@ Route::get('admin/notifications/read/{id}', [AdminNotificationController::class,
 Route::post('admin/notifications/read-all', [AdminNotificationController::class, 'markAllAsRead'])->name('admin.notifications.readAll');
 
 Route::get('/admin/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin/akun')
+    ->name('admin.user.')
+    ->group(function () {
+
+    Route::get('/admin', [ManagementController::class, 'admin'])
+        ->name('admin');
+
+    Route::get('/kurir', [ManagementController::class, 'kurir'])
+        ->name('kurir');
+
+    Route::post('/store', [ManagementController::class, 'store'])
+        ->name('store');
+});
+
+
+Route::middleware(['auth', 'role:kurir'])
+    ->prefix('kurir')
+    ->name('kurir.')
+    ->group(function () {
+
+    Route::get('/dashboard', [KurirController::class, 'dashboard'])->name('dashboard');
+    Route::get('/pesanan', [KurirController::class, 'pesanan'])->name('pesanan');
+    Route::get('/profil', [KurirController::class, 'profil'])->name('profil');
+    Route::post('/pesanan/{id}/selesai', [KurirController::class, 'selesai'])->name('pesanan.selesai');
+    Route::get('/riwayat', [KurirController::class, 'riwayat'])->name('riwayat');
+
+});

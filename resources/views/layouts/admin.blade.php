@@ -50,6 +50,25 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('pengguna.*') ? 'active' : '' }}" href="{{ route('pengguna.index') }}">Pengguna</a>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ request()->is('admin/akun/*') ? 'active' : '' }}"
+                    href="#" role="button" data-bs-toggle="dropdown">
+                        Manajemen Akun
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('admin.user.admin') }}">
+                                Admin
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('admin.user.kurir') }}">
+                                Pegawai / Kurir
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
             </ul>
             <ul class="navbar-nav ms-auto">
 
@@ -99,11 +118,23 @@
                 {{-- User Dropdown --}}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle"></i> Admin
+                        <i class="bi bi-person-circle"></i>
+                        {{ auth()->user()->username }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <span class="dropdown-item-text text-muted">
+                                Role: {{ ucfirst(auth()->user()->role) }}
+                            </span>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{{ route('laporan.index') }}">Laporan</a></li>
-                        <li><a class="dropdown-item" href="/">Keluar</a></li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button class="dropdown-item text-danger">Keluar</button>
+                            </form>
+                        </li>
                     </ul>
                 </li>
 

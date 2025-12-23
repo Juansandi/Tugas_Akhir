@@ -35,4 +35,10 @@ class Pesanan extends Model
     {
         return $this->hasOne(Refund::class);
     }
+    
+    public function tugasKurir()
+    {
+        return $this->hasOne(TugasKurir::class, 'pesanan_id', 'id');
+    }
+
 }

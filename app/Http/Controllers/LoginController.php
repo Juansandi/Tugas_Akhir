@@ -14,26 +14,27 @@ class LoginController extends Controller
         return view('login');
     }
 
-    public function login(Request $request)
+   public function login(Request $request)
     {
         $request->validate([
             'username' => 'required',
             'password' => 'required',
         ]);
 
-        $adminUsername = 'admin';
-        $adminPassword = 'admin';
-
-        // Cek login admin
-        if ($request->username === $adminUsername && $request->password === $adminPassword) {
-            // Set session admin (simple)
-            session(['is_admin' => true, 'admin_username' => $adminUsername]);
-            return redirect('/admin/dashboard');
-        }
         $pengguna = Pengguna::where('username', $request->username)->first();
 
         if ($pengguna && Hash::check($request->password, $pengguna->password)) {
             Auth::login($pengguna);
+            $request->session()->regenerate();
+
+            if ($pengguna->role === 'admin') {
+                return redirect('/admin/dashboard');
+            }
+
+            if ($pengguna->role === 'kurir') {
+                return redirect('/kurir/dashboard');
+            }
+
             return redirect('/home');
         }
 

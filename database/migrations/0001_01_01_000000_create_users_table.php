@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('no_telp')->nullable();
             $table->integer('jumlah_poin')->default(0);
             $table->timestamp('email_verified_at')->nullable();
-            $table->enum('role', ['user', 'admin'])->default('user');
+            $table->enum('role', ['user', 'admin', 'kurir'])->default('user');
             $table->timestamps();
         });
 
