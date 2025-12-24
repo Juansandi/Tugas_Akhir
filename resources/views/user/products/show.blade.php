@@ -1,160 +1,158 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-md">
+<div class="container-md py-4">
 
-    <div class="row bg-light p-4 rounded shadow-sm d-flex align-items-stretch">
-        <!-- Product Image -->
-        <div class="col-lg-6 col-md-12 mb-4 d-flex flex-column">
-            <div class="product-image shadow-sm rounded overflow-hidden">
-                @if($product->image)
-                    <img src="{{ asset('storage/' . $product->image) }}" class="img-fluid" alt="{{ $product->nama_produk }}">
-                @else
-                    <img src="https://via.placeholder.com/500x400?text=No+Image" class="img-fluid" alt="No Image">
-                @endif
+    <div class="row bg-light p-4 rounded shadow-sm">
+
+        {{-- IMAGE --}}
+        <div class="col-lg-6 mb-4">
+            <div class="rounded overflow-hidden shadow-sm">
+                <img src="{{ $product->image
+                    ? asset('storage/' . $product->image)
+                    : 'https://via.placeholder.com/500x400?text=No+Image' }}"
+                    class="img-fluid w-100"
+                    style="max-height:450px; object-fit:cover;">
             </div>
         </div>
 
-        <!-- Product Info -->
-        <div class="col-lg-6 col-md-12 d-flex flex-column">
-            <div class="product-info p-4 shadow rounded bg-white">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h2 class="product-title mb-0">{{ $product->nama_produk }}</h2>
+        {{-- INFO --}}
+        <div class="col-lg-6">
+            <div class="bg-white p-4 rounded shadow-sm h-100">
 
-                    <form action="{{ route('wishlist.store', $product->id) }}" method="POST" class="m-0 p-0">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h2 class="fw-bold">{{ $product->nama_produk }}</h2>
+
+                    <form action="{{ route('wishlist.store', $product->id) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-outline-primary" title="Tambah ke Wishlist" style="width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                        <button class="btn btn-outline-danger btn-sm">
                             <i class="bi bi-heart"></i>
                         </button>
                     </form>
                 </div>
 
-                <div class="rating mb-3">
-                    <span class="stars">★★★★★</span>
-                    <span class="review-count text-muted">({{ $product->reviews->count() }} ulasan)</span>
-                </div>
+                <p class="text-muted mb-2">
+                    Kategori: {{ $product->kategori->nama_kategori ?? '-' }}
+                </p>
 
-                @if($product->kategori)
-                <p class="text-muted mb-2">Kategori: {{ $product->kategori->nama_kategori }}</p>
-                @endif
+                @php
+                    $minPrice = $product->sizes->min('harga');
+                @endphp
 
-                <h3 class="price text-success mb-4">Rp {{ number_format($product->harga, 0, ',', '.') }}</h3>
+                <h3 class="text-success fw-bold mb-3" id="priceDisplay">
+                    Rp {{ number_format($minPrice, 0, ',', '.') }}
+                </h3>
 
-                <div class="description mb-4">
-                    @if($product->deskripsi)
-                        <p>{{ $product->deskripsi }}</p>
-                    @else
-                        <p>Produk berkualitas tinggi yang tersedia di toko kami. Dapatkan pengalaman berbelanja terbaik dengan produk pilihan.</p>
-                    @endif
-                </div>
+                <p class="mb-4">{{ $product->deskripsi }}</p>
 
-                <!-- Quantity and Actions -->
-                <div class="product-actions">
-                    <form action="{{ route('cart.store') }}" method="POST" class="d-flex flex-column gap-3">
-                        @csrf
-                        <input type="hidden" name="produk_id" value="{{ $product->id }}">
+                {{-- FORM CART --}}
+                <form action="{{ route('cart.store') }}" method="POST">
+                    @csrf
 
-                        <div class="quantity-selector d-flex align-items-center gap-2">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="decreaseQty()">-</button>
-                            <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control text-center" style="width: 80px;">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="increaseQty()">+</button>
-                        </div>
+                    <input type="hidden" name="produk_id" value="{{ $product->id }}">
 
-                        <button type="submit" class="btn btn-dark btn-lg w-100 mb-2">Add to Cart</button>
-                        <button type="button" class="btn btn-outline-dark btn-lg w-100">Buy Now</button>
-                    </form>
-                </div>
+                    {{-- UKURAN --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Pilih Ukuran</label>
+                        <select name="size_id"
+                                id="sizeSelect"
+                                class="form-select"
+                                required
+                                onchange="updateUI()">
+
+                            <option value="">-- Pilih ukuran --</option>
+
+                            @foreach($product->sizes as $size)
+                                <option value="{{ $size->id }}"
+                                        data-price="{{ $size->harga }}"
+                                        data-stock="{{ $size->stok }}"
+                                        {{ $size->stok == 0 ? 'disabled' : '' }}>
+                                    {{ $size->size }}
+                                    — Rp {{ number_format($size->harga, 0, ',', '.') }}
+                                    {{ $size->stok == 0 ? '(Habis)' : '(stok '.$size->stok.')' }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <small id="stockInfo" class="text-muted"></small>
+                    </div>
+
+                    {{-- QTY --}}
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Jumlah</label>
+                        <input type="number"
+                               name="quantity"
+                               id="quantity"
+                               value="1"
+                               min="1"
+                               class="form-control"
+                               disabled>
+                    </div>
+
+                    {{-- ACTION --}}
+                    <button type="submit"
+                            id="btnAdd"
+                            class="btn btn-dark btn-lg w-100"
+                            disabled>
+                        Tambah ke Keranjang
+                    </button>
+                </form>
+
             </div>
         </div>
     </div>
 
-    <!-- Reviews Section -->
+    {{-- REVIEWS --}}
     <div class="row mt-5">
-    <div class="col-12">
-        <h4>Ulasan Pengguna</h4>
-        @forelse($product->reviews as $review)
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
+        <div class="col-12">
+            <h4>Ulasan Pengguna</h4>
+
+            @forelse($product->reviews as $review)
+                <div class="card mb-3">
+                    <div class="card-body">
                         <strong>{{ $review->user->username ?? 'Anonim' }}</strong>
-                        <small class="text-muted">{{ $review->created_at->format('d M Y') }}</small>
+                        <div class="text-warning">
+                            {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
+                        </div>
+                        <p class="mb-0">{{ $review->comment }}</p>
                     </div>
-                    <div class="text-warning">
-                        {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
-                    </div>
-                    <p class="mb-0">{{ $review->comment }}</p>
                 </div>
-            </div>
-        @empty
-            <p class="text-muted">Belum ada ulasan untuk produk ini.</p>
-        @endforelse
+            @empty
+                <p class="text-muted">Belum ada ulasan.</p>
+            @endforelse
+        </div>
     </div>
 </div>
 
-</div>
-
+{{-- SCRIPT --}}
 <script>
-function increaseQty() {
-    const qtyInput = document.getElementById('quantity');
-    qtyInput.value = parseInt(qtyInput.value) + 1;
-}
+function updateUI() {
+    const select = document.getElementById('sizeSelect');
+    const option = select.options[select.selectedIndex];
 
-function decreaseQty() {
-    const qtyInput = document.getElementById('quantity');
-    if (parseInt(qtyInput.value) > 1) {
-        qtyInput.value = parseInt(qtyInput.value) - 1;
+    if (!option.value) return;
+
+    const price = parseInt(option.dataset.price);
+    const stock = parseInt(option.dataset.stock);
+
+    document.getElementById('priceDisplay').innerText =
+        'Rp ' + price.toLocaleString('id-ID');
+
+    const qty = document.getElementById('quantity');
+    const btn = document.getElementById('btnAdd');
+
+    if (stock > 0) {
+        qty.disabled = false;
+        qty.max = stock;
+        qty.value = 1;
+        btn.disabled = false;
+        document.getElementById('stockInfo').innerText =
+            'Stok tersedia: ' + stock;
+    } else {
+        qty.disabled = true;
+        btn.disabled = true;
+        document.getElementById('stockInfo').innerText = 'Stok habis';
     }
 }
 </script>
-
-<style>
-.product-title {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #333;
-}
-.stars {
-    color: #ffc107;
-    font-size: 1.2rem;
-}
-.price {
-    font-size: 1.8rem;
-    font-weight: 700;
-}
-.product-features {
-    list-style: none;
-    padding-left: 0;
-}
-.product-features li {
-    padding: 0.25rem 0;
-    position: relative;
-    padding-left: 1.5rem;
-}
-.product-features li:before {
-    content: "•";
-    color: #28a745;
-    font-weight: bold;
-    position: absolute;
-    left: 0;
-}
-.quantity-selector {
-    max-width: 200px;
-}
-.product-image img {
-    width: 100%;
-    max-height: 450px;
-    object-fit: cover;
-}
-.product-image, .product-info {
-    min-height: 450px; /* agar tinggi seimbang */
-    height: 100%;
-}
-
-.product-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-</style>
 @endsection

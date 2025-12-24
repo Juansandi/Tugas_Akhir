@@ -49,11 +49,22 @@
         <form method="POST" action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}">
             @csrf
             <div class="mb-3 mt-3">
-                <label for="no_resi" class="form-label">Kode Pengantaran / Nama Kurir</label>
-                <input type="text" name="no_resi" id="no_resi" class="form-control" placeholder="Masukkan kode pengiriman atau nama kurir" value="{{ $pesanan->no_resi }}">
+                <label class="form-label">Pilih Kurir</label>
+                <select name="kurir_id" class="form-select" required>
+                    <option value="">-- Pilih Kurir --</option>
+                    @foreach($kurirs as $kurir)
+                        <option value="{{ $kurir->id }}">
+                            {{ $kurir->username }}
+                        </option>
+                    @endforeach
+                </select>
+
                 <input type="hidden" name="status" value="dikirim">
             </div>
-            <button type="submit" class="btn btn-success">Kirim Pesanan</button>
+
+            <button type="submit" class="btn btn-success">
+                Tugaskan Kurir & Kirim Pesanan
+            </button>
         </form>
     @elseif ($pesanan->status === 'dikirim')
         <p class="mt-3"><strong>Info Pengiriman:</strong> {{ $pesanan->no_resi ?? '-' }}</p>
@@ -71,24 +82,32 @@
 
     <h5>Detail Produk</h5>
     <div class="list-group">
-        @foreach($pesanan->detail as $item)
-            <div class="list-group-item py-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <img src="{{ asset('storage/' . $item->produk->image) }}" alt="{{ $item->produk->nama_produk }}"
-                            style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
-                        <div>
-                            <div class="fw-bold">{{ $item->produk->nama_produk }}</div>
-                            <small class="text-muted">Jumlah: {{ $item->quantity }}</small>
-                        </div>
-                    </div>
-                    <div class="text-end">
-                        <span class="fw-semibold">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</span>
+    @foreach($pesanan->detail as $item)
+        <div class="list-group-item py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <img src="{{ asset('storage/' . $item->produk->image) }}"
+                        alt="{{ $item->produk->nama_produk }}"
+                        style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
+
+                    <div>
+                        <div class="fw-bold">{{ $item->produk->nama_produk }}</div>
+                        <small class="text-muted">
+                            Ukuran: {{ $item->size->size }} <br>
+                            Jumlah: {{ $item->quantity }}
+                        </small>
                     </div>
                 </div>
+                <div class="text-end">
+                    <span class="fw-semibold">
+                        Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}
+                    </span>
+                </div>
             </div>
-        @endforeach
+        </div>
+    @endforeach
     </div>
+
 </div>
 
 @endsection

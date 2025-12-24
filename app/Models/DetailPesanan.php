@@ -11,6 +11,7 @@ class DetailPesanan extends Model
     protected $fillable = [
         'pesanan_id',
         'produk_id',
+        'product_size_id',
         'quantity',
         'price',
     ];
@@ -23,5 +24,10 @@ class DetailPesanan extends Model
     public function produk()
     {
         return $this->belongsTo(Produk::class, 'produk_id');
+    }
+
+    public function size()
+    {
+        return $this->belongsTo(ProductSize::class, 'product_size_id');
     }
 }

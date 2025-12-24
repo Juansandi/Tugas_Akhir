@@ -20,12 +20,15 @@ class PesananController extends Controller
     public function checkoutForm()
     {
         $user = Auth::user();
-        $cartItems = Cart::where('user_id', $user->id)->with('produk')->get();
+        $cartItems = Cart::where('user_id', $user->id)
+        ->with(['produk', 'size'])
+        ->get();
+
         $alamat = $user->alamat ?? '-';
 
         $subtotal = 0;
         foreach ($cartItems as $item) {
-            $subtotal += $item->produk->harga * $item->quantity;
+            $subtotal += $item->size->harga * $item->quantity;
         }
 
         $promos = Promo::where('mulai', '<=', now())
@@ -38,125 +41,105 @@ class PesananController extends Controller
 
     public function store(Request $request)
     {
-        $user = \App\Models\Pengguna::find(Auth::id());
+        $user = Pengguna::findOrFail(Auth::id());
 
         DB::beginTransaction();
         try {
-            $cartItems = Cart::where('user_id', $user->id)->with('produk')->get();
+
+            $cartItems = Cart::with(['produk', 'size'])
+                ->where('user_id', $user->id)
+                ->get();
 
             if ($cartItems->isEmpty()) {
-                return back()->with('error', 'Keranjang Anda kosong.');
+                return redirect()->route('cart.index')
+                    ->with('error', 'Keranjang Anda kosong.');
             }
 
+            // 🔥 VALIDASI STOK TERAKHIR
+            foreach ($cartItems as $item) {
+                if ($item->quantity > $item->size->stok) {
+                    DB::rollBack();
+                    return redirect()->route('cart.index')
+                        ->with('error', 'Stok produk "' . 
+                            $item->produk->nama_produk . 
+                            ' (' . $item->size->size . ')" tidak mencukupi.');
+                }
+            }
+
+            // ===============================
+            // HITUNG SUBTOTAL
+            // ===============================
             $subtotal = 0;
             foreach ($cartItems as $item) {
-                $subtotal += $item->produk->harga * $item->quantity;
+                $subtotal += $item->size->harga * $item->quantity;
             }
 
-            // Validasi input
+            // VALIDASI INPUT
             $request->validate([
                 'metode_pembayaran' => 'required|in:transfer,cod',
                 'promo_id' => 'nullable|exists:promos,id',
                 'poin' => 'nullable|integer|min:0',
             ]);
 
-            $metode = $request->metode_pembayaran;
-            $promoId = $request->promo_id;
-            $poinDigunakan = $request->poin ?? 0;
-
-            // Cek poin user cukup
-            if ($poinDigunakan > $user->jumlah_poin) {
-                return back()->with('error', 'Poin yang Anda gunakan melebihi jumlah poin Anda.');
-            }
-
+            $promo = $request->promo_id ? Promo::find($request->promo_id) : null;
             $diskonPromo = 0;
-            $promo = null;
 
-            if ($promoId) {
-                $promo = Promo::find($promoId);
-
-                if ($promo && now()->between($promo->mulai, $promo->akhir)) {
-                    $diskonPromo = $subtotal * ($promo->diskon / 100);
-                }
+            if ($promo && now()->between($promo->mulai, $promo->akhir)) {
+                $diskonPromo = $subtotal * ($promo->diskon / 100);
             }
 
-            // Diskon dari poin (misal 1 poin = Rp 100)
+            $poinDigunakan = min($request->poin ?? 0, $user->jumlah_poin);
             $diskonPoin = $poinDigunakan * 100;
 
-            // Total akhir
-            $totalBayar = $subtotal - $diskonPromo - $diskonPoin;
-            if ($totalBayar < 0) {
-                $totalBayar = 0;
-            }
+            $totalBayar = max(0, $subtotal - $diskonPromo - $diskonPoin);
 
-            // Buat pesanan
+            // ===============================
+            // BUAT PESANAN
+            // ===============================
             $pesanan = Pesanan::create([
                 'user_id' => $user->id,
                 'total' => $totalBayar,
-                'status' => 'menunggu konfirmasi',  // Langsung status diproses setelah bayar
-                'metode_pembayaran' => $metode,
+                'status' => 'menunggu konfirmasi',
+                'metode_pembayaran' => $request->metode_pembayaran,
+                'promo_id' => $promo?->id,
+                'diskon_dari_promo' => $diskonPromo,
                 'poin_digunakan' => $poinDigunakan,
                 'diskon_dari_poin' => $diskonPoin,
-                'promo_id' => $promoId,
-                'diskon_dari_promo' => $diskonPromo,
             ]);
 
-            // Simpan detail pesanan
+            // ===============================
+            // DETAIL PESANAN + KURANGI STOK
+            // ===============================
             foreach ($cartItems as $item) {
+
                 DetailPesanan::create([
                     'pesanan_id' => $pesanan->id,
                     'produk_id' => $item->produk_id,
+                    'product_size_id' => $item->product_size_id,
                     'quantity' => $item->quantity,
-                    'price' => $item->produk->harga,
+                    'price' => $item->size->harga,
                 ]);
 
-                // Kurangi stok produk
-                $produk = $item->produk;
-                $produk->stok -= $item->quantity;
-                if ($produk->stok < 0) {
-                    $produk->stok = 0; // optional: agar stok tidak minus
-                }
-                $produk->save();
+                // Kurangi stok size
+                $item->size->decrement('stok', $item->quantity);
             }
 
-            // Notifikasi pesanan baru
-            AdminNotification::create([
-                'tipe' => 'pesanan_baru',
-                'pesan' => 'Pesanan baru oleh ' . auth()->user()->username . ' (#' . $pesanan->id . ')',
-                'url' => route('admin.pesanan.show', $pesanan->id),
-            ]);
-
-            // Notifikasi stok hampir habis
-            foreach ($pesanan->detail as $detail) {
-                $produk = $detail->produk;
-                if ($produk && $produk->stok <= 5) {
-                    AdminNotification::create([
-                        'tipe' => 'stok_hampir_habis',
-                        'pesan' => 'Stok produk "' . $produk->nama . '" Sisa: ' . $produk->stok,
-                        'url' => route('products.edit', $produk->id),
-                    ]);
-                }
-            }
-
-            // Kurangi poin user jika digunakan
+            // Kurangi poin user
             if ($poinDigunakan > 0) {
-                $user->jumlah_poin -= $poinDigunakan;
-                if ($user->jumlah_poin < 0) {
-                    $user->jumlah_poin = 0;
-                }
-                $user->save();
+                $user->decrement('jumlah_poin', $poinDigunakan);
             }
 
-            // Hapus keranjang
+            // Hapus cart
             Cart::where('user_id', $user->id)->delete();
 
             DB::commit();
 
             return redirect()->route('pesanan.show', $pesanan->id)
-                ->with('success', 'Pesanan berhasil dibuat dan diproses.');
+                ->with('success', 'Pesanan berhasil dibuat.');
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem.');
         }
     }
 

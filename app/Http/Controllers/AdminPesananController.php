@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pesanan;
+use App\Models\Pengguna;
 use App\Models\UserNotification;
+use App\Models\TugasKurir;
 
 class AdminPesananController extends Controller
 {
@@ -16,8 +18,11 @@ class AdminPesananController extends Controller
 
     public function show($id)
     {
-        $pesanan = Pesanan::with(['pengguna', 'detail.produk'])->findOrFail($id);
-        return view('admin.pesanan.show', compact('pesanan'));
+        $pesanan = Pesanan::with(['detail.produk', 'detail.size', 'pengguna'])->findOrFail($id);
+
+        $kurirs = Pengguna::where('role', 'kurir')->get();
+
+        return view('admin.pesanan.show', compact('pesanan', 'kurirs'));
     }
 
     public function updateStatus(Request $request, $id)
@@ -28,8 +33,24 @@ class AdminPesananController extends Controller
         $pesanan->status = $status;
 
         // Jika ada input nomor resi
-        if ($status === 'dikirim' && $request->filled('no_resi')) {
-            $pesanan->no_resi = $request->input('no_resi');
+        if ($request->status === 'dikirim') {
+
+            $request->validate([
+                'kurir_id' => 'required|exists:pengguna,id'
+            ]);
+
+            // update status pesanan
+            $pesanan->status = 'dikirim';
+            $pesanan->save();
+
+            // buat tugas kurir
+            TugasKurir::create([
+                'pesanan_id' => $pesanan->id,
+                'user_id'    => $request->kurir_id,
+                'status'     => 'aktif',
+            ]);
+
+            return back()->with('success', 'Pesanan dikirim dan kurir berhasil ditugaskan.');
         }
 
         // Jika status berubah menjadi selesai, hitung poin dan update pengguna
