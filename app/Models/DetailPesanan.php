@@ -12,8 +12,10 @@ class DetailPesanan extends Model
         'pesanan_id',
         'produk_id',
         'product_size_id',
+        'paket_id',
         'quantity',
         'price',
+        'type'
     ];
 
     public function pesanan()
@@ -29,5 +31,10 @@ class DetailPesanan extends Model
     public function size()
     {
         return $this->belongsTo(ProductSize::class, 'product_size_id');
+    }
+
+    public function paket()
+    {
+        return $this->belongsTo(Paket::class);
     }
 }

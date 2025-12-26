@@ -23,18 +23,36 @@
         @endphp
 
         @foreach ($cartItems as $item)
-            @php
-                $totalPerItem = $item->size->harga * $item->quantity;
-                $subtotal += $totalPerItem;
-            @endphp
+            @if($item->type === 'paket')
+                @php
+                    $totalPerItem = $item->paket->harga_paket * $item->quantity;
+                    $subtotal += $totalPerItem;
+                @endphp
 
-            <div class="card mb-2 p-3">
-                <strong>{{ $item->produk->nama_produk }}</strong><br>
-                <span class="text-muted">Ukuran: {{ $item->size->size }}</span><br>
-                {{ $item->quantity }} × Rp{{ number_format($item->size->harga, 0, ',', '.') }}
-                =
-                <strong>Rp{{ number_format($totalPerItem, 0, ',', '.') }}</strong>
-            </div>
+                <div class="card mb-2 p-3">
+                    <strong>{{ $item->paket->nama_paket }}</strong><br>
+                    <span class="text-muted">Paket Produk</span><br>
+                    {{ $item->quantity }} ×
+                    Rp {{ number_format($item->paket->harga_paket,0,',','.') }}
+                    =
+                    <strong>Rp {{ number_format($totalPerItem,0,',','.') }}</strong>
+                </div>
+
+            @else
+                @php
+                    $totalPerItem = $item->size->harga * $item->quantity;
+                    $subtotal += $totalPerItem;
+                @endphp
+
+                <div class="card mb-2 p-3">
+                    <strong>{{ $item->produk->nama_produk }}</strong><br>
+                    <span class="text-muted">Ukuran: {{ $item->size->size }}</span><br>
+                    {{ $item->quantity }} ×
+                    Rp {{ number_format($item->size->harga,0,',','.') }}
+                    =
+                    <strong>Rp {{ number_format($totalPerItem,0,',','.') }}</strong>
+                </div>
+            @endif
         @endforeach
 
         {{-- PEMBAYARAN --}}

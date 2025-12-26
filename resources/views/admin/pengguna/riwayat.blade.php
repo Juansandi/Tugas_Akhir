@@ -40,17 +40,44 @@
                                 $subtotalItem = $detail->quantity * $detail->price;
                                 $subtotalKeseluruhan += $subtotalItem;
                             @endphp
+
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    {{ $detail->produk->nama_produk }} ({{ $detail->quantity }} x Rp {{ number_format($detail->price, 0, ',', '.') }})
+                                    @if($detail->type === 'produk' && $detail->produk)
+                                        {{ $detail->produk->nama_produk }}
+                                        <small class="text-muted">
+                                            ({{ $detail->quantity }} x
+                                            Rp {{ number_format($detail->price, 0, ',', '.') }})
+                                        </small>
+                                    @elseif($detail->type === 'paket' && $detail->paket)
+                                        <strong>{{ $detail->paket->nama_paket }}</strong>
+                                        <span class="badge bg-info ms-1">Paket</span>
+                                        <div class="text-muted">
+                                            ({{ $detail->quantity }} x
+                                            Rp {{ number_format($detail->price, 0, ',', '.') }})
+                                        </div>
+
+                                        @if($detail->type === 'paket')
+                                            <ul class="small text-muted mt-1">
+                                                @foreach($detail->paket->detailPakets as $isi)
+                                                    <li>
+                                                        {{ $isi->produk->nama_produk }}
+                                                        ({{ $isi->quantity }} {{ $isi->size->size }})
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
+                                    @endif
                                 </div>
+
                                 <div>
-                                    <strong>Subtotal: Rp{{ number_format($subtotalItem, 0, ',', '.') }}</strong>
+                                    <strong>
+                                        Subtotal: Rp {{ number_format($subtotalItem, 0, ',', '.') }}
+                                    </strong>
                                 </div>
                             </li>
                         @endforeach
                     </ul>
-
                     <div class="mt-4">
                         <p><strong>Tanggal:</strong> {{ $order->created_at->format('d M Y H:i') }}</p>
                         <p><strong>Metode Pembayaran:</strong> {{ strtoupper($order->metode_pembayaran) }}</p>

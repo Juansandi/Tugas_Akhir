@@ -18,7 +18,7 @@ class AdminPesananController extends Controller
 
     public function show($id)
     {
-        $pesanan = Pesanan::with(['detail.produk', 'detail.size', 'pengguna'])->findOrFail($id);
+        $pesanan = Pesanan::with(['detail.produk', 'detail.size', 'pengguna', 'detail.paket'])->findOrFail($id);
 
         $kurirs = Pengguna::where('role', 'kurir')->get();
 

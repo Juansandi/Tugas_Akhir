@@ -5,21 +5,38 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\ProductSize;
+use App\Models\Paket;
 use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
     public function index()
     {
-        $cartItems = Cart::with(['produk', 'size'])
-            ->where('user_id', Auth::id())
-            ->get();
+        $cartItems = Cart::with([
+            'produk',
+            'size',
+            'paket.detailPakets.size',
+            'paket.detailPakets.produk'
+        ])
+        ->where('user_id', Auth::id())
+        ->get();
 
         $stokError = false;
 
         foreach ($cartItems as $item) {
-            if ($item->size->stok < $item->quantity) {
-                $stokError = true;
+
+            if ($item->type === 'produk') {
+                if (!$item->size || $item->size->stok < $item->quantity) {
+                    $stokError = true;
+                }
+            }
+
+            if ($item->type === 'paket') {
+                foreach ($item->paket->detailPakets as $detail) {
+                    if ($detail->size && $detail->size->stok < ($detail->quantity * $item->quantity)) {
+                        $stokError = true;
+                    }
+                }
             }
         }
 
@@ -44,7 +61,7 @@ class CartController extends Controller
             return back()->with('error', 'Jumlah melebihi stok tersedia.');
         }
 
-        $cart = Cart::where('user_id', Auth::id()) // 🔥 FIX
+        $cart = Cart::where('user_id', Auth::id())
             ->where('produk_id', $request->produk_id)
             ->where('product_size_id', $request->size_id)
             ->first();
@@ -61,10 +78,11 @@ class CartController extends Controller
             ]);
         } else {
             Cart::create([
-                'user_id'         => Auth::id(), // 🔥 FIX
+                'user_id'         => Auth::id(), 
                 'produk_id'       => $request->produk_id,
                 'product_size_id' => $request->size_id,
                 'quantity'        => $request->quantity,
+                'type'            => 'produk'
             ]);
         }
 
@@ -119,5 +137,81 @@ class CartController extends Controller
         $item->delete();
 
         return back()->with('success', 'Item dihapus dari keranjang.');
+    }
+
+    public function storePaket(Request $request)
+    {
+        $request->validate([
+            'paket_id' => 'required|exists:pakets,id',
+        ]);
+
+        $paket = Paket::with('detailPakets.size')->findOrFail($request->paket_id);
+
+        // paket nonaktif
+        if ($paket->status !== 'aktif') {
+            return back()->with('error', 'Paket tidak tersedia.');
+        }
+
+        // cek stok tiap produk dalam paket
+        foreach ($paket->detailPakets as $item) {
+            if ($item->size && $item->size->stok < $item->quantity) {
+                return back()->with(
+                    'error',
+                    'Stok produk dalam paket tidak mencukupi.'
+                );
+            }
+        }
+
+        // cek apakah paket sudah ada di cart
+        $cart = Cart::where('user_id', Auth::id())
+            ->where('paket_id', $paket->id)
+            ->where('type', 'paket')
+            ->first();
+
+        if ($cart) {
+            $cart->increment('quantity');
+        } else {
+            Cart::create([
+                'user_id' => Auth::id(),
+                'paket_id' => $paket->id,
+                'quantity' => 1,
+                'type' => 'paket'
+            ]);
+        }
+
+        return redirect()->route('cart.index')
+            ->with('success', 'Paket berhasil ditambahkan ke keranjang.');
+    }
+
+    public function addPaket(Request $request, $paketId)
+    {
+        $paket = Paket::with('detailPakets')->findOrFail($paketId);
+
+        // Cek stok semua isi paket
+        foreach ($paket->detailPakets as $item) {
+            if ($item->size && $item->size->stok < $item->quantity) {
+                return back()->with('error',
+                    'Stok paket tidak mencukupi ('.$item->produk->nama_produk.')'
+                );
+            }
+        }
+
+        $cart = Cart::where('user_id', Auth::id())
+            ->where('paket_id', $paketId)
+            ->where('type', 'paket')
+            ->first();
+
+        if ($cart) {
+            $cart->increment('quantity');
+        } else {
+            Cart::create([
+                'user_id' => Auth::id(),
+                'paket_id' => $paketId,
+                'quantity' => 1,
+                'type' => 'paket'
+            ]);
+        }
+
+        return back()->with('success', 'Paket ditambahkan ke keranjang');
     }
 }

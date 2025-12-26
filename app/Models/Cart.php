@@ -12,8 +12,10 @@ class Cart extends Model
     protected $fillable = [
         'user_id', 
         'produk_id',
+        'paket_id',
         'product_size_id', 
-        'quantity'
+        'quantity',
+        'type'
     ];
 
     public function produk()
@@ -24,6 +26,11 @@ class Cart extends Model
     public function user()
     {
         return $this->belongsTo(Pengguna::class);
+    }
+
+    public function paket()
+    {
+        return $this->belongsTo(Paket::class);
     }
 
     public function size()

@@ -2,68 +2,90 @@
 
 @section('content')
 <div class="container py-4">
-    <h4>Riwayat Pesanan Saya</h4>
+    <h4 class="mb-4">Riwayat Pesanan Saya</h4>
 
-    @if ($pesanan->isEmpty())
-        <p>Belum ada pesanan.</p>
+    @if ($pesanans->isEmpty())
+        <div class="alert alert-info">
+            Belum ada pesanan.
+        </div>
     @else
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID Pesanan</th>
-                    <th>Tanggal Pesan</th>
-                    <th>Status</th>
-                    <th>Total Bayar</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($pesanan as $pesanan)
-                <tr>
-                    <td>{{ $pesanan->id }}</td>
-                    <td>{{ $pesanan->created_at->format('d M Y, H:i') }}</td>
-                    <td>
-                            @php
-                                $status = $pesanan->status;
-                                $badgeClass = match($status) {
-                                    'menunggu konfirmasi' => 'bg-secondary text-light',
-                                    'diproses'            => 'bg-primary text-light',
-                                    'dikirim'             => 'bg-info text-dark',
-                                    'diterima'            => 'bg-warning text-dark',
-                                    'selesai'             => 'bg-success text-light',
-                                    default               => 'bg-light text-dark'
-                                };
-                            @endphp
-                            <span class="badge {{ $badgeClass }}">
-                                {{ ucfirst($status) }}
-                            </span>
-                        </td>
-                    <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
-                    <td>
-                        <a href="{{ route('pesanan.show', $pesanan->id) }}" class="btn btn-primary btn-sm">Detail</a>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>#</th>
+                        <th>Tanggal</th>
+                        <th>Status</th>
+                        <th>Total Bayar</th>
+                        <th width="220">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($pesanans as $order)
+                        @php
+                            $badge = match($order->status) {
+                                'menunggu konfirmasi' => 'secondary',
+                                'diproses'            => 'primary',
+                                'dikirim'             => 'info',
+                                'diterima'            => 'warning',
+                                'selesai'             => 'success',
+                                default               => 'light',
+                            };
+                        @endphp
+                        <tr class="text-center">
+                            <td>#{{ $order->id }}</td>
+                            <td>
+                                @if($order->created_at)
+                                    {{ $order->created_at->format('d M Y') }}<br>
+                                    <small class="text-muted">{{ $order->created_at->format('H:i') }}</small>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                                <small class="text-muted">
+                                    {{ $order->created_at->format('H:i') }}
+                                </small>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ $badge }}">
+                                    {{ ucfirst($order->status) }}
+                                </span>
+                            </td>
+                            <td class="fw-semibold text-success">
+                                Rp {{ number_format($order->total, 0, ',', '.') }}
+                            </td>
+                            <td class="text-start">
 
-                        @if ($pesanan->status === 'selesai')
-                            @if ($pesanan->refund)
-                                <a href="{{ route('refund.show', $pesanan->refund->id) }}" class="btn btn-info btn-sm mt-1">
-                                    Detail Refund
+                                <a href="{{ route('pesanan.show', $order->id) }}"
+                                   class="btn btn-outline-primary btn-sm w-100 mb-1">
+                                    Detail Pesanan
                                 </a>
-                            @else
-                                <a href="{{ route('refund.create', ['pesanan_id' => $pesanan->id]) }}" class="btn btn-warning btn-sm mt-1">
-                                    Ajukan Refund
-                                </a>
-                            @endif
-                        @endif
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+
+                                @if ($order->status === 'selesai')
+                                    @if ($order->refund)
+                                        <a href="{{ route('refund.show', $order->refund->id) }}"
+                                           class="btn btn-outline-info btn-sm w-100">
+                                            Detail Refund
+                                        </a>
+                                    @else
+                                        <a href="{{ route('refund.create', ['pesanan_id' => $order->id]) }}"
+                                           class="btn btn-outline-warning btn-sm w-100">
+                                            Ajukan Refund
+                                        </a>
+                                    @endif
+                                @endif
+
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     @endif
-    @if(session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-@endif
-</div>
 
+    @if(session('error'))
+        <div class="alert alert-danger mt-3">
+            {{ session('error') }}
+        </div>
+    @endif
+</div>
 @endsection

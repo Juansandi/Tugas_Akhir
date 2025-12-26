@@ -26,6 +26,9 @@ if (Auth::check()) {
                     <a class="nav-link" href="{{ route('user.products') }}">Produk</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('paket.index') }}">Paket Produk</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="#">Tentang</a>
                 </li>
                 <li class="nav-item">

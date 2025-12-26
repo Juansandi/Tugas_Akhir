@@ -86,18 +86,40 @@
         <div class="list-group-item py-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <img src="{{ asset('storage/' . $item->produk->image) }}"
-                        alt="{{ $item->produk->nama_produk }}"
-                        style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; margin-right: 16px;">
 
+                    {{-- IMAGE --}}
+                    @if($item->type === 'produk' && $item->produk)
+                        <img src="{{ asset('storage/'.$item->produk->image) }}"
+                            alt="{{ $item->produk->nama_produk }}"
+                            style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-right:16px;">
+                    @elseif($item->type === 'paket' && $item->paket)
+                        <img src="{{ asset('storage/'.$item->paket->image) }}"
+                            alt="{{ $item->paket->nama_paket }}"
+                            style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-right:16px;">
+                    @endif
+
+                    {{-- INFO --}}
                     <div>
-                        <div class="fw-bold">{{ $item->produk->nama_produk }}</div>
-                        <small class="text-muted">
-                            Ukuran: {{ $item->size->size }} <br>
-                            Jumlah: {{ $item->quantity }}
-                        </small>
+                        @if($item->type === 'produk')
+                            <div class="fw-bold">{{ $item->produk->nama_produk }}</div>
+                            <small class="text-muted">
+                                Ukuran: {{ $item->size->size ?? '-' }} <br>
+                                Jumlah: {{ $item->quantity }}
+                            </small>
+                        @else
+                            <div class="fw-bold">
+                                {{ $item->paket->nama_paket }}
+                                <span class="badge bg-info ms-1">Paket</span>
+                            </div>
+                            <small class="text-muted">
+                                Jumlah Paket: {{ $item->quantity }}
+                            </small>
+                        @endif
                     </div>
+
                 </div>
+
+                {{-- HARGA --}}
                 <div class="text-end">
                     <span class="fw-semibold">
                         Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}
@@ -105,7 +127,7 @@
                 </div>
             </div>
         </div>
-    @endforeach
+        @endforeach
     </div>
 
 </div>

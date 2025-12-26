@@ -20,7 +20,7 @@ class PenggunaController extends Controller
             ->where('role', 'user')
             ->firstOrFail();
 
-        $pesanan = Pesanan::with('detail.produk')
+        $pesanan = Pesanan::with('detail.produk', 'detail.size', 'detail.paket')
             ->where('user_id', $id)
             ->orderBy('created_at', 'desc')
             ->get();

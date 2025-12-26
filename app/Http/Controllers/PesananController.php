@@ -21,14 +21,20 @@ class PesananController extends Controller
     {
         $user = Auth::user();
         $cartItems = Cart::where('user_id', $user->id)
-        ->with(['produk', 'size'])
+        ->with(['produk', 'size', 'paket.detailPakets.size'])
         ->get();
 
         $alamat = $user->alamat ?? '-';
 
         $subtotal = 0;
+
         foreach ($cartItems as $item) {
-            $subtotal += $item->size->harga * $item->quantity;
+
+            if ($item->type === 'paket') {
+                $subtotal += $item->paket->harga_paket * $item->quantity;
+            } else {
+                $subtotal += $item->size->harga * $item->quantity;
+            }
         }
 
         $promos = Promo::where('mulai', '<=', now())
@@ -46,23 +52,65 @@ class PesananController extends Controller
         DB::beginTransaction();
         try {
 
-            $cartItems = Cart::with(['produk', 'size'])
-                ->where('user_id', $user->id)
-                ->get();
+            // ===============================
+            // AMBIL CART + RELASI
+            // ===============================
+            $cartItems = Cart::with([
+                'produk',
+                'size',
+                'paket.detailPakets.size'
+            ])->where('user_id', $user->id)->get();
 
             if ($cartItems->isEmpty()) {
                 return redirect()->route('cart.index')
                     ->with('error', 'Keranjang Anda kosong.');
             }
 
-            // 🔥 VALIDASI STOK TERAKHIR
+            // ===============================
+            // VALIDASI STOK TERAKHIR (FAIL FAST)
+            // ===============================
             foreach ($cartItems as $item) {
-                if ($item->quantity > $item->size->stok) {
-                    DB::rollBack();
-                    return redirect()->route('cart.index')
-                        ->with('error', 'Stok produk "' . 
-                            $item->produk->nama_produk . 
-                            ' (' . $item->size->size . ')" tidak mencukupi.');
+
+                // ===== PRODUK =====
+                if ($item->type === 'produk') {
+
+                    if (!$item->size) {
+                        return back()->with('error', 'Ukuran produk tidak tersedia.');
+                    }
+
+                    if ($item->size->stok < $item->quantity) {
+                        return back()->with(
+                            'error',
+                            'Stok produk tidak mencukupi.'
+                        );
+                    }
+                }
+
+                // ===== PAKET =====
+                else {
+
+                    if (!$item->paket) {
+                        return back()->with('error', 'Paket tidak valid.');
+                    }
+
+                    foreach ($item->paket->detailPakets as $detail) {
+
+                        if (!$detail->size) {
+                            return back()->with(
+                                'error',
+                                'Ukuran produk dalam paket tidak tersedia.'
+                            );
+                        }
+
+                        $need = $detail->quantity * $item->quantity;
+
+                        if ($detail->size->stok < $need) {
+                            return back()->with(
+                                'error',
+                                'Stok paket tidak mencukupi.'
+                            );
+                        }
+                    }
                 }
             }
 
@@ -71,16 +119,25 @@ class PesananController extends Controller
             // ===============================
             $subtotal = 0;
             foreach ($cartItems as $item) {
-                $subtotal += $item->size->harga * $item->quantity;
+                if ($item->type === 'paket') {
+                    $subtotal += $item->paket->harga_paket * $item->quantity;
+                } else {
+                    $subtotal += $item->size->harga * $item->quantity;
+                }
             }
 
+            // ===============================
             // VALIDASI INPUT
+            // ===============================
             $request->validate([
                 'metode_pembayaran' => 'required|in:transfer,cod',
                 'promo_id' => 'nullable|exists:promos,id',
                 'poin' => 'nullable|integer|min:0',
             ]);
 
+            // ===============================
+            // DISKON PROMO & POIN
+            // ===============================
             $promo = $request->promo_id ? Promo::find($request->promo_id) : null;
             $diskonPromo = 0;
 
@@ -108,28 +165,62 @@ class PesananController extends Controller
             ]);
 
             // ===============================
-            // DETAIL PESANAN + KURANGI STOK
+            // DETAIL PESANAN + POTONG STOK
             // ===============================
             foreach ($cartItems as $item) {
 
-                DetailPesanan::create([
-                    'pesanan_id' => $pesanan->id,
-                    'produk_id' => $item->produk_id,
-                    'product_size_id' => $item->product_size_id,
-                    'quantity' => $item->quantity,
-                    'price' => $item->size->harga,
-                ]);
+                // ===== PRODUK =====
+                if ($item->type === 'produk') {
 
-                // Kurangi stok size
-                $item->size->decrement('stok', $item->quantity);
+                    DetailPesanan::create([
+                        'pesanan_id'      => $pesanan->id,
+                        'produk_id'       => $item->produk_id,
+                        'product_size_id' => $item->product_size_id,
+                        'quantity'        => $item->quantity,
+                        'price'           => $item->size->harga,
+                        'type'            => 'produk',
+                    ]);
+
+                    // potong stok size (AMAN)
+                    $item->size->update([
+                        'stok' => max(0, $item->size->stok - $item->quantity)
+                    ]);
+                }
+
+                // ===== PAKET =====
+                else {
+
+                    DetailPesanan::create([
+                        'pesanan_id' => $pesanan->id,
+                        'paket_id'   => $item->paket_id,
+                        'quantity'   => $item->quantity,
+                        'price'      => $item->paket->harga_paket,
+                        'type'       => 'paket',
+                    ]);
+
+                    // potong stok isi paket
+                    foreach ($item->paket->detailPakets as $detail) {
+                        $detail->size->update([
+                            'stok' => max(
+                                0,
+                                $detail->size->stok
+                                - ($detail->quantity * $item->quantity)
+                            )
+                        ]);
+                    }
+                }
             }
 
-            // Kurangi poin user
+            // ===============================
+            // KURANGI POIN USER
+            // ===============================
             if ($poinDigunakan > 0) {
                 $user->decrement('jumlah_poin', $poinDigunakan);
             }
 
-            // Hapus cart
+            // ===============================
+            // HAPUS CART
+            // ===============================
             Cart::where('user_id', $user->id)->delete();
 
             DB::commit();
@@ -138,8 +229,14 @@ class PesananController extends Controller
                 ->with('success', 'Pesanan berhasil dibuat.');
 
         } catch (\Exception $e) {
+
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan sistem.');
+
+            // SAAT DEVELOPMENT:
+            return back()->with('error', $e->getMessage());
+
+            // SAAT PRODUCTION:
+            // return back()->with('error', 'Terjadi kesalahan sistem.');
         }
     }
 
@@ -153,9 +250,9 @@ class PesananController extends Controller
     public function history()
     {
         $user = Auth::user();
-        $pesanan = Pesanan::with('refund')->where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
+        $pesanans = Pesanan::with('refund')->where('user_id', $user->id)->latest()->get();
         
-        return view('user.pesanan.history', compact('pesanan'));
+        return view('user.pesanan.history', compact('pesanans'));
     }
 
     public function updateStatus(Request $request, $id)

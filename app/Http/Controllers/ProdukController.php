@@ -239,8 +239,8 @@ class ProdukController extends Controller
         }
 
         $pesananTerbaru = \App\Models\Pesanan::where('status', '!=', 'selesai')
-            ->with(['pengguna', 'detail.produk'])
-            ->orderBy('created_at', 'desc')
+            ->with(['pengguna', 'detail.produk', 'detail.paket'])
+            ->latest()
             ->limit(5)
             ->get();
         

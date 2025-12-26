@@ -71,24 +71,64 @@
 
 @foreach($pesanan->detail as $item)
     <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+
+        {{-- INFO KIRI --}}
         <div class="d-flex align-items-center">
-            <img src="{{ asset('storage/' . $item->produk->image) }}" alt="{{ $item->produk->nama_produk }}" 
-                class="me-3" style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px;">
+
+            @php
+                $image = $item->type === 'paket'
+                    ? optional($item->paket)->image
+                    : optional($item->produk)->image;
+            @endphp
+
+            @if($image)
+                <img src="{{ asset('storage/'.$image) }}"
+                     class="me-3"
+                     style="width:64px;height:64px;object-fit:cover;border-radius:8px;">
+            @endif
+
             <div>
-                <div class="fw-bold">{{ $item->produk->nama_produk }}</div>
-                <small class="text-muted">Jumlah: {{ $item->quantity }}</small>
+                @if($item->type === 'paket')
+                    <div class="fw-bold">{{ $item->paket->nama_paket }}</div>
+                    <small class="text-muted">Paket Produk</small>
+                @else
+                    <div class="fw-bold">{{ $item->produk->nama_produk }}</div>
+                    <small class="text-muted">
+                        Ukuran: {{ optional($item->size)->size }}
+                    </small>
+                @endif
+
+                <div class="text-muted">
+                    Jumlah: {{ $item->quantity }}
+                </div>
             </div>
         </div>
+
+        {{-- INFO KANAN --}}
         <div class="text-end">
-            <div class="fw-semibold">Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</div>
-            @if($pesanan->status == 'selesai' && !in_array($item->produk->id, $userReviewedProdukIds))
-                <a href="{{ route('review.form', ['produk' => $item->produk->id, 'pesanan_id' => $pesanan->id]) }}" class="btn btn-success btn-sm">
+            <div class="fw-semibold">
+                Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}
+            </div>
+
+            {{-- REVIEW HANYA UNTUK PRODUK --}}
+            @if(
+                $item->type === 'produk' &&
+                $pesanan->status === 'selesai' &&
+                !in_array($item->produk_id, $userReviewedProdukIds)
+            )
+                <a href="{{ route('review.form', [
+                    'produk' => $item->produk_id,
+                    'pesanan_id' => $pesanan->id
+                ]) }}"
+                class="btn btn-success btn-sm mt-1">
                     Review
                 </a>
             @endif
         </div>
+
     </div>
 @endforeach
+
 
         </div>
     </div>

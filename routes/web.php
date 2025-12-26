@@ -21,6 +21,8 @@ use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\KurirController;
+use App\Http\Controllers\Admin\PaketController;
+use App\Http\Controllers\PaketUserController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -37,12 +39,16 @@ Route::get('/products', [ProdukController::class, 'showToUser'])->name('user.pro
 Route::get('/produk/{id}', [ProdukController::class, 'showToUserDetail'])->name('produk.detail');
 Route::get('/produk', [ProdukController::class, 'showToUser'])->name('produk.index');
 
+Route::get('/paket', [PaketUserController::class, 'index'])->name('paket.index');
+Route::get('/paket/{paket}', [PaketUserController::class, 'show'])->name('paket.show');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
     Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
     Route::put('/cart/{id}', [CartController::class, 'update'])->name('cart.update');
+    Route::post('/cart/paket', [CartController::class, 'storePaket'])->name('cart.store.paket');
+    Route::post('/cart/paket/{paket}', [CartController::class, 'addPaket'])->name('cart.paket.store');
 });
 
 Route::middleware('auth')->group(function () {
@@ -106,6 +112,17 @@ Route::delete('/admin/reviews/{id}', [ProdukController::class, 'destroyReview'])
 Route::get('/admin/categories', [KategoriController::class, 'index'])->name('categories.index');
 Route::post('/admin/categories/store', [KategoriController::class, 'store'])->name('categories.store');
 
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin/paket')
+    ->name('admin.paket.')
+    ->group(function () {
+    Route::get('/', [PaketController::class, 'index'])->name('index');
+    Route::get('/create', [PaketController::class, 'create'])->name('create');
+    Route::post('/', [PaketController::class, 'store'])->name('store');
+    Route::get('/{paket}/edit', [PaketController::class, 'edit'])->name('edit');
+    Route::put('/{paket}', [PaketController::class, 'update'])->name('update');
+    Route::delete('/{paket}', [PaketController::class, 'destroy'])->name('destroy');
+});
 
 Route::get('/admin/promos', [PromoController::class, 'index'])->name('promos.index');
 Route::get('/admin/promos/create', [PromoController::class, 'create'])->name('promos.create');

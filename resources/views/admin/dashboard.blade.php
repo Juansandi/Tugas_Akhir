@@ -90,7 +90,12 @@
                                     <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
                                     <td>
                                         @foreach($pesanan->detail as $detail)
-                                            {{ $detail->produk->nama_produk }}@if(!$loop->last), @endif
+                                            @if($detail->type === 'produk' && $detail->produk)
+                                                {{ $detail->produk->nama_produk }}
+                                            @elseif($detail->type === 'paket' && $detail->paket)
+                                                {{ $detail->paket->nama_paket }} (Paket)
+                                            @endif
+                                            @if(!$loop->last), @endif
                                         @endforeach
                                     </td>
                                     <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
