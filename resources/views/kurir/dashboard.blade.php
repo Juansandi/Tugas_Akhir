@@ -5,32 +5,34 @@
 @section('content')
 <h4>Dashboard</h4>
 
-<div class="row g-3 mt-2">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h6>Total Pesanan</h6>
-                <h3>12</h3>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
                 <h6>Pesanan Aktif</h6>
-                <h3>5</h3>
+                <h2 class="fw-bold">{{ $pesananAktif }}</h2>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
                 <h6>Pesanan Selesai</h6>
-                <h3>7</h3>
+                <h2 class="fw-bold">{{ $pesananSelesai }}</h2>
             </div>
         </div>
     </div>
 </div>
+
+<h5>Pesanan Terakhir</h5>
+<ul class="list-group">
+@foreach($pesananTerakhir as $item)
+    <li class="list-group-item">
+        Pesanan #{{ $item->pesanan->id }} -
+        {{ ucfirst($item->status) }}
+    </li>
+@endforeach
+</ul>
+
 @endsection

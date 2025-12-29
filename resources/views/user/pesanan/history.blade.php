@@ -74,6 +74,16 @@
                                     @endif
                                 @endif
 
+                                @php
+                                    $adminUnread = optional($order->chatAdminUnreadForUser)->unread_count ?? 0;
+                                    $kurirUnread = optional($order->chatKurirUnreadForUser)->unread_count ?? 0;
+                                @endphp
+
+                                @if($adminUnread > 0 || $kurirUnread > 0)
+                                    <span class="badge bg-danger mb-1">
+                                        {{ $adminUnread + $kurirUnread }} pesan baru
+                                    </span>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

@@ -26,6 +26,33 @@
                     $totalSetelahDiskon = $subtotal - $diskonPromo - $diskonPoin;
                 @endphp
                 <span class="badge {{ $badgeClass }} px-3 py-2">{{ ucfirst($status) }}</span>
+                 <div class="mt-2 d-flex gap-2 flex-wrap">
+                    @if(in_array($pesanan->status, ['diproses', 'dikirim', 'selesai']))
+                        <a href="{{ route('chat.show', ['pesanan' => $pesanan->id, 'type' => 'admin']) }}"
+                        class="btn btn-outline-primary btn-sm position-relative">
+                            💬 Chat Admin
+
+                            @if(optional($pesanan->chatAdminUnreadForUser)->unread_count > 0)
+                                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                                    {{ $pesanan->chatAdminUnreadForUser->unread_count }}
+                                </span>
+                            @endif
+                        </a>
+                    @endif
+
+                    @if(in_array($pesanan->status, ['dikirim', 'selesai']))
+                        <a href="{{ route('chat.show', ['pesanan' => $pesanan->id, 'type' => 'kurir']) }}"
+                        class="btn btn-outline-success btn-sm position-relative">
+                            🚚 Chat Kurir
+
+                            @if(optional($pesanan->chatKurirUnreadForUser)->unread_count > 0)
+                                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                                    {{ $pesanan->chatKurirUnreadForUser->unread_count }}
+                                </span>
+                            @endif
+                        </a>
+                    @endif
+                </div>
             </div>
 
             <h5 class="mb-3">Perincian Harga</h5>

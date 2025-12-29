@@ -27,40 +27,50 @@
             </thead>
             <tbody>
                 @forelse($pesananList as $index => $pesanan)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
-                        <td>
-                            @php
-                                $status = $pesanan->status;
-                                $badgeClass = match($status) {
-                                    'menunggu konfirmasi' => 'bg-secondary text-light',
-                                    'diproses'            => 'bg-primary text-light',
-                                    'dikirim'             => 'bg-info text-dark',
-                                    'diterima'            => 'bg-warning text-dark',
-                                    'selesai'             => 'bg-success text-light',
-                                    default               => 'bg-light text-dark'
-                                };
-                            @endphp
-                            <span class="badge {{ $badgeClass }}">
-                                {{ ucfirst($status) }}
-                            </span>
-                        </td>
+                <tr>
+                    <td>{{ $index + 1 }}</td>
 
-                        <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
-                        <td>
-                            <a href="{{ route('admin.pesanan.show', $pesanan->id) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i> Detail
-                            </a>
-                            {{-- Tambahan aksi admin jika diperlukan, misalnya ubah status --}}
-                        </td>
-                    </tr>
+                    <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
+
+                    <td>
+                        @php
+                            $status = $pesanan->status;
+                            $badgeClass = match($status) {
+                                'menunggu konfirmasi' => 'bg-secondary',
+                                'diproses' => 'bg-primary',
+                                'dikirim' => 'bg-info text-dark',
+                                'diterima' => 'bg-warning text-dark',
+                                'selesai' => 'bg-success',
+                                default => 'bg-light text-dark'
+                            };
+                        @endphp
+                        <span class="badge {{ $badgeClass }}">
+                            {{ ucfirst($status) }}
+                        </span>
+                    </td>
+
+                    <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
+
+                    <td>
+                        <a href="{{ route('admin.pesanan.show', $pesanan->id) }}"
+                        class="btn btn-sm btn-outline-primary position-relative">
+
+                            <i class="bi bi-eye"></i> Detail
+
+                            @if(optional($pesanan->chatAdmin)->unread_count > 0)
+                                <span class="badge bg-danger">
+                                    {{ $pesanan->chatAdmin->unread_count }} pesan baru
+                                </span>
+                            @endif
+                        </a>
+                    </td>
+                </tr>
                 @empty
-                    <tr>
-                        <td colspan="5" class="text-muted">Belum ada pesanan.</td>
-                    </tr>
+                <tr>
+                    <td colspan="5" class="text-muted">Belum ada pesanan.</td>
+                </tr>
                 @endforelse
-            </tbody>
+                </tbody>
         </table>
     </div>
 </div>

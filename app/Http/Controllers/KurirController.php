@@ -11,19 +11,62 @@ class KurirController extends Controller
 {
     public function dashboard()
     {
-        return view('kurir.dashboard');
+        $userId = Auth::id();
+
+        $pesananAktif = TugasKurir::where('user_id', $userId)
+            ->where('status', 'aktif')
+            ->count();
+
+        $pesananSelesai = TugasKurir::where('user_id', $userId)
+            ->where('status', 'selesai')
+            ->count();
+
+        $pesananTerakhir = TugasKurir::with('pesanan')
+            ->where('user_id', $userId)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('kurir.dashboard', compact(
+            'pesananAktif',
+            'pesananSelesai',
+            'pesananTerakhir'
+        ));
     }
 
     public function pesanan()
     {
-        $tugas = TugasKurir::with('pesanan')
-            ->where('user_id', Auth::id())
-            ->where('status', 'aktif')
-            ->get();
+        $tugas = TugasKurir::with([
+            'pesanan.pengguna',
+            'pesanan.detail.produk',
+            'pesanan.detail.size',
+            'pesanan.detail.paket',
+            'pesanan.chatKurir.messages'
+        ])
+        ->where('user_id', Auth::id())
+        ->where('status', 'aktif')
+        ->get();
 
         return view('kurir.pesanan', compact('tugas'));
     }
 
+    public function detail(TugasKurir $tugas)
+    {
+        // keamanan: pastikan tugas milik kurir login
+        if ($tugas->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $tugas->load([
+            'pesanan.pengguna',
+            'pesanan.detail.produk',
+            'pesanan.detail.size',
+            'pesanan.detail.paket',
+            'pesanan.chatKurir.messages'
+        ]);
+
+        return view('kurir.pesanan_detail', compact('tugas'));
+    }
 
     public function profil()
     {

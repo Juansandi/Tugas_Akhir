@@ -41,4 +41,49 @@ class Pesanan extends Model
         return $this->hasOne(TugasKurir::class, 'pesanan_id', 'id');
     }
 
+    public function chats()
+    {
+        return $this->hasMany(Chat::class);
+    }
+
+    public function chatAdminUnreadForUser()
+    {
+        return $this->hasOne(Chat::class)
+            ->where('type', 'admin')
+            ->withCount([
+                'messages as unread_count' => function ($q) {
+                    $q->where('sender_type', 'admin')
+                    ->where('is_read', false);
+                }
+            ]);
+    }
+
+    public function chatKurirUnreadForUser()
+    {
+        return $this->hasOne(Chat::class)
+            ->where('type', 'kurir')
+            ->withCount([
+                'messages as unread_count' => function ($q) {
+                    $q->where('sender_type', 'kurir')
+                    ->where('is_read', false);
+                }
+            ]);
+    }
+
+    public function chatAdmin()
+    {
+        return $this->hasOne(Chat::class)
+        ->where('type', 'admin')
+        ->withCount([
+            'messages as unread_count' => function ($q) {
+                $q->where('sender_type', 'user')
+                  ->where('is_read', false);
+            }
+        ]);
+    }
+
+    public function chatKurir()
+    {
+        return $this->hasOne(Chat::class)->where('type', 'kurir');
+    }
 }

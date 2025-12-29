@@ -29,7 +29,21 @@
     @endphp
 
     <p><strong>Status:</strong> <span class="badge {{ $badgeClass }}">{{ ucfirst($status) }}</span></p>
+    <div class="mt-2 d-flex gap-2 flex-wrap">
+    @if(in_array($pesanan->status, ['diproses', 'dikirim', 'selesai']))
+        <a href="{{ route('admin.chat.show', $pesanan->chatAdmin->id) }}"
+        class="btn btn-outline-primary btn-sm mt-2">
+            💬 Chat Customer
 
+            @if(optional($pesanan->chatAdmin)->unread_count > 0)
+                <span class="badge bg-danger ms-2">
+                    {{ $pesanan->chatAdmin->unread_count }} pesan baru
+                </span>
+            @endif
+        </a>
+    @endif
+
+    </div>
     <h5 class="mt-4">Perincian Harga</h5>
     <ul class="list-unstyled ps-3">
         <li class="mb-1"><strong>Subtotal:</strong> Rp {{ number_format($subtotal, 0, ',', '.') }}</li>

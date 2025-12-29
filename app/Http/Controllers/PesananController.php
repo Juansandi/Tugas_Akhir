@@ -250,8 +250,16 @@ class PesananController extends Controller
     public function history()
     {
         $user = Auth::user();
-        $pesanans = Pesanan::with('refund')->where('user_id', $user->id)->latest()->get();
-        
+
+        $pesanans = Pesanan::with([
+            'refund',
+            'chatAdminUnreadForUser',
+            'chatKurirUnreadForUser'
+        ])
+        ->where('user_id', $user->id)
+        ->latest()
+        ->get();
+
         return view('user.pesanan.history', compact('pesanans'));
     }
 

@@ -7,12 +7,25 @@ use App\Models\Pesanan;
 use App\Models\Pengguna;
 use App\Models\UserNotification;
 use App\Models\TugasKurir;
+use App\Models\Chat;
 
 class AdminPesananController extends Controller
 {
     public function index()
     {
-        $pesananList = Pesanan::with(['pengguna', 'detail.produk'])->orderBy('created_at', 'desc')->get();
+        $pesananList = Pesanan::with([
+            'pengguna',
+            'detail.produk',
+            'chatAdmin' => function ($q) {
+                $q->withCount([
+                    'messages as unread_count' => function ($mq) {
+                        $mq->where('sender_type', 'user')
+                        ->where('is_read', false);
+                    }
+                ]);
+            }
+        ])->orderBy('created_at', 'desc')->get();
+
         return view('admin.pesanan.index', compact('pesananList'));
     }
 
@@ -50,6 +63,11 @@ class AdminPesananController extends Controller
                 'status'     => 'aktif',
             ]);
 
+            Chat::firstOrCreate([
+                'pesanan_id' => $pesanan->id,
+                'type' => 'kurir'
+            ]);
+
             return back()->with('success', 'Pesanan dikirim dan kurir berhasil ditugaskan.');
         }
 
@@ -75,6 +93,11 @@ class AdminPesananController extends Controller
         
         // Notifikasi ke user berdasarkan status lainnya
         if ($status === 'diproses') {
+            Chat::firstOrCreate([
+                'pesanan_id' => $pesanan->id,
+                'type' => 'admin'
+            ]);
+
             UserNotification::create([
                 'user_id' => $pesanan->user_id,
                 'tipe' => 'pesanan_diproses',

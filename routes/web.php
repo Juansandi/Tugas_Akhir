@@ -23,6 +23,7 @@ use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\KurirController;
 use App\Http\Controllers\Admin\PaketController;
 use App\Http\Controllers\PaketUserController;
+use App\Http\Controllers\ChatController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -75,6 +76,11 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/chat/{pesanan}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/{chat}/send', [ChatController::class, 'send'])->name('chat.send');
+});
+
+Route::middleware(['auth'])->group(function () {
     Route::get('/refund/create/{pesanan_id}', [RefundController::class, 'create'])->name('refund.create');
     Route::post('/refund/{pesanan_id}', [RefundController::class, 'store'])->name('refund.store');
     Route::get('/refund/{id}', [RefundController::class, 'show'])->name('refund.show');
@@ -123,6 +129,11 @@ Route::middleware(['auth', 'role:admin'])
     Route::put('/{paket}', [PaketController::class, 'update'])->name('update');
     Route::delete('/{paket}', [PaketController::class, 'destroy'])->name('destroy');
 });
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/chat/{chat}', [ChatController::class, 'adminShow'])->name('admin.chat.show');
+});
+
 
 Route::get('/admin/promos', [PromoController::class, 'index'])->name('promos.index');
 Route::get('/admin/promos/create', [PromoController::class, 'create'])->name('promos.create');
@@ -179,5 +190,13 @@ Route::middleware(['auth', 'role:kurir'])
     Route::get('/profil', [KurirController::class, 'profil'])->name('profil');
     Route::post('/pesanan/{id}/selesai', [KurirController::class, 'selesai'])->name('pesanan.selesai');
     Route::get('/riwayat', [KurirController::class, 'riwayat'])->name('riwayat');
+});
+Route::middleware(['auth', 'role:kurir'])->group(function () {
+    Route::get('/kurir/pesanan/{tugas}', [KurirController::class, 'detail'])->name('kurir.pesanan.detail');
+    Route::post('/pesanan/{id}/selesai', [KurirController::class, 'selesai'])->name('kurir.selesai');
+});
 
+// routes/web.php
+Route::middleware(['auth', 'role:kurir'])->group(function () {
+    Route::get('/kurir/chat/{chat}', [ChatController::class, 'kurirShow'])->name('kurir.chat.show');
 });
