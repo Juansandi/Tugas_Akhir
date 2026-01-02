@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Pesanan;
 use App\Models\TugasKurir;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class KurirController extends Controller
 {
@@ -94,6 +95,54 @@ class KurirController extends Controller
             ->get();
 
         return view('kurir.riwayat', compact('tugas'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        /** @var \App\Models\Pengguna $user */
+        $user = Auth::user();
+
+        // pastikan hanya kurir
+        if ($user->role !== 'kurir') {
+            abort(403);
+        }
+
+        $request->validate([
+            'username' => 'required|string|max:50',
+            'no_telp' => 'nullable|string|max:20',
+        ]);
+
+        $user->update([
+            'username' => $request->username,
+            'no_telp' => $request->no_telp,
+        ]);
+
+        return back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        /** @var \App\Models\Pengguna $user */
+        $user = Auth::user();
+
+        if ($user->role !== 'kurir') {
+            abort(403);
+        }
+
+        $request->validate([
+            'password_lama' => 'required',
+            'password_baru' => 'required|min:6|confirmed',
+        ]);
+
+        if (!Hash::check($request->password_lama, $user->password)) {
+            return back()->with('error', 'Password lama tidak sesuai.');
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password_baru),
+        ]);
+
+        return back()->with('success', 'Password berhasil diubah.');
     }
 
 }

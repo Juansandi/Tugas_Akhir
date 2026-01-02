@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\AlamatPengguna;
 
 class Pengguna extends Authenticatable
 {
@@ -51,4 +52,16 @@ class Pengguna extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function alamatPengguna()
+    {
+        return $this->hasMany(AlamatPengguna::class, 'pengguna_id');
+    }
+
+    public function alamatUtama()
+    {
+        return $this->hasOne(AlamatPengguna::class, 'pengguna_id')
+                    ->where('is_default', true);
+    }
+
 }

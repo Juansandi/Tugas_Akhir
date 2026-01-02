@@ -14,13 +14,36 @@
         {{ ucfirst($tugas->status) }}
     </span>
 
-    {{-- ALAMAT --}}
+    {{-- Nama Customer --}}
     <div class="card mb-3">
         <div class="card-body">
-            <h6>Alamat Customer</h6>
-            <p class="mb-0">
-                {{ $tugas->pesanan->pengguna->alamat ?? '-' }}
+            <h6>Nama Customer</h6>
+            <p class="mb-0 fw-semibold">
+                {{ $tugas->pesanan->pengguna->username ?? '-' }}
             </p>
+        </div>
+    </div>
+
+   {{-- ALAMAT PENGIRIMAN --}}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h6>Alamat Pengiriman</h6>
+
+            @if (!empty($tugas->pesanan->alamat_pengiriman))
+                <p class="mb-1">
+                    {{ $tugas->pesanan->alamat_pengiriman }}
+                </p>
+
+                @if (!empty($tugas->pesanan->no_telp_pengiriman))
+                    <small class="text-muted">
+                        No. Telp: {{ $tugas->pesanan->no_telp_pengiriman }}
+                    </small>
+                @endif
+            @else
+                <p class="text-muted mb-0">
+                    Alamat pengiriman tidak tersedia
+                </p>
+            @endif
         </div>
     </div>
 

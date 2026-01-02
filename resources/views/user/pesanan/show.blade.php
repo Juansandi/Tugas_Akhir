@@ -63,9 +63,24 @@
                 <li class="mb-1"><strong>Total Setelah Diskon:</strong> Rp {{ number_format($totalSetelahDiskon, 0, ',', '.') }}</li>
                 <li class="mb-1"><strong>Total Dibayar:</strong> <span class="fs-5 fw-bold text-success">Rp {{ number_format($pesanan->total, 0, ',', '.') }}</span></li>
             </ul>
+            <h5 class="mt-4 mb-2">Alamat Pengiriman</h5>
+            @if (!empty($pesanan->alamat_pengiriman))
+                <div class="border rounded p-3 mb-3 bg-light">
+                    <p class="mb-1">
+                        {{ $pesanan->alamat_pengiriman }}
+                    </p>
 
-            <h5 class="mt-4 mb-2">Info Pengiriman</h5>
-            <p>{{ $pesanan->no_resi ?? '-' }}</p>
+                    @if (!empty($pesanan->no_telp_pengiriman))
+                        <small class="text-muted">
+                            No. Telp: {{ $pesanan->no_telp_pengiriman }}
+                        </small>
+                    @endif
+                </div>
+            @else
+                <p class="text-muted">
+                    Alamat pengiriman tidak tersedia.
+                </p>
+            @endif
 
             @if($pesanan->status === 'selesai')
                 <h5 class="mt-4 mb-2">Poin Diperoleh</h5>

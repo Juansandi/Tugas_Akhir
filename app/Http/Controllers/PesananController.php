@@ -11,6 +11,7 @@ use App\Models\DetailPesanan;
 use App\Models\Produk;
 use App\Models\Cart;
 use App\Models\Promo;
+use App\Models\AlamatPengguna;
 use App\Models\AdminNotification;
 use Carbon\Carbon;
 
@@ -19,12 +20,20 @@ class PesananController extends Controller
 
     public function checkoutForm()
     {
+        /** @var \App\Models\Pengguna $user */
         $user = Auth::user();
         $cartItems = Cart::where('user_id', $user->id)
         ->with(['produk', 'size', 'paket.detailPakets.size'])
         ->get();
 
-        $alamat = $user->alamat ?? '-';
+        $alamatList = $user->alamatPengguna()->get();
+        $alamatUtama = $user->alamatUtama;
+
+        if ($alamatList->isEmpty()) {
+        return redirect()
+            ->route('profile.show')
+            ->with('error', 'Silakan tambahkan alamat terlebih dahulu sebelum checkout.');
+        }
 
         $subtotal = 0;
 
@@ -41,9 +50,8 @@ class PesananController extends Controller
                         ->where('akhir', '>=', now())
                         ->get();
 
-        return view('user.pesanan.checkout', compact('cartItems', 'alamat', 'subtotal', 'promos'));
+        return view('user.pesanan.checkout', compact('cartItems', 'alamatList','alamatUtama' , 'subtotal', 'promos'));
     }
-
 
     public function store(Request $request)
     {
@@ -51,6 +59,23 @@ class PesananController extends Controller
 
         DB::beginTransaction();
         try {
+
+            // ===============================
+            // VALIDASI INPUT UTAMA
+            // ===============================
+            $request->validate([
+                'metode_pembayaran' => 'required|in:transfer,cod',
+                'promo_id' => 'nullable|exists:promos,id',
+                'poin' => 'nullable|integer|min:0',
+                'alamat_id' => 'required|exists:alamat_pengguna,id', // ⬅️ WAJIB
+            ]);
+
+            // ===============================
+            // AMBIL & VALIDASI ALAMAT USER
+            // ===============================
+            $alamat = AlamatPengguna::where('id', $request->alamat_id)
+                ->where('pengguna_id', $user->id)
+                ->firstOrFail();
 
             // ===============================
             // AMBIL CART + RELASI
@@ -67,48 +92,26 @@ class PesananController extends Controller
             }
 
             // ===============================
-            // VALIDASI STOK TERAKHIR (FAIL FAST)
+            // VALIDASI STOK (FAIL FAST)
             // ===============================
             foreach ($cartItems as $item) {
 
-                // ===== PRODUK =====
                 if ($item->type === 'produk') {
 
-                    if (!$item->size) {
-                        return back()->with('error', 'Ukuran produk tidak tersedia.');
+                    if (!$item->size || $item->size->stok < $item->quantity) {
+                        return back()->with('error', 'Stok produk tidak mencukupi.');
                     }
 
-                    if ($item->size->stok < $item->quantity) {
-                        return back()->with(
-                            'error',
-                            'Stok produk tidak mencukupi.'
-                        );
-                    }
-                }
-
-                // ===== PAKET =====
-                else {
+                } else {
 
                     if (!$item->paket) {
                         return back()->with('error', 'Paket tidak valid.');
                     }
 
                     foreach ($item->paket->detailPakets as $detail) {
-
-                        if (!$detail->size) {
-                            return back()->with(
-                                'error',
-                                'Ukuran produk dalam paket tidak tersedia.'
-                            );
-                        }
-
                         $need = $detail->quantity * $item->quantity;
-
-                        if ($detail->size->stok < $need) {
-                            return back()->with(
-                                'error',
-                                'Stok paket tidak mencukupi.'
-                            );
+                        if (!$detail->size || $detail->size->stok < $need) {
+                            return back()->with('error', 'Stok paket tidak mencukupi.');
                         }
                     }
                 }
@@ -119,31 +122,18 @@ class PesananController extends Controller
             // ===============================
             $subtotal = 0;
             foreach ($cartItems as $item) {
-                if ($item->type === 'paket') {
-                    $subtotal += $item->paket->harga_paket * $item->quantity;
-                } else {
-                    $subtotal += $item->size->harga * $item->quantity;
-                }
+                $subtotal += $item->type === 'paket'
+                    ? $item->paket->harga_paket * $item->quantity
+                    : $item->size->harga * $item->quantity;
             }
-
-            // ===============================
-            // VALIDASI INPUT
-            // ===============================
-            $request->validate([
-                'metode_pembayaran' => 'required|in:transfer,cod',
-                'promo_id' => 'nullable|exists:promos,id',
-                'poin' => 'nullable|integer|min:0',
-            ]);
 
             // ===============================
             // DISKON PROMO & POIN
             // ===============================
             $promo = $request->promo_id ? Promo::find($request->promo_id) : null;
-            $diskonPromo = 0;
-
-            if ($promo && now()->between($promo->mulai, $promo->akhir)) {
-                $diskonPromo = $subtotal * ($promo->diskon / 100);
-            }
+            $diskonPromo = ($promo && now()->between($promo->mulai, $promo->akhir))
+                ? $subtotal * ($promo->diskon / 100)
+                : 0;
 
             $poinDigunakan = min($request->poin ?? 0, $user->jumlah_poin);
             $diskonPoin = $poinDigunakan * 100;
@@ -151,7 +141,7 @@ class PesananController extends Controller
             $totalBayar = max(0, $subtotal - $diskonPromo - $diskonPoin);
 
             // ===============================
-            // BUAT PESANAN
+            // BUAT PESANAN (SNAPSHOT ALAMAT)
             // ===============================
             $pesanan = Pesanan::create([
                 'user_id' => $user->id,
@@ -162,6 +152,8 @@ class PesananController extends Controller
                 'diskon_dari_promo' => $diskonPromo,
                 'poin_digunakan' => $poinDigunakan,
                 'diskon_dari_poin' => $diskonPoin,
+                'alamat_pengiriman' => $alamat->alamat,
+                'no_telp_pengiriman' => $alamat->no_telp,
             ]);
 
             // ===============================
@@ -169,74 +161,57 @@ class PesananController extends Controller
             // ===============================
             foreach ($cartItems as $item) {
 
-                // ===== PRODUK =====
                 if ($item->type === 'produk') {
 
                     DetailPesanan::create([
-                        'pesanan_id'      => $pesanan->id,
-                        'produk_id'       => $item->produk_id,
+                        'pesanan_id' => $pesanan->id,
+                        'produk_id' => $item->produk_id,
                         'product_size_id' => $item->product_size_id,
-                        'quantity'        => $item->quantity,
-                        'price'           => $item->size->harga,
-                        'type'            => 'produk',
+                        'quantity' => $item->quantity,
+                        'price' => $item->size->harga,
+                        'type' => 'produk',
                     ]);
 
-                    // potong stok size (AMAN)
-                    $item->size->update([
-                        'stok' => max(0, $item->size->stok - $item->quantity)
-                    ]);
-                }
+                    $item->size->decrement('stok', $item->quantity);
 
-                // ===== PAKET =====
-                else {
+                } else {
 
                     DetailPesanan::create([
                         'pesanan_id' => $pesanan->id,
-                        'paket_id'   => $item->paket_id,
-                        'quantity'   => $item->quantity,
-                        'price'      => $item->paket->harga_paket,
-                        'type'       => 'paket',
+                        'paket_id' => $item->paket_id,
+                        'quantity' => $item->quantity,
+                        'price' => $item->paket->harga_paket,
+                        'type' => 'paket',
                     ]);
 
-                    // potong stok isi paket
                     foreach ($item->paket->detailPakets as $detail) {
-                        $detail->size->update([
-                            'stok' => max(
-                                0,
-                                $detail->size->stok
-                                - ($detail->quantity * $item->quantity)
-                            )
-                        ]);
+                        $detail->size->decrement(
+                            'stok',
+                            $detail->quantity * $item->quantity
+                        );
                     }
                 }
             }
 
             // ===============================
-            // KURANGI POIN USER
+            // KURANGI POIN & HAPUS CART
             // ===============================
             if ($poinDigunakan > 0) {
                 $user->decrement('jumlah_poin', $poinDigunakan);
             }
 
-            // ===============================
-            // HAPUS CART
-            // ===============================
             Cart::where('user_id', $user->id)->delete();
 
             DB::commit();
 
-            return redirect()->route('pesanan.show', $pesanan->id)
+            return redirect()
+                ->route('pesanan.show', $pesanan->id)
                 ->with('success', 'Pesanan berhasil dibuat.');
 
         } catch (\Exception $e) {
 
             DB::rollBack();
-
-            // SAAT DEVELOPMENT:
             return back()->with('error', $e->getMessage());
-
-            // SAAT PRODUCTION:
-            // return back()->with('error', 'Terjadi kesalahan sistem.');
         }
     }
 

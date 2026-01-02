@@ -11,9 +11,22 @@
     <form action="{{ route('pesanan.store') }}" method="POST" id="checkoutForm">
         @csrf
 
-        {{-- ALAMAT --}}
         <h5>Alamat Pengiriman</h5>
-        <p class="mb-4">{{ $alamat }}</p>
+        @forelse ($alamatList as $alamat)
+            <div class="form-check mb-2">
+                <input type="radio"
+                    name="alamat_id"
+                    value="{{ $alamat->id }}"
+                    class="form-check-input"
+                    {{ $alamat->is_default ? 'checked' : '' }}>
+                <label class="form-check-label">
+                    <strong>{{ $alamat->label }}</strong><br>
+                    {{ $alamat->alamat }}
+                </label>
+            </div>
+        @empty
+            <p class="text-muted">Belum ada alamat pengiriman.</p>
+        @endforelse
 
         {{-- ITEM --}}
         <h5>Item dalam Keranjang</h5>

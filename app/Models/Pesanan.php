@@ -13,6 +13,8 @@ class Pesanan extends Model
         'total',
         'status',
         'metode_pembayaran',
+        'alamat_pengiriman',
+        'no_telp_pengiriman',
         'no_resi',
         'poin_diperoleh',
         'poin_digunakan',

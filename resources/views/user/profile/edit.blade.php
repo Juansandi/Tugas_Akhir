@@ -27,11 +27,6 @@
               <label for="no_telp" class="form-label">No. Telepon</label>
               <input type="text" name="no_telp" id="no_telp" class="form-control" value="{{ $user->no_telp }}">
           </div>
-
-          <div class="mb-3">
-              <label for="alamat" class="form-label">Alamat</label>
-              <textarea name="alamat" id="alamat" class="form-control" rows="3">{{ $user->alamat }}</textarea>
-          </div>
         </div>
 
         <div class="modal-footer">

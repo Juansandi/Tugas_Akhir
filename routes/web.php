@@ -24,6 +24,7 @@ use App\Http\Controllers\KurirController;
 use App\Http\Controllers\Admin\PaketController;
 use App\Http\Controllers\PaketUserController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\AlamatController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -58,7 +59,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::get('/profile/password', [ProfileController::class, 'editPassword'])->name('profile.editPassword');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+});
 
+Route::middleware('auth')->group(function () {
+    Route::get('/alamat', [AlamatController::class, 'index'])->name('alamat.index');
+    Route::post('/alamat', [AlamatController::class, 'store'])->name('alamat.store');
+    Route::put('/alamat/{alamat}', [AlamatController::class, 'update'])->name('alamat.update');
+    Route::post('/alamat/{alamat}/default', [AlamatController::class, 'setDefault'])->name('alamat.default');
+    Route::delete('/alamat/{alamat}', [AlamatController::class, 'destroy'])->name('alamat.destroy');
 });
 
 Route::middleware('auth')->group(function () {
@@ -196,7 +204,17 @@ Route::middleware(['auth', 'role:kurir'])->group(function () {
     Route::post('/pesanan/{id}/selesai', [KurirController::class, 'selesai'])->name('kurir.selesai');
 });
 
-// routes/web.php
 Route::middleware(['auth', 'role:kurir'])->group(function () {
     Route::get('/kurir/chat/{chat}', [ChatController::class, 'kurirShow'])->name('kurir.chat.show');
 });
+
+Route::middleware(['auth'])->group(function () {
+
+    Route::put('/kurir/profile', [KurirController::class, 'updateProfile'])
+        ->name('kurir.profile.update');
+
+    Route::put('/kurir/password', [KurirController::class, 'updatePassword'])
+        ->name('kurir.password.update');
+
+});
+

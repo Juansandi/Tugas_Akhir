@@ -30,7 +30,26 @@
 
         <p><strong>Email:</strong> {{ $user->email }}</p>
         <p><strong>No. Telepon:</strong> {{ $user->no_telp ?? '-' }}</p>
-        <p><strong>Alamat:</strong> {{ $user->alamat ?? '-' }}</p>
+        <h4>Daftar Alamat</h4>
+
+@if ($user->alamatPengguna->isEmpty())
+    <p>Belum ada alamat.</p>
+@else
+    <ul>
+        @foreach ($user->alamatPengguna as $alamat)
+            <li>
+                {{ $alamat->label }} – {{ $alamat->alamat }}
+                @if ($alamat->is_default)
+                    <strong>(Utama)</strong>
+                @endif
+            </li>
+        @endforeach
+    </ul>
+@endif
+<a href="{{ route('alamat.index') }}" class="btn btn-sm btn-outline-success mt-2">
+    <i class="bi bi-geo-alt me-1"></i> Kelola Alamat
+</a>
+
         <p><strong>Jumlah Poin:</strong> {{ $user->jumlah_poin }}</p>
 
         <div class="d-flex gap-2 mt-4">

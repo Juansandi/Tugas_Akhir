@@ -6,13 +6,30 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Pengguna;
+use App\Models\AlamatPengguna;
 use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
     public function show()
-    {
-        $user = Auth::user();
+    {   
+    /** @var \App\Models\Pengguna $user */
+    $user = Auth::user();
+
+        // 🔄 SINKRON ALAMAT DEFAULT
+        if ($user->alamat && $user->alamatPengguna()->count() === 0) {
+            AlamatPengguna::create([
+                'pengguna_id' => $user->id,
+                'label' => 'Alamat Utama',
+                'alamat' => $user->alamat,
+                'no_telp' => $user->no_telp,
+                'is_default' => true,
+            ]);
+        }
+
+        // reload relasi alamat
+        $user->load('alamatPengguna');
+
         return view('user.profile.show', compact('user'));
     }
 

@@ -10,7 +10,22 @@
     </div>
 
     <p><strong>Nama Pembeli:</strong> {{ $pesanan->pengguna->username ?? 'Guest' }}</p>
+    {{-- ALAMAT PENGIRIMAN --}}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h6 class="mb-2">Alamat Pengiriman</h6>
 
+            <p class="mb-1">
+                {{ $pesanan->alamat_pengiriman }}
+            </p>
+
+            @if (!empty($pesanan->no_telp_pengiriman))
+                <small class="text-muted">
+                    No. Telp: {{ $pesanan->no_telp_pengiriman }}
+                </small>
+            @endif
+        </div>
+    </div>
     @php
         $status = $pesanan->status;
         $badgeClass = match($status) {
