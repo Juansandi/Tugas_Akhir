@@ -1,103 +1,255 @@
 @extends('layouts.app')
 
-@section('content')
-<div class="container-fluid text-center text-white py-5" 
-     style="background: url('https://rsud.bulelengkab.go.id/uploads/konten/32_manfaat-sayur-untuk-anak-menunjang-tumbuh-kembang-yang-optimal.jpg') center center / cover no-repeat; height: 600px;">
-    <div class="py-5" style="background-color: rgba(0,0,0,0.5);">
-        <h1 class="display-4 fw-bold">Belanja Beras & Sayur Berkualitas Tanpa Keluar Rumah</h1>
-        <p class="lead">Dapatkan produk segar langsung dari petani</p>
-        <a href="#products" class="btn btn-light mt-3">Belanja Sekarang</a>
+@section('hero')
+
+{{-- ================= HERO SECTION ================= --}}
+<div class="container-fluid px-0">
+    <div class="hero-section text-white d-flex align-items-center"
+         style="background: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)),
+                url('https://rsud.bulelengkab.go.id/uploads/konten/32_manfaat-sayur-untuk-anak-menunjang-tumbuh-kembang-yang-optimal.jpg')
+                center / cover no-repeat;
+                min-height: 95vh;">
+        <div class="container text-center">
+
+            @guest
+                <h1 class="display-4 fw-bold mb-3">
+                    Belanja Bahan Pokok Tanpa Keluar Rumah
+                </h1>
+                <p class="lead mb-4">
+                    Beras & sayur segar langsung dari petani
+                </p>
+                <a href="{{ route('login') }}" class="btn btn-success btn-lg px-4">
+                    Login & Mulai Belanja
+                </a>
+            @endguest
+
+            @auth
+                <h1 class="display-5 fw-bold mb-3">
+                    Halo, {{ auth()->user()->username }} 👋
+                </h1>
+                <p class="lead mb-4">
+                    Yuk lanjutkan belanja kebutuhan harianmu
+                </p>
+                <a href="#featured" class="btn btn-success btn-lg px-4">
+                    Lihat Produk
+                </a>
+            @endauth
+
+        </div>
     </div>
 </div>
 
+{{-- ================= KEUNGGULAN ================= --}}
+<div class="container py-5">
+    <div class="row text-center g-4">
+        <div class="col-md-3">
+            <i class="bi bi-basket fs-1 text-success"></i>
+            <h6 class="fw-bold mt-3">Produk Segar</h6>
+            <p class="text-muted small">Langsung dari petani</p>
+        </div>
+        <div class="col-md-3">
+            <i class="bi bi-truck fs-1 text-success"></i>
+            <h6 class="fw-bold mt-3">Pengiriman Cepat</h6>
+            <p class="text-muted small">Kurir internal</p>
+        </div>
+        <div class="col-md-3">
+            <i class="bi bi-chat-dots fs-1 text-success"></i>
+            <h6 class="fw-bold mt-3">Chat Real-time</h6>
+            <p class="text-muted small">Admin & Kurir</p>
+        </div>
+        <div class="col-md-3">
+            <i class="bi bi-shield-check fs-1 text-success"></i>
+            <h6 class="fw-bold mt-3">Aman & Terpercaya</h6>
+            <p class="text-muted small">Transaksi tercatat</p>
+        </div>
+    </div>
+</div>
 
-{{-- Produk Pilihan Hari Ini --}}
-<div class="container py-5" id="products">
-    <h2 class="text-center mb-4">Produk Pilihan Hari Ini</h2>
-    @if($featuredProducts->count() > 0)
-        <div class="row justify-content-center">
-            @foreach($featuredProducts as $product)
-            <div class="col-md-3 mb-4">
-                <div class="card h-100 shadow">
-                    @if($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
-                    @else
-                        <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
-                    @endif
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">{{ $product->nama_produk }}</h5>
-                        <p class="card-text text-muted mb-1">{{ Str::limit($product->deskripsi, 50) }}</p>
-                        <p class="card-text"><strong>Rp {{ number_format($product->harga, 0, ',', '.') }}</strong></p>
-                        <p class="card-text"><small class="text-muted">Stok: {{ $product->stok }}</small></p>
-                        
-                        <div class="mt-auto d-flex justify-content-between align-items-center">
-                            <div class="d-flex gap-2">
-                                <a href="{{ route('produk.detail', $product->id) }}" class="btn btn-outline-primary btn-sm" title="Lihat Detail">
-                                    <i class="bi bi-info-circle"></i>
-                                </a>
+{{-- ================= PRODUK PILIHAN ================= --}}
+<div class="container py-5" id="featured">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">🌟 Produk Pilihan Hari Ini</h3>
+        <a href="{{ route('user.products') }}" class="btn btn-outline-success btn-sm">
+            Lihat Semua
+        </a>
+    </div>
 
-                                <form action="{{ route('wishlist.store', $product->id) }}" method="POST" class="mb-0">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Tambah ke Wishlist">
-                                        <i class="bi bi-heart"></i>
-                                    </button>
-                                </form>
-                            </div>
+    @if($featuredProducts->count())
+    <div class="row g-4">
+        @foreach($featuredProducts as $product)
+        <div class="col-6 col-md-3">
+            <div class="card h-100 shadow-sm border-0">
+                <img src="{{ $product->image
+                        ? asset('storage/'.$product->image)
+                        : 'https://via.placeholder.com/300x200' }}"
+                     class="card-img-top"
+                     style="height:180px; object-fit:cover">
 
-                            <form action="{{ route('cart.store') }}" method="POST" class="mb-0">
-                                @csrf
-                                <input type="hidden" name="produk_id" value="{{ $product->id }}">
-                                <input type="hidden" name="quantity" value="1">
-                                <button type="submit" class="btn btn-sm btn-outline-primary" title="Tambah ke Keranjang">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
-                            </form>
+                <div class="card-body d-flex flex-column">
+                    <h6 class="fw-semibold mb-1">{{ $product->nama_produk }}</h6>
+
+                    <span class="text-success fw-bold mb-2">
+                        Rp {{ number_format($product->sizes->min('harga') ?? 0,0,',','.') }}
+                    </span>
+
+                    <div class="mt-auto d-flex justify-content-between">
+                        <a href="{{ route('produk.detail', $product->id) }}"
+                           class="btn btn-sm btn-outline-primary">
+                            Detail
+                        </a>
+
+                        <div class="mt-auto d-flex justify-content-between">
+                            <a href="{{ route('produk.detail', $product->id) }}"
+                            class="btn btn-sm btn-outline-primary w-100">
+                                Pilih Ukuran
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
-            @endforeach
         </div>
-        <div class="text-center mt-4">
-            <a href="{{ route('user.products') }}" class="btn btn-outline-primary">Lihat Semua Produk</a>
-        </div>
+        @endforeach
+    </div>
     @else
-        <div class="text-center">
-            <p class="text-muted">Belum ada produk tersedia.</p>
-            <a href="{{ route('user.products') }}" class="btn btn-outline-primary">Cek Produk Lainnya</a>
-        </div>
+        <p class="text-muted">Belum ada produk tersedia.</p>
     @endif
 </div>
 
-{{-- Kategori Produk --}}
+{{-- ================= PRODUK TERLARIS ================= --}}
+@if(isset($produkTerlaris) && $produkTerlaris->count())
 <div class="container py-5">
-    <h2 class="text-center mb-4">Lihat Kategori Produk Kami</h2>
-    <p class="text-center">Jelajahi pilihan kategori produk kami dari beras, sayur, hingga umbi-umbian</p>
-    <div class="row justify-content-center">
-        <div class="col-md-3 mb-4">
-            <div class="card shadow">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcwmiQUfzNzvfwnovFZk0Lzw4ZriBl75108w&s" class="card-img-top" alt="Beras">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Beras</h5>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">🏆 Produk Terlaris</h3>
+        <span class="text-muted small">Paling banyak dibeli</span>
+    </div>
+
+    <div class="row g-4">
+        @foreach($produkTerlaris as $product)
+        <div class="col-6 col-md-3">
+            <div class="card h-100 shadow-sm border-0 position-relative">
+
+                {{-- BADGE --}}
+                <span class="position-absolute top-0 start-0 badge bg-danger m-2">
+                    Best Seller
+                </span>
+
+                {{-- IMAGE --}}
+                <img src="{{ $product->image
+                        ? asset('storage/'.$product->image)
+                        : 'https://via.placeholder.com/300x200' }}"
+                     class="card-img-top"
+                     style="height:180px; object-fit:cover">
+
+                <div class="card-body d-flex flex-column">
+                    <h6 class="fw-semibold mb-1">
+                        {{ $product->nama_produk }}
+                    </h6>
+
+                    {{-- HARGA DARI SIZE TERMURAH --}}
+                    <span class="text-success fw-bold mb-1">
+                        Rp {{ number_format($product->sizes->min('harga') ?? 0,0,',','.') }}
+                    </span>
+
+                    {{-- TOTAL TERJUAL --}}
+                    <small class="text-muted mb-2">
+                        Terjual {{ $product->total_terjual }} kali
+                    </small>
+
+                    <div class="mt-auto">
+                        <a href="{{ route('produk.detail', $product->id) }}"
+                           class="btn btn-outline-success btn-sm w-100">
+                            Lihat Produk
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card shadow">
-                <img src="https://akcdn.detik.net.id/visual/2021/06/08/ilustrasi-sayur_169.jpeg?w=1200" class="card-img-top" alt="Sayur-Sayuran">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Sayur-Sayuran</h5>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 mb-4">
-            <div class="card shadow">
-                <img src="https://d1vbn70lmn1nqe.cloudfront.net/prod/wp-content/uploads/2022/08/10085013/Ini-X-Jenis-Umbi-umbian-dan-Manfaatnya-untuk-Kesehatan.jpg" class="card-img-top" alt="Serat & Umbi">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Serat & Umbi</h5>
-                </div>
-            </div>
-        </div>
+        @endforeach
     </div>
 </div>
+@endif
+
+{{-- ================= PRODUK REKOMENDASI ================= --}}
+@auth
+@if($recommendedProducts->count())
+<div class="container py-5">
+    <h3 class="fw-bold mb-4">🎯 Rekomendasi Untuk Kamu</h3>
+
+    <div class="row g-4">
+        @foreach($recommendedProducts as $product)
+        <div class="col-6 col-md-3">
+            <div class="card h-100 shadow-sm border-0">
+                <img src="{{ $product->image
+                        ? asset('storage/'.$product->image)
+                        : 'https://via.placeholder.com/300x200' }}"
+                     class="card-img-top"
+                     style="height:180px; object-fit:cover">
+
+                <div class="card-body">
+                    <h6 class="fw-semibold">{{ $product->nama_produk }}</h6>
+                    <span class="text-success fw-bold">
+                        Rp {{ number_format($product->sizes->min('harga') ?? 0,0,',','.') }}
+                    </span>
+                </div>
+                <div class="mt-auto d-flex justify-content-between">
+                    <a href="{{ route('produk.detail', $product->id) }}"
+                       class="btn btn-sm btn-outline-success w-100">
+                        Lihat Produk
+                    </a>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
+@endauth
+
+{{-- ================= KATEGORI ================= --}}
+<div class="container py-5">
+    <h3 class="text-center fw-bold mb-4">📦 Kategori Produk</h3>
+
+    <div class="row justify-content-center g-4">
+        @foreach($categories as $kategori)
+        <div class="col-md-3">
+            <a href="{{ route('produk.index', ['kategori' => $kategori->id]) }}"
+               class="text-decoration-none">
+                <div class="card shadow-sm text-center h-100 border-0">
+                    <div class="card-body">
+                        <i class="bi bi-box-seam fs-1 text-success mb-3"></i>
+                        <h6 class="fw-semibold text-dark">
+                            {{ $kategori->nama_kategori }}
+                        </h6>
+                        <small class="text-muted">
+                            {{ $kategori->products_count }} produk
+                        </small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        @endforeach
+    </div>
+</div>
+
+{{-- ================= PESANAN TERAKHIR ================= --}}
+@auth
+@if($lastOrder)
+<div class="container py-5">
+    <div class="alert alert-info d-flex justify-content-between align-items-center">
+        <div>
+            <strong>Pesanan Terakhir:</strong>
+            #{{ $lastOrder->id }}
+            <span class="badge bg-secondary ms-2">
+                {{ ucfirst($lastOrder->status) }}
+            </span>
+        </div>
+        <a href="{{ route('pesanan.show', $lastOrder->id) }}"
+           class="btn btn-sm btn-outline-primary">
+            Lihat Pesanan
+        </a>
+    </div>
+</div>
+@endif
+@endauth
+
 @endsection

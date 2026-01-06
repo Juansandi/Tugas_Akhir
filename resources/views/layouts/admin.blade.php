@@ -131,7 +131,8 @@
                             </span>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{{ route('laporan.index') }}">Laporan</a></li>
+                        <li><a class="dropdown-item" href="{{ route('laporan.index') }}">Laporan Penjualan</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.laporan.detail') }}">Laporan Detail</a></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf

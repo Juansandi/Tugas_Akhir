@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\DetailPesanan;
 
 class Produk extends Model
 {
@@ -37,5 +38,9 @@ class Produk extends Model
     {
         return $this->hasMany(ProductSize::class, 'produk_id');
     }
-
+    public function detailPesanan()
+    
+    {
+        return $this->hasMany(DetailPesanan::class, 'produk_id');
+    }
 }

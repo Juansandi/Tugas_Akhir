@@ -171,6 +171,9 @@ Route::get('admin/notifications/read/{id}', [AdminNotificationController::class,
 Route::post('admin/notifications/read-all', [AdminNotificationController::class, 'markAllAsRead'])->name('admin.notifications.readAll');
 
 Route::get('/admin/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+Route::get('/admin/laporan/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.pdf');
+Route::get('/admin/laporan/detail', [LaporanController::class, 'detail'])->name('admin.laporan.detail');
+Route::get('/admin/laporan/detail/pdf', [LaporanController::class, 'detailPdf'])->name('admin.laporan.detail.pdf');
 
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin/akun')
