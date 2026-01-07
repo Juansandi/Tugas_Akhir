@@ -174,6 +174,10 @@ Route::get('/admin/laporan', [LaporanController::class, 'index'])->name('laporan
 Route::get('/admin/laporan/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.pdf');
 Route::get('/admin/laporan/detail', [LaporanController::class, 'detail'])->name('admin.laporan.detail');
 Route::get('/admin/laporan/detail/pdf', [LaporanController::class, 'detailPdf'])->name('admin.laporan.detail.pdf');
+Route::get('/admin/laporan/produk-terlaris',[LaporanController::class, 'produkTerlaris'])->name('admin.laporan.produk_terlaris');
+Route::get('/admin/laporan/produk-terlaris/pdf',[LaporanController::class, 'produkTerlarisPdf'])->name('admin.laporan.produk_terlaris_pdf');
+Route::get('/admin/laporan/paket-terlaris',[LaporanController::class, 'paketTerlaris'])->name('admin.laporan.paket_terlaris');
+Route::get('/admin/laporan/paket-terlaris/pdf',[LaporanController::class, 'paketTerlarisPdf'])->name('admin.laporan.paket_terlaris_pdf');
 
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin/akun')

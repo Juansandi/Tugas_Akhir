@@ -158,4 +158,180 @@ class LaporanController extends Controller
         return $pdf->download('laporan-detail-penjualan.pdf');
     }
 
+    public function produkTerlaris(Request $request)
+    {
+        $startDate = $request->start_date
+            ? Carbon::parse($request->start_date)
+            : Carbon::now()->startOfMonth();
+
+        $endDate = $request->end_date
+            ? Carbon::parse($request->end_date)
+            : Carbon::now();
+
+        $produkTerlaris = DB::table('detail_pesanans')
+            ->join('pesanans', 'detail_pesanans.pesanan_id', '=', 'pesanans.id')
+            ->join('produks', 'detail_pesanans.produk_id', '=', 'produks.id')
+            ->join('product_sizes', 'detail_pesanans.product_size_id', '=', 'product_sizes.id')
+            ->join('kategoris', 'produks.kategori_id', '=', 'kategoris.id')
+            ->where('pesanans.status', 'selesai')
+            ->whereBetween('pesanans.created_at', [$startDate, $endDate])
+            ->select(
+                'produks.nama_produk as nama_produk',
+                'product_sizes.size as ukuran',      // ✅ UKURAN
+                'kategoris.nama_kategori as nama_kategori',
+                DB::raw('SUM(detail_pesanans.quantity) as total_qty'),
+                DB::raw('SUM(detail_pesanans.quantity * detail_pesanans.price) as total_omzet')
+            )
+            ->groupBy(
+                'produks.nama_produk',
+                'product_sizes.size',                // ✅ GROUP PER UKURAN
+                'kategoris.nama_kategori'
+            )
+            ->orderByDesc('total_qty')
+            ->get();
+
+        $grafikProdukTerlaris = DB::table('detail_pesanans')
+    ->join('pesanans', 'detail_pesanans.pesanan_id', '=', 'pesanans.id')
+    ->join('produks', 'detail_pesanans.produk_id', '=', 'produks.id')
+    ->join('product_sizes', 'detail_pesanans.product_size_id', '=', 'product_sizes.id')
+    ->where('pesanans.status', 'selesai')
+    ->whereBetween('pesanans.created_at', [$startDate, $endDate])
+    ->select(
+        DB::raw("CONCAT(produks.nama_produk, ' (', product_sizes.size, ')') as label"),
+        DB::raw('SUM(detail_pesanans.quantity) as total_qty')
+    )
+    ->groupBy('label')
+    ->orderByDesc('total_qty')
+    ->limit(5)
+    ->get();
+
+
+        return view('admin.laporan.produk_terlaris', compact(
+            'produkTerlaris',
+            'grafikProdukTerlaris',
+            'startDate',
+            'endDate'
+        ));
+    }
+
+    public function produkTerlarisPdf(Request $request)
+    {
+        // query SAMA
+        $startDate = $request->start_date
+            ? Carbon::parse($request->start_date)
+            : Carbon::now()->startOfMonth();
+
+        $endDate = $request->end_date
+            ? Carbon::parse($request->end_date)
+            : Carbon::now();
+
+        $produkTerlaris = DB::table('detail_pesanans')
+            ->join('pesanans', 'detail_pesanans.pesanan_id', '=', 'pesanans.id')
+            ->join('produks', 'detail_pesanans.produk_id', '=', 'produks.id')
+            ->join('product_sizes', 'detail_pesanans.product_size_id', '=', 'product_sizes.id')
+            ->join('kategoris', 'produks.kategori_id', '=', 'kategoris.id')
+            ->where('pesanans.status', 'selesai')
+            ->whereBetween('pesanans.created_at', [$startDate, $endDate])
+            ->select(
+                'produks.nama_produk as nama_produk',
+                'product_sizes.size as ukuran',      // ✅ UKURAN
+                'kategoris.nama_kategori as nama_kategori',
+                DB::raw('SUM(detail_pesanans.quantity) as total_qty'),
+                DB::raw('SUM(detail_pesanans.quantity * detail_pesanans.price) as total_omzet')
+            )
+            ->groupBy(
+                'produks.nama_produk',
+                'product_sizes.size',                // ✅ GROUP PER UKURAN
+                'kategoris.nama_kategori'
+            )
+            ->orderByDesc('total_qty')
+            ->get();
+
+        $grafikProdukTerlaris = DB::table('detail_pesanans')
+            ->join('pesanans', 'detail_pesanans.pesanan_id', '=', 'pesanans.id')
+            ->join('produks', 'detail_pesanans.produk_id', '=', 'produks.id')
+            ->join('product_sizes', 'detail_pesanans.product_size_id', '=', 'product_sizes.id')
+            ->where('pesanans.status', 'selesai')
+            ->whereBetween('pesanans.created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw("CONCAT(produks.nama_produk, ' (', product_sizes.size, ')') as label"),
+                DB::raw('SUM(detail_pesanans.quantity) as total_qty')
+            )
+            ->groupBy('label')
+            ->orderByDesc('total_qty')
+            ->limit(5)
+            ->get();
+
+        $pdf = Pdf::loadView(
+            'admin.laporan.produk_terlaris_pdf',
+            compact('produkTerlaris', 'grafikProdukTerlaris', 'startDate', 'endDate')
+        );
+
+        return $pdf->download('laporan.produk_terlaris.pdf');
+    }
+
+    public function paketTerlaris(Request $request)
+    {
+        $startDate = $request->start_date
+            ? Carbon::parse($request->start_date)
+            : Carbon::now()->startOfMonth();
+
+        $endDate = $request->end_date
+            ? Carbon::parse($request->end_date)
+            : Carbon::now();
+
+        $paketTerlaris = DB::table('detail_pesanans')
+            ->join('pesanans', 'detail_pesanans.pesanan_id', '=', 'pesanans.id')
+            ->join('pakets', 'detail_pesanans.paket_id', '=', 'pakets.id')
+            ->whereNotNull('detail_pesanans.paket_id')
+            ->where('pesanans.status', 'selesai')
+            ->whereBetween('pesanans.created_at', [$startDate, $endDate])
+            ->select(
+                'pakets.nama_paket as nama_paket',
+                DB::raw('SUM(detail_pesanans.quantity) as total_qty'),
+                DB::raw('SUM(detail_pesanans.quantity * detail_pesanans.price) as total_omzet')
+            )
+            ->groupBy('pakets.nama_paket')
+            ->orderByDesc('total_qty')
+            ->get();
+
+        return view('admin.laporan.paket_terlaris', compact(
+            'paketTerlaris',
+            'startDate',
+            'endDate'
+        ));
+    }
+
+    public function paketTerlarisPdf(Request $request)
+    {
+        $startDate = $request->start_date
+            ? Carbon::parse($request->start_date)
+            : Carbon::now()->startOfMonth();
+
+        $endDate = $request->end_date
+            ? Carbon::parse($request->end_date)
+            : Carbon::now();
+
+        $paketTerlaris = DB::table('detail_pesanans')
+            ->join('pesanans', 'detail_pesanans.pesanan_id', '=', 'pesanans.id')
+            ->join('pakets', 'detail_pesanans.paket_id', '=', 'pakets.id')
+            ->whereNotNull('detail_pesanans.paket_id')
+            ->where('pesanans.status', 'selesai')
+            ->whereBetween('pesanans.created_at', [$startDate, $endDate])
+            ->select(
+                'pakets.nama_paket as nama_paket',
+                DB::raw('SUM(detail_pesanans.quantity) as total_qty'),
+                DB::raw('SUM(detail_pesanans.quantity * detail_pesanans.price) as total_omzet')
+            )
+            ->groupBy('pakets.nama_paket')
+            ->orderByDesc('total_qty')
+            ->get();
+
+        $pdf = Pdf::loadView(
+            'admin.laporan.paket_terlaris_pdf',
+            compact('paketTerlaris', 'startDate', 'endDate')
+        );
+
+        return $pdf->download('laporan-paket-terlaris.pdf');
+    }
 }

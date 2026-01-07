@@ -71,7 +71,34 @@
                         </li>
                     </ul>
                 </li>
-
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ request()->is('admin/laporan*') ? 'active' : '' }}"
+                    href="#" role="button" data-bs-toggle="dropdown">
+                        Laporan
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('laporan.index') }}">
+                                Laporan Penjualan
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('admin.laporan.detail') }}">
+                                Detail Penjualan
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('admin.laporan.produk_terlaris') }}">
+                                Produk Terlaris
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('admin.laporan.paket_terlaris') }}">
+                                Paket Terlaris
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <ul class="navbar-nav ms-auto">
 
@@ -131,8 +158,6 @@
                             </span>
                         </li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{{ route('laporan.index') }}">Laporan Penjualan</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.laporan.detail') }}">Laporan Detail</a></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf

@@ -244,11 +244,16 @@ class ProdukController extends Controller
             ->limit(5)
             ->get();
         
-        $produkTerlaris = DetailPesanan::select('produk_id', DB::raw('SUM(quantity) as total_terjual'))
+        $produkTerlaris = DetailPesanan::join('pesanans', 'detail_pesanans.pesanan_id', '=', 'pesanans.id')
+            ->where('pesanans.status', 'selesai')
+            ->whereYear('pesanans.created_at', Carbon::now()->year)
+            ->whereMonth('pesanans.created_at', Carbon::now()->month)
+            ->select('produk_id', DB::raw('SUM(quantity) as total_terjual'))
             ->groupBy('produk_id')
             ->orderByDesc('total_terjual')
-            ->with('produk') // relasi ke model Produk
+            ->with('produk')
             ->first();
+
 
         return view('admin.dashboard', compact(
             'totalProduk',

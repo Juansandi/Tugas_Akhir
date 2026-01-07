@@ -48,6 +48,9 @@
                     <small>Total Dipesan: {{ $produkTerlaris->total_terjual }}</small>
                 </div>
             </div>
+            <a href="{{ route('admin.laporan.produk_terlaris') }}" class="small text-dark">
+                Lihat laporan →
+            </a>
         </div>
         @endif
     </div>
