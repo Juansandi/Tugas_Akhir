@@ -7,8 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .navbar-nav .nav-link.active {
-            font-weight: bold;
-            text-decoration: underline;
+            font-weight: 600;
+            background-color: rgba(13,110,253,.1);
+            border-radius: 6px;
         }
         body {
             background-color: #f8f9fa;
@@ -35,11 +36,45 @@
 
         <div class="collapse navbar-collapse" id="navbarAdmin">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}" href="{{ route('products.index') }}">Produk</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.paket.*') ? 'active' : '' }}" href="{{ route('admin.paket.index') }}">Paket</a>
+                @php
+                    $produkActive =
+                        request()->routeIs('products.*') ||
+                        request()->routeIs('admin.stok.*') ||
+                        request()->routeIs('admin.harga.*') ||
+                        request()->routeIs('admin.paket.*');
+                @endphp
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ $produkActive ? 'active' : '' }}"
+                    href="#" data-bs-toggle="dropdown">
+                        Produk
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item {{ request()->routeIs('products.*') ? 'active' : '' }}"
+                            href="{{ route('products.index') }}">
+                                Daftar Produk
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item {{ request()->routeIs('admin.stok.*') ? 'active' : '' }}"
+                            href="{{ route('admin.stok.index') }}">
+                                Stok Produk
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item {{ request()->routeIs('admin.harga.*') ? 'active' : '' }}"
+                            href="{{ route('admin.harga.index') }}">
+                                Harga Produk
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item {{ request()->routeIs('admin.paket.*') ? 'active' : '' }}"
+                            href="{{ route('admin.paket.index') }}">
+                                Paket
+                            </a>
+                        </li>
+                    </ul>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('pesanan.*') ? 'active' : '' }}" href="{{ route('pesanan.index') }}">Pesanan</a>

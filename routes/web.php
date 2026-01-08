@@ -22,6 +22,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ManagementController;
 use App\Http\Controllers\KurirController;
 use App\Http\Controllers\Admin\PaketController;
+use App\Http\Controllers\Admin\StokController;
+use App\Http\Controllers\Admin\HargaController;
 use App\Http\Controllers\PaketUserController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\AlamatController;
@@ -122,6 +124,16 @@ Route::put('/admin/products/{product}', [ProdukController::class, 'update'])->na
 Route::delete('/admin/products/{product}', [ProdukController::class, 'destroy'])->name('products.destroy');
 Route::get('/admin/products/{id}/reviews', [ProdukController::class, 'showReviews'])->name('products.reviews');
 Route::delete('/admin/reviews/{id}', [ProdukController::class, 'destroyReview'])->name('reviews.destroy');
+
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/stok', [StokController::class, 'index'])->name('admin.stok.index');
+    Route::post('/stok/update', [StokController::class, 'update'])->name('admin.stok.update');
+});
+
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/harga', [HargaController::class, 'index'])->name('admin.harga.index');
+    Route::post('/harga/update', [HargaController::class, 'update'])->name('admin.harga.update');
+});
 
 Route::get('/admin/categories', [KategoriController::class, 'index'])->name('categories.index');
 Route::post('/admin/categories/store', [KategoriController::class, 'store'])->name('categories.store');
