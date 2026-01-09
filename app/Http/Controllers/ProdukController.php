@@ -9,20 +9,32 @@ use App\Models\Review;
 use App\Models\Pesanan;
 use App\Models\DetailPesanan;
 use App\Models\ProductSize;
+use App\Models\PriceHistory;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ProdukController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Produk::with(['kategori', 'sizes'])->latest()->paginate(10);
-        $categories = Kategori::all(); // ⬅ Tambahkan ini
+        $query = Produk::with(['kategori', 'sizes'])->latest();
+
+        // 🔍 SEARCH PRODUK
+        if ($request->filled('q')) {
+            $query->where('nama_produk', 'like', '%' . $request->q . '%');
+        }
+
+        // 🏷️ FILTER KATEGORI
+        if ($request->filled('kategori')) {
+            $query->where('kategori_id', $request->kategori);
+        }
+
+        $products = $query->paginate(10)->withQueryString();
+        $categories = Kategori::all();
 
         return view('admin.products.index', compact('products', 'categories'));
     }
-
 
     public function create()
     {
@@ -85,67 +97,92 @@ class ProdukController extends Controller
 
     public function update(Request $request, Produk $product)
     {
-        $request->validate([
-            'nama_produk' => 'required|string|max:255',
-            'jenis'       => 'nullable|string|max:255',
-            'deskripsi'   => 'nullable|string',
-            'harga'       => 'required|numeric|min:0',
-            'stok'        => 'required|integer|min:0',
-            'kategori_id' => 'required|exists:kategoris,id',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        DB::beginTransaction();
 
-            'sizes'             => 'nullable|array',
-            'sizes.*.id'        => 'nullable|integer|exists:product_sizes,id',
-            'sizes.*.size'      => 'nullable|string',
-            'sizes.*.stok'      => 'nullable|integer|min:0',
-            'sizes.*.harga'     => 'nullable|numeric|min:0',
-        ]);
+        try {
+            $request->validate([
+                'nama_produk' => 'required|string|max:255',
+                'jenis'       => 'nullable|string|max:255',
+                'deskripsi'   => 'nullable|string',
+                'kategori_id' => 'required|exists:kategoris,id',
+                'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
 
-        $data = $request->except('sizes');
+                'sizes'             => 'nullable|array',
+                'sizes.*.id'        => 'nullable|integer|exists:product_sizes,id',
+                'sizes.*.size'      => 'nullable|string',
+                'sizes.*.stok'      => 'nullable|integer|min:0',
+                'sizes.*.harga'     => 'nullable|numeric|min:0',
+            ]);
 
-        // 1️⃣ Gambar baru → hapus lama
-        if ($request->hasFile('image')) {
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
+            // =====================
+            // UPDATE DATA PRODUK
+            // =====================
+            $data = $request->except('sizes');
+
+            if ($request->hasFile('image')) {
+                if ($product->image) {
+                    Storage::disk('public')->delete($product->image);
+                }
+                $data['image'] = $request->file('image')->store('products', 'public');
             }
-            $data['image'] = $request->file('image')->store('products', 'public');
-        }
 
-        // 2️⃣ Update data produk
-        $product->update($data);
+            $product->update($data);
 
-        // 3️⃣ Update ukuran
-        if ($request->sizes) {
-            foreach ($request->sizes as $sizeData) {
+            // =====================
+            // UPDATE UKURAN + HISTORI HARGA
+            // =====================
+            if ($request->sizes) {
+                foreach ($request->sizes as $sizeData) {
 
-                // update ukuran lama
-                if (!empty($sizeData['id'])) {
-                    $size = ProductSize::find($sizeData['id']);
+                    // UPDATE ukuran lama
+                    if (!empty($sizeData['id'])) {
+                        $size = ProductSize::findOrFail($sizeData['id']);
 
-                    $size->update([
-                        'size'  => $sizeData['size'],
-                        'stok'  => $sizeData['stok'],
-                        'harga' => $sizeData['harga'],
-                    ]);
+                        // 👉 SIMPAN HISTORI JIKA HARGA BERUBAH
+                        if (
+                            isset($sizeData['harga']) &&
+                            $size->harga != $sizeData['harga']
+                        ) {
+                            PriceHistory::create([
+                                'produk_id'       => $product->id,
+                                'product_size_id' => $size->id,
+                                'harga_lama'      => $size->harga,
+                                'harga_baru'      => $sizeData['harga'],
+                                'pengguna_id'     => auth()->id(),
+                            ]);
 
-                } else {
-                    // tambah ukuran baru
-                    if (!empty($sizeData['size'])) {
-                        ProductSize::create([
-                            'produk_id' => $product->id,
-                            'size'      => $sizeData['size'],
-                            'stok'      => $sizeData['stok'] ?? 0,
-                            'harga'     => $sizeData['harga'] ?? $product->harga,
-                        ]);
+                            // Update harga
+                            $size->harga = $sizeData['harga'];
+                        }
+
+                        // Update atribut lain
+                        $size->size = $sizeData['size'];
+                        $size->stok = $sizeData['stok'];
+                        $size->save();
+
+                    } else {
+                        // TAMBAH ukuran baru (tidak perlu histori)
+                        if (!empty($sizeData['size'])) {
+                            ProductSize::create([
+                                'produk_id' => $product->id,
+                                'size'      => $sizeData['size'],
+                                'stok'      => $sizeData['stok'] ?? 0,
+                                'harga'     => $sizeData['harga'] ?? $product->harga,
+                            ]);
+                        }
                     }
                 }
             }
+
+            DB::commit();
+            return redirect()->route('products.index')
+                ->with('success', 'Produk berhasil diperbarui.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal memperbarui produk.');
         }
-
-        return redirect()->route('products.index')
-            ->with('success', 'Produk berhasil diperbarui.');
     }
-
 
     public function destroy(Produk $product)
     {

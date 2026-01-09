@@ -3,146 +3,199 @@
 @section('title', 'Manajemen Produk')
 
 @section('content')
-    <div class="container py-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold">Manajemen Produk</h2>
+<div class="container py-4">
+
+    {{-- HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0">Manajemen Produk</h2>
 
         <div class="d-flex gap-2">
-            <a href="{{ route('products.create') }}" class="btn btn-dark me-0">Tambah Produk</a>
-            <button class="btn btn-secondary ms-0" data-bs-toggle="modal" data-bs-target="#modalKategori">
-                Tambah Kategori
+            <a href="{{ route('products.create') }}" class="btn btn-dark">
+                Tambah Produk
+            </a>
+            <button class="btn btn-outline-secondary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalKategori">
+                Kategori
             </button>
         </div>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    {{-- FLASH --}}
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
     @endif
 
-   <div class="accordion" id="kategoriAccordion">
-    <div class="accordion-item">
-        <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#kategoriList">
-            Daftar Kategori
-        </button>
-        </h2>
-        <div id="kategoriList" class="accordion-collapse collapse">
-        <div class="accordion-body">
-            @foreach($categories as $category)
-                <div>{{ $category->nama_kategori }}</div>
-            @endforeach
+    <form method="GET" action="{{ route('products.index') }}" class="mb-3">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <input type="text"
+                    name="q"
+                    class="form-control"
+                    placeholder="Cari produk..."
+                    value="{{ request('q') }}">
+            </div>
+
+            {{-- BAWA FILTER KATEGORI --}}
+            @if(request('kategori'))
+                <input type="hidden" name="kategori" value="{{ request('kategori') }}">
+            @endif
+
+            <div class="col-auto">
+                <button class="btn btn-outline-primary">
+                    Cari
+                </button>
+            </div>
+
+            @if(request('q') || request('kategori'))
+                <div class="col-auto">
+                    <a href="{{ route('products.index') }}" class="btn btn-link">
+                        Reset
+                    </a>
+                </div>
+            @endif
         </div>
-        </div>
+    </form>
+
+    {{-- DAFTAR KATEGORI --}}
+    <div class="mb-3">
+        <strong>Kategori:</strong>
+
+        {{-- SEMUA --}}
+        <a href="{{ route('products.index', ['q' => request('q')]) }}"
+        class="btn btn-sm {{ request('kategori') ? 'btn-outline-secondary' : 'btn-secondary' }}">
+            Semua
+        </a>
+
+        @foreach($categories as $category)
+            <a href="{{ route('products.index', [
+                    'kategori' => $category->id,
+                    'q' => request('q')
+                ]) }}"
+            class="btn btn-sm
+                {{ request('kategori') == $category->id
+                        ? 'btn-dark'
+                        : 'btn-outline-secondary' }}">
+                {{ $category->nama_kategori }}
+            </a>
+        @endforeach
     </div>
-    </div>
-</br>
+
+    {{-- TABLE --}}
     <div class="table-responsive">
-        <table class="table table-bordered align-middle text-center">
-            <thead class="table-secondary">
-                <tr>
-                    <th>No</th>
-                    <th>Gambar</th>
-                    <th>Nama Produk</th>
-                    <th>Merk</th>
-                    <th>Kategori</th>
-                    <th>Harga Utama</th>
-                    <th>Stok</th>
-                    <th>Harga Per Ukuran</th>
-                    <th>Deskripsi</th>
-                    <th>Aksi</th>
-                    <th>Review</th>
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr class="text-center">
+                    <th width="40">No</th>
+                    <th>Produk</th>
+                    <th width="140">Kategori</th>
+                    <th>Ukuran, Harga & Stok</th>
+                    <th width="180">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($products as $index => $product)
-                    <tr>
-                        <td>{{ $index + $products->firstItem() }}</td>
 
-                        {{-- Gambar Produk --}}
-                        <td>
-                            @if ($product->image)
-                                <img src="{{ asset('storage/' . $product->image) }}" 
-                                     width="90" height="90" 
-                                     style="object-fit: cover; border-radius: 6px;">
-                            @else
-                                <span class="text-muted">No Image</span>
+            @forelse($products as $index => $product)
+                <tr>
+                    {{-- NO --}}
+                    <td class="text-center">
+                        {{ $index + $products->firstItem() }}
+                    </td>
+
+                    {{-- PRODUK --}}
+                    <td>
+                        <div class="d-flex gap-2">
+                            @if($product->image)
+                                <img src="{{ asset('storage/'.$product->image) }}"
+                                     width="60" height="60"
+                                     style="object-fit:cover;border-radius:4px;">
                             @endif
-                        </td>
+                            <div>
+                                <div class="fw-semibold">
+                                    {{ $product->nama_produk }}
+                                </div>
+                                <small class="text-muted">
+                                    {{ $product->jenis }}
+                                </small>
+                            </div>
+                        </div>
+                    </td>
 
-                        {{-- Nama Produk --}}
-                        <td>{{ $product->nama_produk }}</td>
+                    {{-- KATEGORI --}}
+                    <td class="text-center">
+                        {{ $product->kategori->nama_kategori ?? '-' }}
+                    </td>
 
-                        {{-- Merk --}}
-                        <td>{{ $product->jenis }}</td>
-
-                        {{-- Kategori --}}
-                        <td>{{ $product->kategori->nama_kategori ?? '-' }}</td>
-
-                        {{-- Harga utama --}}
-                        <td>Rp {{ number_format($product->harga, 0, ',', '.') }}</td>
-
-                        {{-- Stok total --}}
-                        <td>{{ $product->stok }}</td>
-
-                        {{-- Harga Per Ukuran --}}
-                        <td class="text-start">
-                            @if ($product->sizes->count())
-                                @foreach ($product->sizes as $size)
-                                    <div class="mb-1">
-                                        <strong>{{ $size->size }}:</strong>
-                                        Rp {{ number_format($size->harga, 0, ',', '.') }}
-                                        <span class="text-muted"> (stok: {{ $size->stok }})</span>
+                    {{-- UKURAN --}}
+                    <td>
+                        @if($product->sizes->count())
+                            @foreach($product->sizes as $size)
+                                <div class="d-flex justify-content-between border rounded px-2 py-1 mb-1">
+                                    <div>
+                                        <strong>{{ $size->size }}</strong>
                                     </div>
-                                @endforeach
-                            @else
-                                <span class="text-muted">Tidak ada ukuran</span>
-                            @endif
-                        </td>
+                                    <div>
+                                        Rp {{ number_format($size->harga,0,',','.') }}
+                                    </div>
+                                    <div>
+                                        Stok:
+                                        <span class="{{ $size->stok <= 5 ? 'text-danger fw-bold' : '' }}">
+                                            {{ $size->stok }}
+                                        </span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <span class="text-muted">Tidak ada ukuran</span>
+                        @endif
+                    </td>
 
-                        {{-- Deskripsi --}}
-                        <td>{{ Str::limit($product->deskripsi, 30) }}</td>
+                    {{-- AKSI --}}
+                    <td class="text-center">
+                        <a href="{{ route('products.edit', $product->id) }}"
+                           class="btn btn-sm btn-primary mb-1 w-100">
+                            Edit
+                        </a>
 
-                        {{-- Tombol Aksi --}}
-                        <td>
-                            <a href="{{ route('products.edit', $product->id) }}" 
-                               class="btn btn-sm btn-primary mb-1">Edit</a>
+                        <a href="{{ route('products.reviews', $product->id) }}"
+                           class="btn btn-sm btn-outline-secondary mb-1 w-100">
+                            Review
+                        </a>
 
-                            <form action="{{ route('products.destroy', $product->id) }}" 
-                                  method="POST" 
-                                  onsubmit="return confirm('Hapus produk ini?')" 
-                                  class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger">Hapus</button>
-                            </form>
-                        </td>
+                        <form action="{{ route('products.destroy', $product->id) }}"
+                              method="POST"
+                              onsubmit="return confirm('Hapus produk ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-danger w-100">
+                                Hapus
+                            </button>
+                        </form>
+                    </td>
+                </tr>
 
-                        {{-- Review --}}
-                        <td>
-                            <a href="{{ route('products.reviews', $product->id) }}" 
-                               class="btn btn-sm btn-outline-primary"
-                               title="Lihat Ulasan">
-                                <i class="bi bi-chat-left-text"></i>
-                            </a>
-                        </td>
+            @empty
+                <tr>
+                    <td colspan="5" class="text-center text-muted">
+                        Belum ada produk
+                    </td>
+                </tr>
+            @endforelse
 
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="11" class="text-muted">Belum ada produk.</td>
-                    </tr>
-                @endforelse
             </tbody>
         </table>
     </div>
 
-    {{-- Pagination --}}
+    {{-- PAGINATION --}}
     <div class="mt-3">
         {{ $products->links() }}
     </div>
+
 </div>
 
-<!-- Modal Tambah Kategori -->
+{{-- MODAL TAMBAH KATEGORI --}}
 <div class="modal fade" id="modalKategori" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -155,34 +208,45 @@
             <div class="modal-body">
                 <form id="formKategori">
                     @csrf
-
                     <div class="mb-3">
-                        <label>Nama Kategori</label>
-                        <input type="text" class="form-control" name="nama_kategori" required>
+                        <label class="form-label">Nama Kategori</label>
+                        <input type="text" name="nama_kategori"
+                               class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label>Deskripsi (opsional)</label>
-                        <textarea class="form-control" name="description"></textarea>
+                        <label class="form-label">Deskripsi (opsional)</label>
+                        <textarea name="description"
+                                  class="form-control"
+                                  rows="3"></textarea>
                     </div>
 
-                    <div id="kategoriError" class="text-danger d-none"></div>
+                    <div id="kategoriError"
+                         class="text-danger d-none"></div>
                 </form>
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button class="btn btn-primary" id="btnSimpanKategori">Simpan</button>
+                <button class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Batal
+                </button>
+                <button class="btn btn-primary"
+                        id="btnSimpanKategori">
+                    Simpan
+                </button>
             </div>
 
         </div>
     </div>
 </div>
+
+{{-- SCRIPT KATEGORI --}}
 <script>
 document.getElementById('btnSimpanKategori').addEventListener('click', function () {
 
-    let form = document.getElementById('formKategori');
-    let formData = new FormData(form);
+    const form = document.getElementById('formKategori');
+    const formData = new FormData(form);
 
     fetch("{{ route('categories.store') }}", {
         method: "POST",
@@ -194,15 +258,13 @@ document.getElementById('btnSimpanKategori').addEventListener('click', function 
     .then(res => res.json())
     .then(data => {
         if (data.errors) {
-            document.getElementById('kategoriError').classList.remove('d-none');
-            document.getElementById('kategoriError').innerText = data.errors.nama_kategori[0];
+            const err = document.getElementById('kategoriError');
+            err.classList.remove('d-none');
+            err.innerText = data.errors.nama_kategori[0];
         } else {
-            // sukses → tutup modal & reload
             location.reload();
         }
     });
 });
 </script>
 @endsection
-
-

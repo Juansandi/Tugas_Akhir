@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ProductSize;
+use App\Models\PriceHistory;
 use Illuminate\Support\Facades\DB;
 
 class HargaController extends Controller
@@ -40,8 +41,24 @@ class HargaController extends Controller
         DB::beginTransaction();
         try {
             foreach ($hargaDiubah as $sizeId => $hargaBaru) {
-                ProductSize::where('id', $sizeId)
-                    ->update(['harga' => $hargaBaru]);
+
+                $size = ProductSize::findOrFail($sizeId);
+
+                // ✅ SIMPAN HISTORI HARGA
+                if ($size->harga != $hargaBaru) {
+                    PriceHistory::create([
+                        'produk_id'        => $size->produk_id,
+                        'product_size_id'  => $size->id,
+                        'harga_lama'       => $size->harga,
+                        'harga_baru'       => $hargaBaru,
+                        'pengguna_id'      => auth()->id()
+                    ]);
+                }
+
+                // ✅ UPDATE HARGA
+                $size->update([
+                    'harga' => $hargaBaru
+                ]);
             }
 
             DB::commit();

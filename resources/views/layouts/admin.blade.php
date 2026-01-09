@@ -4,38 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Panel')</title>
+
+    {{-- Bootstrap --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {{-- Bootstrap Icons --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
     <style>
+        body {
+            background-color: #f8f9fa;
+        }
         .navbar-nav .nav-link.active {
             font-weight: 600;
             background-color: rgba(13,110,253,.1);
             border-radius: 6px;
         }
-        body {
-            background-color: #f8f9fa;
+        .dropdown-item.active {
+            font-weight: 600;
+            background-color: rgba(13,110,253,.1);
         }
     </style>
 </head>
 <body>
 
-    @php
+@php
     use App\Models\AdminNotification;
-    // Ambil notifikasi belum dibaca, urut terbaru
     $notifs = AdminNotification::where('is_read', false)->latest()->get();
 @endphp
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="{{ route('admin.dashboard') }}"> 
+
+        {{-- BRAND --}}
+        <a class="navbar-brand fw-bold" href="{{ route('admin.dashboard') }}">
             <img src="https://cdn-icons-png.flaticon.com/512/591/591788.png" width="30" class="me-2">
             Admin Panel
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin" aria-controls="navbarAdmin" aria-expanded="false" aria-label="Toggle navigation">
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarAdmin">
+
+            {{-- ================= MENU KIRI ================= --}}
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                {{-- PRODUK --}}
                 @php
                     $produkActive =
                         request()->routeIs('products.*') ||
@@ -45,111 +60,112 @@
                 @endphp
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle {{ $produkActive ? 'active' : '' }}"
-                    href="#" data-bs-toggle="dropdown">
-                        Produk
+                    <a class="nav-link dropdown-toggle {{ $produkActive ? 'active' : '' }}" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-box-seam me-1"></i> Produk
                     </a>
                     <ul class="dropdown-menu">
                         <li>
                             <a class="dropdown-item {{ request()->routeIs('products.*') ? 'active' : '' }}"
-                            href="{{ route('products.index') }}">
+                               href="{{ route('products.index') }}">
                                 Daftar Produk
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item {{ request()->routeIs('admin.stok.*') ? 'active' : '' }}"
-                            href="{{ route('admin.stok.index') }}">
+                               href="{{ route('admin.stok.index') }}">
                                 Stok Produk
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item {{ request()->routeIs('admin.harga.*') ? 'active' : '' }}"
-                            href="{{ route('admin.harga.index') }}">
+                               href="{{ route('admin.harga.index') }}">
                                 Harga Produk
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item {{ request()->routeIs('admin.paket.*') ? 'active' : '' }}"
-                            href="{{ route('admin.paket.index') }}">
+                               href="{{ route('admin.paket.index') }}">
                                 Paket
                             </a>
                         </li>
                     </ul>
                 </li>
+
+                {{-- PESANAN --}}
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('pesanan.*') ? 'active' : '' }}" href="{{ route('pesanan.index') }}">Pesanan</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('promos.*') ? 'active' : '' }}" href="{{ route('promos.index') }}">Promo</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->is('refund.*') ? 'active' : '' }}" href="{{ route('refund.index') }}">Refund</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('pengguna.*') ? 'active' : '' }}" href="{{ route('pengguna.index') }}">Pengguna</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle {{ request()->is('admin/akun/*') ? 'active' : '' }}"
-                    href="#" role="button" data-bs-toggle="dropdown">
-                        Manajemen Akun
+                    <a class="nav-link {{ request()->routeIs('pesanan.*') ? 'active' : '' }}"
+                       href="{{ route('pesanan.index') }}">
+                        <i class="bi bi-cart-check me-1"></i> Pesanan
                     </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="{{ route('admin.user.admin') }}">
-                                Admin
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('admin.user.kurir') }}">
-                                Pegawai / Kurir
-                            </a>
-                        </li>
-                    </ul>
                 </li>
+
+                {{-- PROMO --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('promos.*') ? 'active' : '' }}"
+                       href="{{ route('promos.index') }}">
+                        <i class="bi bi-percent me-1"></i> Promo
+                    </a>
+                </li>
+
+                {{-- REFUND --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('refund.*') ? 'active' : '' }}"
+                       href="{{ route('refund.index') }}">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Refund
+                    </a>
+                </li>
+
+                {{-- PENGGUNA --}}
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('pengguna.*') ? 'active' : '' }}"
+                       href="{{ route('pengguna.index') }}">
+                        <i class="bi bi-people me-1"></i> Pengguna
+                    </a>
+                </li>
+
+                {{-- LAPORAN --}}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle {{ request()->is('admin/laporan*') ? 'active' : '' }}"
-                    href="#" role="button" data-bs-toggle="dropdown">
-                        Laporan
+                       href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-graph-up-arrow me-1"></i> Laporan
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="{{ route('laporan.index') }}">
-                                Laporan Penjualan
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('admin.laporan.detail') }}">
-                                Detail Penjualan
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('admin.laporan.produk_terlaris') }}">
-                                Produk Terlaris
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('admin.laporan.paket_terlaris') }}">
-                                Paket Terlaris
-                            </a>
-                        </li>
+                        <li><a class="dropdown-item" href="{{ route('laporan.index') }}">Laporan Penjualan</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.laporan.detail') }}">Detail Penjualan</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.laporan.produk_terlaris') }}">Produk Terlaris</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.laporan.paket_terlaris') }}">Paket Terlaris</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.price_histories.index') }}">Histori Harga</a></li>
+                    </ul>
+                </li>
+
+                {{-- MANAJEMEN AKUN --}}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ request()->is('admin/akun/*') ? 'active' : '' }}"
+                       href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-shield-lock me-1"></i> Manajemen Akun
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ route('admin.user.admin') }}">Admin</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.user.kurir') }}">Pegawai / Kurir</a></li>
                     </ul>
                 </li>
             </ul>
+
+            {{-- ================= MENU KANAN ================= --}}
             <ul class="navbar-nav ms-auto">
 
-                {{-- Notifikasi Dropdown --}}
+                {{-- NOTIFIKASI --}}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle position-relative" href="#" data-bs-toggle="dropdown">
                         <i class="bi bi-bell"></i>
                         @if($notifs->count())
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
                                 {{ $notifs->count() }}
-                                <span class="visually-hidden">unread notifications</span>
                             </span>
                         @endif
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" style="width: 300px; max-height: 400px; overflow-y: auto;">
-                        @forelse ($notifs as $notif)
+                    <ul class="dropdown-menu dropdown-menu-end" style="width:300px; max-height:400px; overflow:auto">
+                        @forelse($notifs as $notif)
                             <li>
                                 <a class="dropdown-item" href="{{ route('admin.notifications.read', $notif->id) }}">
                                     {{ \Illuminate\Support\Str::limit($notif->pesan, 60) }}
@@ -161,29 +177,19 @@
                         @empty
                             <li><span class="dropdown-item text-center">Tidak ada notifikasi</span></li>
                         @endforelse
-
-                        @if($notifs->count())
-                            <li class="px-3 py-1">
-                                <form action="{{ route('admin.notifications.readAll') }}" method="POST" class="text-center">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-link">Tandai Semua Dibaca</button>
-                                </form>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                        @endif
-                        <li class="px-3 py-2 text-center">
-                            <a href="{{ route('admin.notifications.index') }}" class="btn btn-sm btn-outline-primary w-100">
-                                <i class="bi bi-list"></i> Lihat Semua
+                        <li>
+                            <a href="{{ route('admin.notifications.index') }}"
+                               class="dropdown-item text-center fw-semibold">
+                                Lihat Semua
                             </a>
                         </li>
                     </ul>
                 </li>
 
-
-                {{-- User Dropdown --}}
+                {{-- USER --}}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle"></i>
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle me-1"></i>
                         {{ auth()->user()->username }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
@@ -196,7 +202,9 @@
                         <li>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <button class="dropdown-item text-danger">Keluar</button>
+                                <button class="dropdown-item text-danger">
+                                    <i class="bi bi-box-arrow-right me-1"></i> Keluar
+                                </button>
                             </form>
                         </li>
                     </ul>
@@ -207,15 +215,14 @@
     </div>
 </nav>
 
+{{-- ================= KONTEN ================= --}}
+<main class="py-4">
+    @yield('content')
+</main>
 
-    {{-- Konten --}}
-    <main class="py-4">
-        @yield('content')
-        @yield('scripts')
-    </main>
+{{-- Scripts --}}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+@yield('scripts')
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {{-- Bootstrap Icons --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </body>
 </html>

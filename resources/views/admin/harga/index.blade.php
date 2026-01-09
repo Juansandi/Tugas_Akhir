@@ -5,11 +5,18 @@
 @section('content')
 <div class="container py-4">
 
-<h3 class="mb-4">Manajemen Harga Produk</h3>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">Manajemen Harga Produk</h3>
+    <a href="{{ route('admin.price_histories.index') }}"
+       class="btn btn-outline-secondary btn-sm">
+        📜 Histori Harga
+    </a>
+</div>
 
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
 @endif
+
 {{-- SEARCH --}}
 <form method="GET" action="{{ route('admin.harga.index') }}" class="mb-3">
     <div class="row g-2 align-items-center">

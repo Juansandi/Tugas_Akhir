@@ -3,125 +3,218 @@
 @section('title', 'Edit Produk')
 
 @section('content')
-<div class="container mt-4">
-    <h2>Edit Produk</h2>
+<div class="container py-4">
 
-    <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
-        @csrf @method('PUT')
+    <h2 class="fw-bold mb-4">Edit Produk</h2>
 
-        <div class="mb-3">
-            <label>Nama Produk</label>
-            <input type="text" name="nama_produk" value="{{ $product->nama_produk }}" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label>Merk</label>
-            <input type="text" name="jenis" value="{{ $product->jenis }}" class="form-control" required>
-        </div>
-
-        <div class="mb-3">
-            <label>Kategori</label>
-            <select name="kategori_id" class="form-control" required>
-                @foreach ($categories as $kat)
-                    <option value="{{ $kat->id }}" {{ $product->kategori_id == $kat->id ? 'selected' : '' }}>
-                        {{ $kat->nama_kategori }}
-                    </option>
+    {{-- ERROR --}}
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
                 @endforeach
-            </select>
+            </ul>
         </div>
+    @endif
 
-        <div class="mb-3">
-            <label>Harga Default</label>
-            <input type="number" name="harga" value="{{ $product->harga }}" class="form-control" required>
-        </div>
+    <form action="{{ route('products.update', $product->id) }}"
+          method="POST"
+          enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
 
-        <div class="mb-3">
-            <label>Stok Default</label>
-            <input type="number" name="stok" value="{{ $product->stok }}" class="form-control" required>
-        </div>
+        {{-- ========================= --}}
+        {{-- INFORMASI PRODUK --}}
+        {{-- ========================= --}}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Informasi Produk</h5>
 
-        <div class="mb-3">
-            <label>Deskripsi</label>
-            <textarea name="deskripsi" class="form-control" rows="3">{{ $product->deskripsi }}</textarea>
-        </div>
-
-        <div class="mb-3">
-            <label>Gambar Produk</label>
-            <input type="file" name="image" class="form-control">
-            @if ($product->image)
-                <img src="{{ asset('storage/' . $product->image) }}" width="100" class="mt-2">
-            @endif
-        </div>
-
-    <input type="hidden" id="initialSizeCount" value="{{ $product->sizes->count() }}">
-        {{-- ====================== --}}
-        {{-- EDIT / TAMBAH UKURAN --}}
-        {{-- ====================== --}}
-        <h4 class="mt-4">Ukuran Produk</h4>
-
-        <div id="sizeContainer">
-
-            {{-- Ukuran Lama --}}
-            @foreach ($product->sizes as $i => $size)
-            <div class="row mb-2 p-2 border rounded">
-                <input type="hidden" name="sizes[{{ $i }}][id]" value="{{ $size->id }}">
-
-                <div class="col-md-3">
-                    <label>Ukuran</label>
-                    <input type="text" name="sizes[{{ $i }}][size]" class="form-control" value="{{ $size->size }}">
+                <div class="mb-3">
+                    <label class="form-label">Nama Produk</label>
+                    <input type="text"
+                           name="nama_produk"
+                           class="form-control"
+                           value="{{ $product->nama_produk }}"
+                           required>
                 </div>
 
-                <div class="col-md-3">
-                    <label>Harga</label>
-                    <input type="number" name="sizes[{{ $i }}][harga]" class="form-control" value="{{ $size->harga }}">
+                <div class="mb-3">
+                    <label class="form-label">Merk</label>
+                    <input type="text"
+                           name="jenis"
+                           class="form-control"
+                           value="{{ $product->jenis }}">
                 </div>
 
-                <div class="col-md-3">
-                    <label>Stok</label>
-                    <input type="number" name="sizes[{{ $i }}][stok]" class="form-control" value="{{ $size->stok }}">
+                <div class="mb-3">
+                    <label class="form-label">Kategori</label>
+                    <select name="kategori_id" class="form-select" required>
+                        @foreach ($categories as $kat)
+                            <option value="{{ $kat->id }}"
+                                {{ $product->kategori_id == $kat->id ? 'selected' : '' }}>
+                                {{ $kat->nama_kategori }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
-                <div class="col-md-3 d-flex align-items-end">
-                    <button type="button" class="btn btn-danger w-100" onclick="hapusSize(this)">
-                        Hapus
-                    </button>
+                <div class="mb-3">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea name="deskripsi"
+                              class="form-control"
+                              rows="3">{{ $product->deskripsi }}</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Gambar Produk</label>
+                    <input type="file" name="image" class="form-control">
+                    @if ($product->image)
+                        <img src="{{ asset('storage/'.$product->image) }}"
+                             class="mt-2 rounded"
+                             width="120">
+                    @endif
                 </div>
             </div>
-            @endforeach
-
         </div>
 
-        <button type="button" class="btn btn-outline-primary mt-3" onclick="tambahSize()">
-            + Tambah Ukuran Baru
-        </button>
+        {{-- ========================= --}}
+        {{-- UKURAN, HARGA & STOK --}}
+        {{-- ========================= --}}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Ukuran, Harga & Stok</h5>
 
-        <hr>
+                <small class="text-muted d-block mb-3">
+                    Harga dan stok dikelola per ukuran produk.
+                </small>
 
-        <button type="submit" class="btn btn-primary">Update</button>
-        <a href="{{ route('products.index') }}" class="btn btn-secondary">Kembali</a>
+                <div id="sizeContainer">
+                    @foreach ($product->sizes as $i => $size)
+                        <div class="size-row border rounded p-3 mb-3">
+                            <input type="hidden"
+                                   name="sizes[{{ $i }}][id]"
+                                   value="{{ $size->id }}">
+
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-4">
+                                    <label class="form-label">Ukuran</label>
+                                    <input type="text"
+                                           name="sizes[{{ $i }}][size]"
+                                           class="form-control"
+                                           value="{{ $size->size }}"
+                                           required>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Harga</label>
+                                    <input type="number"
+                                           name="sizes[{{ $i }}][harga]"
+                                           class="form-control"
+                                           value="{{ $size->harga }}"
+                                           required>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label">Stok</label>
+                                    <input type="number"
+                                           name="sizes[{{ $i }}][stok]"
+                                           class="form-control"
+                                           value="{{ $size->stok }}"
+                                           required>
+                                </div>
+
+                                <div class="col-md-1">
+                                    <button type="button"
+                                            class="btn btn-outline-danger"
+                                            onclick="hapusSize(this)">
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <button type="button"
+                        class="btn btn-outline-primary btn-sm"
+                        onclick="tambahSize()">
+                    + Tambah Ukuran
+                </button>
+            </div>
+        </div>
+
+        {{-- ========================= --}}
+        {{-- AKSI --}}
+        {{-- ========================= --}}
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">
+                Simpan Perubahan
+            </button>
+            <a href="{{ route('products.index') }}" class="btn btn-secondary">
+                Batal
+            </a>
+        </div>
+
     </form>
 </div>
 
-
+{{-- ========================= --}}
+{{-- SCRIPT --}}
+{{-- ========================= --}}
 <script>
-    // Ambil jumlah initial size dari hidden input
-    let sizeIndex = parseInt(document.getElementById('initialSizeCount').value);
+let sizeIndex = {{ $product->sizes->count() }};
 
-    console.log("Jumlah size awal:", sizeIndex);
+function tambahSize() {
+    const container = document.getElementById('sizeContainer');
 
-    function addSizeField() {
-        sizeIndex++;
+    const html = `
+        <div class="size-row border rounded p-3 mb-3">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Ukuran</label>
+                    <input type="text"
+                           name="sizes[${sizeIndex}][size]"
+                           class="form-control"
+                           required>
+                </div>
 
-        const container = document.getElementById('sizesContainer');
+                <div class="col-md-4">
+                    <label class="form-label">Harga</label>
+                    <input type="number"
+                           name="sizes[${sizeIndex}][harga]"
+                           class="form-control"
+                           required>
+                </div>
 
-        const newField = document.createElement('div');
-        newField.classList.add('mb-2');
+                <div class="col-md-3">
+                    <label class="form-label">Stok</label>
+                    <input type="number"
+                           name="sizes[${sizeIndex}][stok]"
+                           class="form-control"
+                           required>
+                </div>
 
-        newField.innerHTML = `
-            <input type="text" name="sizes[]" class="form-control mb-2" placeholder="Masukkan ukuran baru">
-        `;
+                <div class="col-md-1">
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            onclick="hapusSize(this)">
+                        ✕
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 
-        container.appendChild(newField);
+    container.insertAdjacentHTML('beforeend', html);
+    sizeIndex++;
+}
+
+function hapusSize(button) {
+    if (confirm('Hapus ukuran ini?')) {
+        button.closest('.size-row').remove();
     }
+}
 </script>
 @endsection

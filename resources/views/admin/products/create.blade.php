@@ -18,94 +18,87 @@
     <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
-        {{-- Nama Produk --}}
-        <div class="mb-3">
-            <label for="nama_produk" class="form-label">Nama Produk</label>
-            <input type="text" name="nama_produk" class="form-control" required>
-        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Informasi Produk</h5>
 
-        {{-- Merk --}}
-        <div class="mb-3">
-            <label for="jenis" class="form-label">Merk</label>
-            <input type="text" name="jenis" class="form-control">
-        </div>
+                <div class="mb-3">
+                    <label class="form-label">Nama Produk</label>
+                    <input type="text" name="nama_produk" class="form-control" required>
+                </div>
 
-        {{-- Kategori --}}
-        <div class="mb-3">
-            <label for="kategori_id" class="form-label">Kategori</label>
-            <select name="kategori_id" class="form-select" required>
-                <option value="">Pilih Kategori</option>
-                @foreach ($categories as $kategori)
-                    <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
-                @endforeach
-            </select>
-        </div>
+                <div class="mb-3">
+                    <label class="form-label">Merk</label>
+                    <input type="text" name="jenis" class="form-control">
+                </div>
 
-        {{-- Harga Default --}}
-        <div class="mb-3">
-            <label for="harga" class="form-label">Harga Default (opsional)</label>
-            <input type="number" name="harga" class="form-control">
-            <small class="text-muted">Harga ini digunakan jika ukuran tidak memiliki harga khusus.</small>
-        </div>
+                <div class="mb-3">
+                    <label class="form-label">Kategori</label>
+                    <select name="kategori_id" class="form-select" required>
+                        <option value="">Pilih Kategori</option>
+                        @foreach ($categories as $kategori)
+                            <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-        {{-- Stok Default --}}
-        <div class="mb-3">
-            <label for="stok" class="form-label">Stok Default (opsional)</label>
-            <input type="number" name="stok" class="form-control">
-            <small class="text-muted">Stok ini digunakan jika ukuran tidak memiliki stok khusus.</small>
-        </div>
+                <div class="mb-3">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea name="deskripsi" class="form-control" rows="3"></textarea>
+                </div>
 
-        {{-- Deskripsi --}}
-        <div class="mb-3">
-            <label for="deskripsi" class="form-label">Deskripsi</label>
-            <textarea name="deskripsi" class="form-control" rows="3"></textarea>
-        </div>
-
-        {{-- Gambar Produk --}}
-        <div class="mb-3">
-            <label for="image" class="form-label">Gambar Produk</label>
-            <input type="file" name="image" class="form-control">
+                <div class="mb-3">
+                    <label class="form-label">Gambar Produk</label>
+                    <input type="file" name="image" class="form-control">
+                </div>
+            </div>
         </div>
 
         {{-- ===================== --}}
         {{--  BAGIAN UKURAN PRODUK --}}
         {{-- ===================== --}}
 
-        <hr class="my-4">
-        <h4 class="fw-bold mb-3">Ukuran Produk</h4>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">Ukuran, Harga & Stok</h5>
 
-        <div id="size-wrapper">
+                <small class="text-muted d-block mb-3">
+                    Setiap produk minimal memiliki satu ukuran.
+                </small>
 
-            {{-- Row ukuran default --}}
-            <div class="size-row border rounded p-3 mb-3">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label class="form-label">Ukuran</label>
-                        <input type="text" name="sizes[0][size]" class="form-control" placeholder="Contoh: 1 kg">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Harga</label>
-                        <input type="number" name="sizes[0][harga]" class="form-control" placeholder="Harga">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Stok</label>
-                        <input type="number" name="sizes[0][stok]" class="form-control" placeholder="Stok">
+                <div id="size-wrapper">
+                    <div class="size-row border rounded p-3 mb-3">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label">Ukuran</label>
+                                <input type="text" name="sizes[0][size]" class="form-control" placeholder="Contoh: 1 kg" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Harga</label>
+                                <input type="number" name="sizes[0][harga]" class="form-control" placeholder="Harga" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Stok</label>
+                                <input type="number" name="sizes[0][stok]" class="form-control" placeholder="Stok" required>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <button type="button" id="add-size" class="btn btn-outline-primary btn-sm">
+                    + Tambah Ukuran
+                </button>
             </div>
-
         </div>
 
-        <button type="button" id="add-size" class="btn btn-sm btn-primary mb-4">
-            + Tambah Ukuran
-        </button>
-
-        {{-- Submit --}}
-        <div class="d-flex gap-2 mt-3">
-            <button type="submit" class="btn btn-success">Simpan</button>
-            <a href="{{ route('products.index') }}" class="btn btn-secondary">Kembali</a>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">
+                Simpan Produk
+            </button>
+            <a href="{{ route('products.index') }}" class="btn btn-secondary">
+                Batal
+            </a>
         </div>
-
     </form>
 </div>
 

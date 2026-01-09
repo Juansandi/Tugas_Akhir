@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\HargaController;
 use App\Http\Controllers\PaketUserController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\AlamatController;
+use App\Http\Controllers\Admin\PriceHistoryController;
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
@@ -134,6 +135,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/harga', [HargaController::class, 'index'])->name('admin.harga.index');
     Route::post('/harga/update', [HargaController::class, 'update'])->name('admin.harga.update');
 });
+
+Route::get('/admin/histori-harga', [PriceHistoryController::class, 'index'])->name('admin.price_histories.index');
 
 Route::get('/admin/categories', [KategoriController::class, 'index'])->name('categories.index');
 Route::post('/admin/categories/store', [KategoriController::class, 'store'])->name('categories.store');
