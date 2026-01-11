@@ -4,37 +4,38 @@
 
 @section('content')
 <div class="container py-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="mb-0">Detail Pesanan #{{ $pesanan->id }}</h4>
-        <a href="{{ route('pesanan.index') }}" class="btn btn-outline-secondary">← Kembali</a>
+        <h4>Detail Pesanan #{{ $pesanan->id }}</h4>
+        <a href="{{ route('admin.pesanan.index') }}" class="btn btn-outline-secondary">← Kembali</a>
     </div>
 
-    <p><strong>Nama Pembeli:</strong> {{ $pesanan->pengguna->username ?? 'Guest' }}</p>
-    {{-- ALAMAT PENGIRIMAN --}}
-    <div class="card mb-4">
+    {{-- INFO PEMBELI --}}
+    <p><strong>Nama Pembeli:</strong> {{ $pesanan->pengguna->username ?? '-' }}</p>
+
+    {{-- ALAMAT --}}
+    <div class="card mb-3">
         <div class="card-body">
-            <h6 class="mb-2">Alamat Pengiriman</h6>
-
-            <p class="mb-1">
-                {{ $pesanan->alamat_pengiriman }}
-            </p>
-
-            @if (!empty($pesanan->no_telp_pengiriman))
-                <small class="text-muted">
-                    No. Telp: {{ $pesanan->no_telp_pengiriman }}
-                </small>
+            <h6>Alamat Pengiriman</h6>
+            <p class="mb-1">{{ $pesanan->alamat_pengiriman }}</p>
+            @if($pesanan->no_telp_pengiriman)
+                <small class="text-muted">No. Telp: {{ $pesanan->no_telp_pengiriman }}</small>
             @endif
         </div>
     </div>
+
+    {{-- STATUS --}}
     @php
         $status = $pesanan->status;
-        $badgeClass = match($status) {
-            'menunggu konfirmasi' => 'bg-secondary text-light',
-            'diproses'            => 'bg-primary text-light',
-            'dikirim'             => 'bg-info text-dark',
-            'diterima'            => 'bg-warning text-dark',
-            'selesai'             => 'bg-success text-light',
-            default               => 'bg-light text-dark'
+        $badge = match($status) {
+            'belum_dibayar'        => 'bg-danger',
+            'menunggu_konfirmasi'  => 'bg-warning',
+            'diproses'             => 'bg-primary',
+            'dikirim'              => 'bg-info',
+            'diterima'             => 'bg-secondary',
+            'selesai'              => 'bg-success',
+            'dibatalkan'           => 'bg-dark',
+            default                => 'bg-light'
         };
 
         $subtotal = $pesanan->detail->sum(fn($item) => $item->price * $item->quantity);
@@ -43,22 +44,37 @@
         $totalSetelahDiskon = $subtotal - $diskonPromo - $diskonPoin;
     @endphp
 
-    <p><strong>Status:</strong> <span class="badge {{ $badgeClass }}">{{ ucfirst($status) }}</span></p>
-    <div class="mt-2 d-flex gap-2 flex-wrap">
-    @if(in_array($pesanan->status, ['diproses', 'dikirim', 'selesai']))
-        <a href="{{ route('admin.chat.show', $pesanan->chatAdmin->id) }}"
-        class="btn btn-outline-primary btn-sm mt-2">
-            💬 Chat Customer
+    <p>
+        <strong>Status:</strong>
+        <span class="badge {{ $badge }}">{{ strtoupper(str_replace('_',' ',$status)) }}</span>
+    </p>
 
-            @if(optional($pesanan->chatAdmin)->unread_count > 0)
-                <span class="badge bg-danger ms-2">
-                    {{ $pesanan->chatAdmin->unread_count }} pesan baru
-                </span>
-            @endif
-        </a>
+    {{-- BATAS WAKTU PEMBAYARAN --}}
+    @if($status === 'belum_dibayar')
+        <p class="text-danger">
+            ⚠ Batas upload bukti bayar:
+            {{ $pesanan->created_at->addHours(24)->format('d M Y H:i') }}
+        </p>
     @endif
 
-    </div>
+    {{-- BUKTI BAYAR --}}
+    @if($status === 'menunggu_konfirmasi')
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6>Bukti Pembayaran</h6>
+               <img src="{{ asset('storage/'.$pesanan->bukti_bayar) }}"
+     class="img-fluid rounded border"
+     style="max-height:300px">
+
+                <form method="POST" action="{{ route('admin.pesanan.verifikasi', $pesanan->id) }}">
+                    @csrf
+                    <button name="aksi" value="terima" class="btn btn-success">Verifikasi</button>
+                    <button name="aksi" value="tolak" class="btn btn-danger">Tolak</button>
+                </form>
+            </div>
+        </div>
+    @endif
+
     <h5 class="mt-4">Perincian Harga</h5>
     <ul class="list-unstyled ps-3">
         <li class="mb-1"><strong>Subtotal:</strong> Rp {{ number_format($subtotal, 0, ',', '.') }}</li>
@@ -68,48 +84,35 @@
         <li class="mb-1"><strong>Total Dibayar:</strong> <span class="fw-bold text-success">Rp {{ number_format($pesanan->total, 0, ',', '.') }}</span></li>
     </ul>
 
-    @if ($pesanan->status === 'menunggu konfirmasi')
+    {{-- AKSI STATUS --}}
+    @if($status === 'diproses')
         <form method="POST" action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}">
             @csrf
-            <input type="hidden" name="status" value="diproses">
-            <button type="submit" class="btn btn-primary mt-3">Proses Pesanan</button>
-        </form>
-    @elseif ($pesanan->status === 'diproses')
-        <form method="POST" action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}">
-            @csrf
-            <div class="mb-3 mt-3">
-                <label class="form-label">Pilih Kurir</label>
-                <select name="kurir_id" class="form-select" required>
-                    <option value="">-- Pilih Kurir --</option>
-                    @foreach($kurirs as $kurir)
-                        <option value="{{ $kurir->id }}">
-                            {{ $kurir->username }}
-                        </option>
-                    @endforeach
-                </select>
+            <input type="hidden" name="status" value="dikirim">
 
-                <input type="hidden" name="status" value="dikirim">
-            </div>
+            <label>Pilih Kurir</label>
+            <select name="kurir_id" class="form-select mb-2" required>
+                <option value="">-- Pilih Kurir --</option>
+                @foreach($kurirs as $kurir)
+                    <option value="{{ $kurir->id }}">{{ $kurir->username }}</option>
+                @endforeach
+            </select>
 
-            <button type="submit" class="btn btn-success">
-                Tugaskan Kurir & Kirim Pesanan
-            </button>
-        </form>
-    @elseif ($pesanan->status === 'dikirim')
-        <p class="mt-3"><strong>Info Pengiriman:</strong> {{ $pesanan->no_resi ?? '-' }}</p>
-    @elseif ($pesanan->status === 'diterima')
-        <p class="mt-3"><strong>Status pesanan telah diterima oleh pembeli.</strong></p>
-
-        <form method="POST" action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}">
-            @csrf
-            <input type="hidden" name="status" value="selesai">
-            <button type="submit" class="btn btn-success mt-3">Selesaikan Pesanan</button>
+            <button class="btn btn-success">Kirim Pesanan</button>
         </form>
     @endif
 
-    <hr class="my-4">
+    @if($status === 'diterima')
+        <form method="POST" action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}">
+            @csrf
+            <input type="hidden" name="status" value="selesai">
+            <button class="btn btn-success mt-3">Selesaikan Pesanan</button>
+        </form>
+    @endif
 
-    <h5>Detail Produk</h5>
+    <hr>
+
+     <h5>Detail Produk</h5>
     <div class="list-group">
     @foreach($pesanan->detail as $item)
         <div class="list-group-item py-3">
@@ -160,5 +163,4 @@
     </div>
 
 </div>
-
 @endsection

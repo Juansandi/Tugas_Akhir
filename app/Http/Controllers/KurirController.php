@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pesanan;
 use App\Models\TugasKurir;
+use App\Models\Chat;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -56,6 +57,14 @@ class KurirController extends Controller
         // keamanan: pastikan tugas milik kurir login
         if ($tugas->user_id !== Auth::id()) {
             abort(403);
+        }
+
+        if (!$tugas->pesanan->chatKurir) {
+            Chat::create([
+                'pesanan_id' => $tugas->pesanan->id,
+                'type'       => 'kurir',
+                'is_active'  => true,
+               ]);
         }
 
         $tugas->load([

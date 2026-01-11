@@ -146,7 +146,9 @@ class PesananController extends Controller
             $pesanan = Pesanan::create([
                 'user_id' => $user->id,
                 'total' => $totalBayar,
-                'status' => 'menunggu konfirmasi',
+                'status' => $request->metode_pembayaran === 'transfer'
+                    ? 'belum_dibayar'
+                    : 'diproses',
                 'metode_pembayaran' => $request->metode_pembayaran,
                 'promo_id' => $promo?->id,
                 'diskon_dari_promo' => $diskonPromo,
@@ -213,6 +215,47 @@ class PesananController extends Controller
             DB::rollBack();
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    public function formPembayaran(Pesanan $pesanan)
+    {
+        abort_if(
+            $pesanan->user_id !== auth()->id() ||
+            $pesanan->status !== 'belum_dibayar',
+            403
+        );
+
+        return view('user.pesanan.pembayaran', compact('pesanan'));
+    }
+
+    public function uploadBukti(Request $request, Pesanan $pesanan)
+    {
+        if ($pesanan->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($pesanan->status !== 'belum_dibayar') {
+            return redirect()
+                ->route('pesanan.show', $pesanan->id)
+                ->with('info', 'Pembayaran sudah dikirim.');
+        }
+
+        $request->validate([
+            'bukti_bayar' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        $path = $request->file('bukti_bayar')
+            ->store('bukti_bayar', 'public');
+
+        $pesanan->update([
+            'bukti_bayar' => $path,
+            'waktu_bayar' => now(),
+            'status' => 'menunggu_konfirmasi'
+        ]);
+
+        return redirect()
+            ->route('pesanan.show', $pesanan->id)
+            ->with('success', 'Bukti pembayaran berhasil dikirim.');
     }
 
     public function show($id)

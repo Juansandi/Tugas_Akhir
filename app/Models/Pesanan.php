@@ -3,6 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Pengguna;
+use App\Models\DetailPesanan;
+use App\Models\Refund;
+use App\Models\TugasKurir;
+use App\Models\Chat;
 
 class Pesanan extends Model
 {
@@ -21,6 +26,8 @@ class Pesanan extends Model
         'promo_id',
         'diskon_dari_poin',
         'diskon_dari_promo',
+        'bukti_bayar',
+        'waktu_bayar',
     ];
 
     public function pengguna()
@@ -88,4 +95,5 @@ class Pesanan extends Model
     {
         return $this->hasOne(Chat::class)->where('type', 'kurir');
     }
+    
 }

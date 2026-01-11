@@ -81,10 +81,12 @@
     {{-- AKSI --}}
     <div class="d-flex gap-2">
 
-        <a href="{{ route('kurir.chat.show', $tugas->pesanan->chatKurir->id) }}"
-           class="btn btn-outline-success">
-            💬 Chat Customer
-        </a>
+        @if($tugas->pesanan->chatKurir)
+            <a href="{{ route('kurir.chat.show', $tugas->pesanan->chatKurir->id) }}"
+            class="btn btn-outline-success">
+                💬 Chat Customer
+            </a>
+        @endif
 
         @if($tugas->status === 'aktif')
             <form method="POST"

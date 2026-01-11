@@ -12,7 +12,8 @@
                 @php
                     $status = $pesanan->status;
                     $badgeClass = match($status) {
-                        'menunggu konfirmasi' => 'bg-secondary text-light',
+                        'belum_dibayar'       => 'bg-danger text-light',
+                        'menunggu_konfirmasi' => 'bg-warning text-dark',
                         'diproses'            => 'bg-primary text-light',
                         'dikirim'             => 'bg-info text-dark',
                         'diterima'            => 'bg-warning text-dark',
@@ -27,6 +28,13 @@
                 @endphp
                 <span class="badge {{ $badgeClass }} px-3 py-2">{{ ucfirst($status) }}</span>
                  <div class="mt-2 d-flex gap-2 flex-wrap">
+                    @if($pesanan->status === 'belum_dibayar')
+                        <a href="{{ route('pesanan.pembayaran', $pesanan->id) }}"
+                        class="btn btn-warning mt-3">
+                            Upload Bukti Pembayaran
+                        </a>
+                    @endif
+
                     @if(in_array($pesanan->status, ['diproses', 'dikirim', 'selesai']))
                         <a href="{{ route('chat.show', ['pesanan' => $pesanan->id, 'type' => 'admin']) }}"
                         class="btn btn-outline-primary btn-sm position-relative">

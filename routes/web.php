@@ -86,6 +86,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/pesanan/{id}/update-status', [PesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
 });
 
+Route::get('/pesanan/{pesanan}/pembayaran', [PesananController::class, 'formPembayaran'])
+    ->name('pesanan.pembayaran');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/pesanan/{pesanan}/pembayaran', [PesananController::class, 'formPembayaran'])
+    ->name('pesanan.pembayaran');
+    Route::post('/pesanan/{pesanan}/upload-bukti',
+        [PesananController::class, 'uploadBukti']
+    )->name('pesanan.uploadBukti');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/chat/{pesanan}', [ChatController::class, 'show'])->name('chat.show');
     Route::post('/chat/{chat}/send', [ChatController::class, 'send'])->name('chat.send');
@@ -167,10 +178,25 @@ Route::delete('/admin/promos/{promo}', [PromoController::class, 'destroy'])->nam
 
 Route::get('/admin/pengguna', [PenggunaController::class, 'index'])->name('pengguna.index');
 Route::get('/admin/pengguna/{id}/riwayat', [PenggunaController::class, 'riwayat'])->name('pengguna.riwayat');
+Route::prefix('admin')
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.')
+    ->group(function () {
 
-Route::get('admin/pesanan', [AdminPesananController::class, 'index'])->name('pesanan.index');
-Route::get('admin/pesanan/{id}', [AdminPesananController::class, 'show'])->name('admin.pesanan.show');
-Route::post('admin/pesanan/{id}/update-status', [AdminPesananController::class, 'updateStatus'])->name('admin.pesanan.updateStatus');
+        Route::get('/pesanan', [AdminPesananController::class, 'index'])
+            ->name('pesanan.index');
+
+        Route::get('/pesanan/{id}', [AdminPesananController::class, 'show'])
+            ->name('pesanan.show');
+
+        Route::post('/pesanan/{id}/status', [AdminPesananController::class, 'updateStatus'])
+            ->name('pesanan.updateStatus');
+
+        Route::post('/pesanan/{pesanan}/verifikasi', 
+            [AdminPesananController::class, 'verifikasiPembayaran']
+        )->name('pesanan.verifikasi');
+    });
+
 
 Route::get('admin/refund', [RefundController::class, 'adminIndex'])->name('refund.index');
 Route::get('admin/refund/{id}', [RefundController::class, 'adminShow'])->name('admin.refund.show');

@@ -36,7 +36,8 @@
                         @php
                             $status = $pesanan->status;
                             $badgeClass = match($status) {
-                                'menunggu konfirmasi' => 'bg-secondary',
+                                'belum_dibayar' => 'bg-danger',
+                                'menunggu_konfirmasi' => 'bg-warning',
                                 'diproses' => 'bg-primary',
                                 'dikirim' => 'bg-info text-dark',
                                 'diterima' => 'bg-warning text-dark',

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Pesanan;
+use App\Models\DetailChat;
 
 class Chat extends Model
 {

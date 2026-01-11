@@ -38,83 +38,61 @@ class AdminPesananController extends Controller
         return view('admin.pesanan.show', compact('pesanan', 'kurirs'));
     }
 
+    public function verifikasiPembayaran(Request $request, Pesanan $pesanan)
+    {
+        abort_if($pesanan->status !== 'menunggu_konfirmasi', 403);
+
+        if ($request->aksi === 'terima') {
+            $pesanan->update(['status' => 'diproses']);
+        } else {
+            $pesanan->update(['status' => 'belum_dibayar']);
+        }
+
+        return back()->with('success', 'Status pembayaran diperbarui.');
+    }
+
+
     public function updateStatus(Request $request, $id)
     {
         $pesanan = Pesanan::findOrFail($id);
 
-        $status = $request->input('status');
-        $pesanan->status = $status;
+        $allowed = [
+            'menunggu_konfirmasi' => ['diproses'],
+            'diproses'            => ['dikirim'],
+            'dikirim'             => ['diterima'],
+            'diterima'            => ['selesai'],
+        ];
 
-        // Jika ada input nomor resi
-        if ($request->status === 'dikirim') {
+        $current = $pesanan->status;
+        $target  = $request->status;
 
+        if (!isset($allowed[$current]) || !in_array($target, $allowed[$current])) {
+            return back()->with('error', 'Perubahan status tidak valid.');
+        }
+
+        if ($target === 'dikirim') {
             $request->validate([
                 'kurir_id' => 'required|exists:pengguna,id'
             ]);
 
-            // update status pesanan
-            $pesanan->status = 'dikirim';
-            $pesanan->save();
-
-            // buat tugas kurir
             TugasKurir::create([
                 'pesanan_id' => $pesanan->id,
                 'user_id'    => $request->kurir_id,
-                'status'     => 'aktif',
+                'status'     => 'aktif'
             ]);
-
-            Chat::firstOrCreate([
-                'pesanan_id' => $pesanan->id,
-                'type' => 'kurir'
-            ]);
-
-            return back()->with('success', 'Pesanan dikirim dan kurir berhasil ditugaskan.');
         }
 
-        // Jika status berubah menjadi selesai, hitung poin dan update pengguna
-        if ($status === 'selesai') {
-            // Hitung poin: 1 poin = 100 rupiah
+        if ($target === 'selesai') {
             $poin = intval($pesanan->total / 1000);
             $pesanan->poin_diperoleh = $poin;
 
             if ($pesanan->pengguna) {
-                $pesanan->pengguna->jumlah_poin += $poin;
-                $pesanan->pengguna->save();
+                $pesanan->pengguna->increment('jumlah_poin', $poin);
             }
-
-            // Notifikasi ke user: pesanan selesai
-            UserNotification::create([
-                'user_id' => $pesanan->user_id,
-                'tipe' => 'pesanan_selesai',
-                'pesan' => 'Pesanan #' . $pesanan->id . ' telah selesai. Terima kasih telah berbelanja!',
-                'url' => route('pesanan.show', $pesanan->id),
-            ]);
-        }
-        
-        // Notifikasi ke user berdasarkan status lainnya
-        if ($status === 'diproses') {
-            Chat::firstOrCreate([
-                'pesanan_id' => $pesanan->id,
-                'type' => 'admin'
-            ]);
-
-            UserNotification::create([
-                'user_id' => $pesanan->user_id,
-                'tipe' => 'pesanan_diproses',
-                'pesan' => 'Pesanan #' . $pesanan->id . ' sedang diproses',
-                'url' => route('pesanan.show', $pesanan->id),
-            ]);
-        } elseif ($status === 'dikirim') {
-            UserNotification::create([
-                'user_id' => $pesanan->user_id,
-                'tipe' => 'pesanan_dikirim',
-                'pesan' => 'Pesanan #' . $pesanan->id . ' sedang dikirim ' . $pesanan->no_resi,
-                'url' => route('pesanan.show', $pesanan->id),
-            ]);
         }
 
-        $pesanan->save();
+        $pesanan->update(['status' => $target]);
 
-        return redirect()->route('admin.pesanan.show', $id)->with('success', 'Status pesanan berhasil diperbarui.');
+        return back()->with('success', 'Status pesanan diperbarui.');
     }
 }

@@ -24,10 +24,11 @@
                     @foreach ($pesanans as $order)
                         @php
                             $badge = match($order->status) {
-                                'menunggu konfirmasi' => 'secondary',
+                                'belum_dibayar'       => 'danger',
+                                'menunggu_konfirmasi' => 'warning text-dark',
                                 'diproses'            => 'primary',
                                 'dikirim'             => 'info',
-                                'diterima'            => 'warning',
+                                'diterima'            => 'warning text-dark',
                                 'selesai'             => 'success',
                                 default               => 'light',
                             };
