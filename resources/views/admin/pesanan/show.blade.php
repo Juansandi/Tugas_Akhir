@@ -5,92 +5,143 @@
 @section('content')
 <div class="container py-4">
 
+    {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4>Detail Pesanan #{{ $pesanan->id }}</h4>
-        <a href="{{ route('admin.pesanan.index') }}" class="btn btn-outline-secondary">← Kembali</a>
+        <h4 class="fw-bold">Detail Pesanan #{{ $pesanan->id }}</h4>
+        <a href="{{ route('admin.pesanan.index') }}" class="btn btn-outline-secondary">
+            ← Kembali
+        </a>
     </div>
 
     {{-- INFO PEMBELI --}}
-    <p><strong>Nama Pembeli:</strong> {{ $pesanan->pengguna->username ?? '-' }}</p>
+    <p>
+        <strong>Nama Pembeli:</strong>
+        {{ $pesanan->pengguna->username ?? 'Guest' }}
+    </p>
 
     {{-- ALAMAT --}}
     <div class="card mb-3">
         <div class="card-body">
-            <h6>Alamat Pengiriman</h6>
+            <h6 class="fw-semibold mb-2">Alamat Pengiriman</h6>
             <p class="mb-1">{{ $pesanan->alamat_pengiriman }}</p>
+
             @if($pesanan->no_telp_pengiriman)
-                <small class="text-muted">No. Telp: {{ $pesanan->no_telp_pengiriman }}</small>
+                <small class="text-muted">
+                    No. Telp: {{ $pesanan->no_telp_pengiriman }}
+                </small>
             @endif
         </div>
     </div>
 
     {{-- STATUS --}}
-    @php
-        $status = $pesanan->status;
-        $badge = match($status) {
-            'belum_dibayar'        => 'bg-danger',
-            'menunggu_konfirmasi'  => 'bg-warning',
-            'diproses'             => 'bg-primary',
-            'dikirim'              => 'bg-info',
-            'diterima'             => 'bg-secondary',
-            'selesai'              => 'bg-success',
-            'dibatalkan'           => 'bg-dark',
-            default                => 'bg-light'
-        };
-
-        $subtotal = $pesanan->detail->sum(fn($item) => $item->price * $item->quantity);
-        $diskonPromo = $pesanan->diskon_dari_promo ?? 0;
-        $diskonPoin = $pesanan->diskon_dari_poin ?? 0;
-        $totalSetelahDiskon = $subtotal - $diskonPromo - $diskonPoin;
-    @endphp
-
-    <p>
+    <p class="mb-2">
         <strong>Status:</strong>
-        <span class="badge {{ $badge }}">{{ strtoupper(str_replace('_',' ',$status)) }}</span>
+        <span class="badge {{ $pesanan->status_badge }}">
+            {{ $pesanan->status_label }}
+        </span>
     </p>
 
-    {{-- BATAS WAKTU PEMBAYARAN --}}
-    @if($status === 'belum_dibayar')
-        <p class="text-danger">
+    {{-- BATAS BAYAR --}}
+    @if($pesanan->status === 'belum_dibayar')
+        <div class="alert alert-danger">
             ⚠ Batas upload bukti bayar:
-            {{ $pesanan->created_at->addHours(24)->format('d M Y H:i') }}
-        </p>
-    @endif
-
-    {{-- BUKTI BAYAR --}}
-    @if($status === 'menunggu_konfirmasi')
-        <div class="card mb-3">
-            <div class="card-body">
-                <h6>Bukti Pembayaran</h6>
-               <img src="{{ asset('storage/'.$pesanan->bukti_bayar) }}"
-     class="img-fluid rounded border"
-     style="max-height:300px">
-
-                <form method="POST" action="{{ route('admin.pesanan.verifikasi', $pesanan->id) }}">
-                    @csrf
-                    <button name="aksi" value="terima" class="btn btn-success">Verifikasi</button>
-                    <button name="aksi" value="tolak" class="btn btn-danger">Tolak</button>
-                </form>
-            </div>
+            <strong>{{ $pesanan->created_at->addHours(24)->format('d M Y H:i') }}</strong>
         </div>
     @endif
 
+    {{-- BUKTI BAYAR --}}
+    @if($pesanan->status === 'menunggu_konfirmasi' && $pesanan->bukti_bayar)
+    <div class="card mb-4">
+        <div class="card-body">
+            <h6 class="fw-semibold mb-3">Bukti Pembayaran</h6>
+
+            <img src="{{ asset('storage/'.$pesanan->bukti_bayar) }}"
+                 class="img-thumbnail"
+                 style="width:220px;height:220px;object-fit:cover;cursor:pointer"
+                 data-bs-toggle="modal"
+                 data-bs-target="#modalBuktiBayar">
+
+            <p class="text-muted mt-2">Klik gambar untuk memperbesar</p>
+
+            <form method="POST"
+                  action="{{ route('admin.pesanan.verifikasi', $pesanan->id) }}"
+                  class="d-flex gap-2 mt-3">
+                @csrf
+                <button name="aksi" value="terima" class="btn btn-success">
+                    Verifikasi
+                </button>
+                <button name="aksi" value="tolak" class="btn btn-danger">
+                    Tolak
+                </button>
+            </form>
+        </div>
+    </div>
+    @endif
+
+    {{-- BUKTI KIRIM KURIR --}}
+    @if($pesanan->tugasKurir && $pesanan->tugasKurir->bukti_kirim)
+    <div class="card mb-4">
+        <div class="card-body">
+            <h6 class="fw-semibold mb-3">Bukti Pengiriman Kurir</h6>
+
+            <img src="{{ asset('storage/'.$pesanan->tugasKurir->bukti_kirim) }}"
+                 class="img-thumbnail"
+                 style="width:220px;height:220px;object-fit:cover;cursor:pointer"
+                 data-bs-toggle="modal"
+                 data-bs-target="#modalBuktiKirim">
+
+            <p class="text-muted mt-2">Klik gambar untuk memperbesar</p>
+
+            <p class="mb-1">
+                <strong>Waktu Kirim: </strong>
+                {{ optional($pesanan->tugasKurir->waktu_kirim)->format('d M Y H:i') }}
+            </p>
+
+            @if($pesanan->tugasKurir->catatan_kurir)
+                <p class="mb-0">
+                    <strong>Catatan Kurir: </strong>
+                    {{ $pesanan->tugasKurir->catatan_kurir }}
+                </p>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    {{-- RINCIAN HARGA --}}
     <h5 class="mt-4">Perincian Harga</h5>
+    @php
+        $subtotal = $pesanan->detail->sum(fn($i) => $i->price * $i->quantity);
+    @endphp
+
     <ul class="list-unstyled ps-3">
-        <li class="mb-1"><strong>Subtotal:</strong> Rp {{ number_format($subtotal, 0, ',', '.') }}</li>
-        <li class="mb-1"><strong>Diskon Promo:</strong> -Rp {{ number_format($diskonPromo, 0, ',', '.') }}</li>
-        <li class="mb-1"><strong>Diskon Poin:</strong> -Rp {{ number_format($diskonPoin, 0, ',', '.') }}</li>
-        <li class="mb-1"><strong>Total Setelah Diskon:</strong> Rp {{ number_format($totalSetelahDiskon, 0, ',', '.') }}</li>
-        <li class="mb-1"><strong>Total Dibayar:</strong> <span class="fw-bold text-success">Rp {{ number_format($pesanan->total, 0, ',', '.') }}</span></li>
+        <li>Subtotal: Rp {{ number_format($subtotal,0,',','.') }}</li>
+        <li>Diskon Promo: -Rp {{ number_format($pesanan->diskon_dari_promo ?? 0,0,',','.') }}</li>
+        <li>Diskon Poin: -Rp {{ number_format($pesanan->diskon_dari_poin ?? 0,0,',','.') }}</li>
+
+        @if(in_array($pesanan->status, ['diproses','dikirim','diterima','selesai']))
+            <li>
+                <strong>Total Dibayar:</strong>
+                <span class="fw-bold text-success">
+                    Rp {{ number_format($pesanan->total,0,',','.') }}
+                </span>
+            </li>
+        @else
+            <li>
+                <strong>Total Dibayar:</strong>
+                <span class="text-muted">Belum dibayar</span>
+            </li>
+        @endif
     </ul>
 
-    {{-- AKSI STATUS --}}
-    @if($status === 'diproses')
-        <form method="POST" action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}">
+    {{-- AKSI ADMIN --}}
+    @if($pesanan->status === 'diproses')
+        <form method="POST"
+              action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}"
+              class="mt-3">
             @csrf
             <input type="hidden" name="status" value="dikirim">
 
-            <label>Pilih Kurir</label>
+            <label class="fw-semibold">Pilih Kurir</label>
             <select name="kurir_id" class="form-select mb-2" required>
                 <option value="">-- Pilih Kurir --</option>
                 @foreach($kurirs as $kurir)
@@ -102,65 +153,104 @@
         </form>
     @endif
 
-    @if($status === 'diterima')
-        <form method="POST" action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}">
+    @if($pesanan->status === 'dikirim')
+        <div class="alert alert-warning mt-4">
+            <strong>Perhatian:</strong><br>
+            Pesanan telah dikirim oleh kurir.  
+            Admin dapat menyelesaikan pesanan walaupun customer belum konfirmasi.
+        </div>
+
+        <form method="POST"
+              action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}">
             @csrf
             <input type="hidden" name="status" value="selesai">
-            <button class="btn btn-success mt-3">Selesaikan Pesanan</button>
+            <button class="btn btn-success">
+                Selesaikan Pesanan
+            </button>
         </form>
     @endif
 
-    <hr>
+    <hr class="my-4">
 
-     <h5>Detail Produk</h5>
+    {{-- DETAIL PRODUK --}}
+    <h5>Detail Produk</h5>
     <div class="list-group">
-    @foreach($pesanan->detail as $item)
-        <div class="list-group-item py-3">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
+        @foreach($pesanan->detail as $item)
+            <div class="list-group-item py-3">
+                <div class="d-flex justify-content-between align-items-center">
 
-                    {{-- IMAGE --}}
-                    @if($item->type === 'produk' && $item->produk)
-                        <img src="{{ asset('storage/'.$item->produk->image) }}"
-                            alt="{{ $item->produk->nama_produk }}"
-                            style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-right:16px;">
-                    @elseif($item->type === 'paket' && $item->paket)
-                        <img src="{{ asset('storage/'.$item->paket->image) }}"
-                            alt="{{ $item->paket->nama_paket }}"
-                            style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-right:16px;">
-                    @endif
+                    <div class="d-flex align-items-center">
+                        @php
+                            $image = $item->type === 'paket'
+                                ? optional($item->paket)->image
+                                : optional($item->produk)->image;
+                        @endphp
 
-                    {{-- INFO --}}
-                    <div>
-                        @if($item->type === 'produk')
-                            <div class="fw-bold">{{ $item->produk->nama_produk }}</div>
-                            <small class="text-muted">
-                                Ukuran: {{ $item->size->size ?? '-' }} <br>
-                                Jumlah: {{ $item->quantity }}
-                            </small>
-                        @else
+                        @if($image)
+                            <img src="{{ asset('storage/'.$image) }}"
+                                 style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-right:16px">
+                        @endif
+
+                        <div>
                             <div class="fw-bold">
-                                {{ $item->paket->nama_paket }}
-                                <span class="badge bg-info ms-1">Paket</span>
+                                {{ $item->type === 'paket'
+                                    ? $item->paket->nama_paket
+                                    : $item->produk->nama_produk }}
                             </div>
                             <small class="text-muted">
-                                Jumlah Paket: {{ $item->quantity }}
+                                Jumlah: {{ $item->quantity }}
+                                @if($item->type === 'produk')
+                                    | Ukuran: {{ $item->size->size ?? '-' }}
+                                @endif
                             </small>
-                        @endif
+                        </div>
+                    </div>
+
+                    <div class="fw-semibold">
+                        Rp {{ number_format($item->price * $item->quantity,0,',','.') }}
                     </div>
 
                 </div>
-
-                {{-- HARGA --}}
-                <div class="text-end">
-                    <span class="fw-semibold">
-                        Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}
-                    </span>
-                </div>
             </div>
-        </div>
         @endforeach
     </div>
 
 </div>
+
+{{-- MODAL BUKTI BAYAR --}}
+@if($pesanan->bukti_bayar)
+<div class="modal fade" id="modalBuktiBayar" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bukti Pembayaran</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="{{ asset('storage/'.$pesanan->bukti_bayar) }}"
+                     class="img-fluid rounded">
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- MODAL BUKTI KIRIM --}}
+@if($pesanan->tugasKurir && $pesanan->tugasKurir->bukti_kirim)
+<div class="modal fade" id="modalBuktiKirim" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bukti Pengiriman Kurir</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="{{ asset('storage/'.$pesanan->tugasKurir->bukti_kirim) }}"
+                     class="img-fluid rounded">
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 @endsection

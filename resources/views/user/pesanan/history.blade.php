@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container py-4">
-    <h4 class="mb-4">Riwayat Pesanan Saya</h4>
+    <h4 class="mb-4 fw-bold">Riwayat Pesanan Saya</h4>
 
     @if ($pesanans->isEmpty())
         <div class="alert alert-info">
@@ -10,8 +10,8 @@
         </div>
     @else
         <div class="table-responsive">
-            <table class="table table-bordered align-middle">
-                <thead class="table-dark text-center">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-dark">
                     <tr>
                         <th>#</th>
                         <th>Tanggal</th>
@@ -23,65 +23,58 @@
                 <tbody>
                     @foreach ($pesanans as $order)
                         @php
-                            $badge = match($order->status) {
-                                'belum_dibayar'       => 'danger',
-                                'menunggu_konfirmasi' => 'warning text-dark',
-                                'diproses'            => 'primary',
-                                'dikirim'             => 'info',
-                                'diterima'            => 'warning text-dark',
-                                'selesai'             => 'success',
-                                default               => 'light',
-                            };
+                            $adminUnread = optional($order->chatAdminUnreadForUser)->unread_count ?? 0;
+                            $kurirUnread = optional($order->chatKurirUnreadForUser)->unread_count ?? 0;
                         @endphp
-                        <tr class="text-center">
+
+                        <tr>
                             <td>#{{ $order->id }}</td>
+
+                            {{-- TANGGAL --}}
                             <td>
-                                @if($order->created_at)
-                                    {{ $order->created_at->format('d M Y') }}<br>
-                                    <small class="text-muted">{{ $order->created_at->format('H:i') }}</small>
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
+                                {{ $order->created_at->format('d M Y') }}<br>
                                 <small class="text-muted">
                                     {{ $order->created_at->format('H:i') }}
                                 </small>
                             </td>
+
+                            {{-- STATUS --}}
                             <td>
-                                <span class="badge bg-{{ $badge }}">
-                                    {{ ucfirst($order->status) }}
+                                <span class="badge {{ $order->status_badge }}">
+                                    {{ $order->status_label }}
                                 </span>
                             </td>
+
+                            {{-- TOTAL --}}
                             <td class="fw-semibold text-success">
                                 Rp {{ number_format($order->total, 0, ',', '.') }}
                             </td>
-                            <td class="text-start">
 
+                            {{-- AKSI --}}
+                            <td class="text-start">
                                 <a href="{{ route('pesanan.show', $order->id) }}"
                                    class="btn btn-outline-primary btn-sm w-100 mb-1">
                                     Detail Pesanan
                                 </a>
 
+                                {{-- REFUND --}}
                                 @if ($order->status === 'selesai')
                                     @if ($order->refund)
                                         <a href="{{ route('refund.show', $order->refund->id) }}"
-                                           class="btn btn-outline-info btn-sm w-100">
+                                           class="btn btn-outline-info btn-sm w-100 mb-1">
                                             Detail Refund
                                         </a>
                                     @else
                                         <a href="{{ route('refund.create', ['pesanan_id' => $order->id]) }}"
-                                           class="btn btn-outline-warning btn-sm w-100">
+                                           class="btn btn-outline-warning btn-sm w-100 mb-1">
                                             Ajukan Refund
                                         </a>
                                     @endif
                                 @endif
 
-                                @php
-                                    $adminUnread = optional($order->chatAdminUnreadForUser)->unread_count ?? 0;
-                                    $kurirUnread = optional($order->chatKurirUnreadForUser)->unread_count ?? 0;
-                                @endphp
-
-                                @if($adminUnread > 0 || $kurirUnread > 0)
-                                    <span class="badge bg-danger mb-1">
+                                {{-- NOTIF CHAT --}}
+                                @if($adminUnread + $kurirUnread > 0)
+                                    <span class="badge bg-danger">
                                         {{ $adminUnread + $kurirUnread }} pesan baru
                                     </span>
                                 @endif

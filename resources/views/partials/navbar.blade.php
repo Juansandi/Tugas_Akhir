@@ -1,13 +1,21 @@
 @php
 use App\Models\UserNotification;
+use App\Models\Cart;
+
+$userNotifs = collect();
+$cartCount = 0;
 
 if (Auth::check()) {
     $userNotifs = UserNotification::where('user_id', Auth::id())
         ->where('is_read', false)
         ->latest()
         ->get();
+
+    // 🔥 JUMLAH ITEM UNIK DI CART
+    $cartCount = Cart::where('user_id', Auth::id())->count();
 }
 @endphp
+
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
@@ -35,7 +43,15 @@ if (Auth::check()) {
                     <a class="nav-link" href="{{ route('wishlist.index') }}"><i class="bi bi-heart"></i></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('cart.index') }}"><i class="bi bi-cart"></i></a>
+                    <a class="nav-link position-relative" href="{{ route('cart.index') }}">
+                        <i class="bi bi-cart"></i>
+                        @if($cartCount > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                                {{ $cartCount }}
+                                <span class="visually-hidden">jumlah item di keranjang</span>
+                            </span>
+                        @endif
+                    </a>
                 </li>
                 @auth
                 <li class="nav-item dropdown">

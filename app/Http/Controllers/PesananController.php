@@ -269,6 +269,8 @@ class PesananController extends Controller
     {
         $user = Auth::user();
 
+        Pesanan::autoCancelExpired(); 
+
         $pesanans = Pesanan::with([
             'refund',
             'chatAdminUnreadForUser',

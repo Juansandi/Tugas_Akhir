@@ -11,27 +11,43 @@ use App\Models\Chat;
 
 class AdminPesananController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pesananList = Pesanan::with([
+        // 🔥 AUTO CANCEL (sementara, tanpa scheduler)
+        Pesanan::autoCancelExpired();
+
+        $query = Pesanan::with([
             'pengguna',
             'detail.produk',
             'chatAdmin' => function ($q) {
                 $q->withCount([
                     'messages as unread_count' => function ($mq) {
                         $mq->where('sender_type', 'user')
-                        ->where('is_read', false);
+                           ->where('is_read', false);
                     }
                 ]);
             }
-        ])->orderBy('created_at', 'desc')->get();
+        ])->orderBy('created_at', 'desc');
+
+        // 🔍 FILTER STATUS
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $pesananList = $query->paginate(10)->withQueryString();
 
         return view('admin.pesanan.index', compact('pesananList'));
     }
 
     public function show($id)
     {
-        $pesanan = Pesanan::with(['detail.produk', 'detail.size', 'pengguna', 'detail.paket'])->findOrFail($id);
+        $pesanan = Pesanan::with([
+            'detail.produk',
+            'detail.size',
+            'detail.paket.detailPakets.size',
+            'pengguna',
+            'tugasKurir',
+        ])->findOrFail($id);
 
         $kurirs = Pengguna::where('role', 'kurir')->get();
 
@@ -59,7 +75,7 @@ class AdminPesananController extends Controller
         $allowed = [
             'menunggu_konfirmasi' => ['diproses'],
             'diproses'            => ['dikirim'],
-            'dikirim'             => ['diterima'],
+            'dikirim'             => ['diterima', 'selesai'],
             'diterima'            => ['selesai'],
         ];
 

@@ -4,75 +4,135 @@
 
 @section('content')
 <div class="container py-4">
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">Manajemen Pesanan</h2>
-        {{-- Tambahkan tombol jika ingin fitur seperti export atau tambah manual --}}
-        {{-- <a href="#" class="btn btn-dark">Tambah Pesanan</a> --}}
     </div>
 
     @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
     @endif
+
+    <form method="GET" class="row g-2 mb-3">
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">-- Semua Status --</option>
+
+                <option value="belum_dibayar"
+                    {{ request('status') === 'belum_dibayar' ? 'selected' : '' }}>
+                    Belum Dibayar
+                </option>
+
+                <option value="menunggu_konfirmasi"
+                    {{ request('status') === 'menunggu_konfirmasi' ? 'selected' : '' }}>
+                    Menunggu Konfirmasi
+                </option>
+
+                <option value="diproses"
+                    {{ request('status') === 'diproses' ? 'selected' : '' }}>
+                    Diproses
+                </option>
+
+                <option value="dikirim"
+                    {{ request('status') === 'dikirim' ? 'selected' : '' }}>
+                    Dikirim
+                </option>
+
+                <option value="diterima"
+                    {{ request('status') === 'diterima' ? 'selected' : '' }}>
+                    Diterima
+                </option>
+
+                <option value="selesai"
+                    {{ request('status') === 'selesai' ? 'selected' : '' }}>
+                    Selesai
+                </option>
+
+                <option value="dibatalkan"
+                    {{ request('status') === 'dibatalkan' ? 'selected' : '' }}>
+                    Dibatalkan
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <button class="btn btn-outline-primary w-100">
+                Filter
+            </button>
+        </div>
+
+        @if(request('status'))
+            <div class="col-md-2">
+                <a href="{{ route('admin.pesanan.index') }}"
+                class="btn btn-outline-secondary w-100">
+                    Reset
+                </a>
+            </div>
+        @endif
+
+    </form>
 
     <div class="table-responsive">
         <table class="table table-bordered align-middle text-center">
             <thead class="table-secondary">
                 <tr>
-                    <th>No</th>
+                    <th width="60">No</th>
                     <th>Nama Pembeli</th>
                     <th>Status</th>
                     <th>Total</th>
-                    <th>Aksi</th>
+                    <th width="160">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($pesananList as $index => $pesanan)
                 <tr>
+
+                    {{-- NO --}}
                     <td>{{ $index + 1 }}</td>
 
+                    {{-- USER --}}
                     <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
 
+                    {{-- STATUS --}}
                     <td>
-                        @php
-                            $status = $pesanan->status;
-                            $badgeClass = match($status) {
-                                'belum_dibayar' => 'bg-danger',
-                                'menunggu_konfirmasi' => 'bg-warning',
-                                'diproses' => 'bg-primary',
-                                'dikirim' => 'bg-info text-dark',
-                                'diterima' => 'bg-warning text-dark',
-                                'selesai' => 'bg-success',
-                                default => 'bg-light text-dark'
-                            };
-                        @endphp
-                        <span class="badge {{ $badgeClass }}">
-                            {{ ucfirst($status) }}
+                        <span class="badge {{ $pesanan->status_badge }}">
+                            {{ $pesanan->status_label }}
                         </span>
                     </td>
 
-                    <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
+                    {{-- TOTAL --}}
+                    <td class="fw-semibold text-success">
+                        Rp {{ number_format($pesanan->total, 0, ',', '.') }}
+                    </td>
 
+                    {{-- AKSI --}}
                     <td>
                         <a href="{{ route('admin.pesanan.show', $pesanan->id) }}"
-                        class="btn btn-sm btn-outline-primary position-relative">
+                           class="btn btn-sm btn-outline-primary position-relative">
 
                             <i class="bi bi-eye"></i> Detail
 
                             @if(optional($pesanan->chatAdmin)->unread_count > 0)
-                                <span class="badge bg-danger">
-                                    {{ $pesanan->chatAdmin->unread_count }} pesan baru
+                                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                                    {{ $pesanan->chatAdmin->unread_count }}
                                 </span>
                             @endif
                         </a>
                     </td>
+
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-muted">Belum ada pesanan.</td>
+                    <td colspan="5" class="text-muted">
+                        Belum ada pesanan.
+                    </td>
                 </tr>
                 @endforelse
-                </tbody>
+            </tbody>
         </table>
     </div>
+
 </div>
 @endsection

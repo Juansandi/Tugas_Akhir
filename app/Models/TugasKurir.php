@@ -13,6 +13,13 @@ class TugasKurir extends Model
         'pesanan_id',
         'user_id',
         'status',
+        'waktu_kirim',
+        'bukti_kirim',
+        'catatan_kurir',    
+    ];
+
+    protected $casts = [
+        'waktu_kirim' => 'datetime',
     ];
 
     public function pesanan()

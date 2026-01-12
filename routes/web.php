@@ -244,12 +244,17 @@ Route::middleware(['auth', 'role:kurir'])
     Route::get('/dashboard', [KurirController::class, 'dashboard'])->name('dashboard');
     Route::get('/pesanan', [KurirController::class, 'pesanan'])->name('pesanan');
     Route::get('/profil', [KurirController::class, 'profil'])->name('profil');
-    Route::post('/pesanan/{id}/selesai', [KurirController::class, 'selesai'])->name('pesanan.selesai');
     Route::get('/riwayat', [KurirController::class, 'riwayat'])->name('riwayat');
 });
+
+Route::middleware(['auth','role:kurir'])->prefix('kurir')->name('kurir.')->group(function () {
+    Route::post('/pesanan/{tugas}/kirim',
+        [KurirController::class, 'kirim']
+    )->name('kirim');
+});
+
 Route::middleware(['auth', 'role:kurir'])->group(function () {
     Route::get('/kurir/pesanan/{tugas}', [KurirController::class, 'detail'])->name('kurir.pesanan.detail');
-    Route::post('/pesanan/{id}/selesai', [KurirController::class, 'selesai'])->name('kurir.selesai');
 });
 
 Route::middleware(['auth', 'role:kurir'])->group(function () {

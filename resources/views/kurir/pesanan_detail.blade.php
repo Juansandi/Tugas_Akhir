@@ -78,31 +78,79 @@
         </div>
     </div>
 
-    {{-- AKSI --}}
-    <div class="d-flex gap-2">
+    @if($tugas->status === 'selesai' && $tugas->bukti_kirim)
+    <div class="card mt-4 border-success">
+        <div class="card-body">
+            <h6 class="fw-semibold text-success mb-3">
+                Bukti Pengiriman
+            </h6>
 
-        @if($tugas->pesanan->chatKurir)
-            <a href="{{ route('kurir.chat.show', $tugas->pesanan->chatKurir->id) }}"
-            class="btn btn-outline-success">
-                💬 Chat Customer
-            </a>
-        @endif
+            <img src="{{ asset('storage/'.$tugas->bukti_kirim) }}"
+                class="img-fluid rounded border mb-2"
+                style="max-height:250px">
 
-        @if($tugas->status === 'aktif')
+            <p class="mb-1">
+                <strong>Waktu Kirim:</strong>
+                {{ optional($tugas->waktu_kirim)->format('d M Y H:i') }}
+            </p>
+
+            @if($tugas->catatan_kurir)
+                <p class="mb-0">
+                    <strong>Catatan: </strong>
+                    {{ $tugas->catatan_kurir }}
+                </p>
+            @endif
+        </div>
+    </div>
+    @endif
+
+    {{-- AKSI KURIR --}}
+    @if($tugas->status === 'aktif')
+    <div class="card mt-4">
+        <div class="card-body">
+            <h6 class="fw-semibold mb-3">Bukti Pengiriman</h6>
+
             <form method="POST"
-                  action="{{ route('kurir.selesai', $tugas->id) }}">
+                action="{{ route('kurir.kirim', $tugas->id) }}"
+                enctype="multipart/form-data">
                 @csrf
-                <button class="btn btn-success">
-                    ✅ Tandai Selesai
+
+                <div class="mb-3">
+                    <label class="form-label">Foto Bukti Kirim</label>
+                    <input type="file"
+                        name="bukti_kirim"
+                        class="form-control"
+                        required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Catatan Kurir (opsional)</label>
+                    <textarea name="catatan_kurir"
+                            class="form-control"
+                            rows="2"
+                            placeholder="Contoh: paket dititip satpam"></textarea>
+                </div>
+
+                <button class="btn btn-success w-100">
+                    🚚 Tandai Sudah Dikirim
                 </button>
             </form>
+        </div>
+    </div>
+    @endif
+    {{-- TOMBOL KEMBALI --}}
+    <div class="mt-4">
+        @if($tugas->status === 'aktif')
+            <a href="{{ route('kurir.pesanan') }}"
+            class="btn btn-outline-secondary w-100">
+                ← Kembali ke Pesanan Aktif
+            </a>
+        @else
+            <a href="{{ route('kurir.riwayat') }}"
+            class="btn btn-outline-secondary w-100">
+                ← Kembali ke Riwayat Pengiriman
+            </a>
         @endif
-
-        <a href="{{ route('kurir.pesanan') }}"
-           class="btn btn-outline-secondary">
-            ← Kembali
-        </a>
-
     </div>
 
 </div>

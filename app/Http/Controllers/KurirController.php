@@ -83,16 +83,59 @@ class KurirController extends Controller
         return view('kurir.profil');
     }
 
-    public function selesai($id)
+    public function tandaiDikirim(Request $request, $id)
     {
         $tugas = TugasKurir::where('id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        $tugas->update(['status' => 'selesai']);
-        $tugas->pesanan->update(['status' => 'selesai']);
+        $request->validate([
+            'bukti_kirim' => 'nullable|image|max:2048',
+            'catatan_kurir' => 'nullable|string|max:255',
+        ]);
 
-        return redirect()->back()->with('success', 'Pesanan selesai dikirim');
+        $path = null;
+        if ($request->hasFile('bukti_kirim')) {
+            $path = $request->file('bukti_kirim')
+                ->store('bukti_kirim', 'public');
+        }
+
+        $tugas->update([
+            'status' => 'dikirim',
+            'waktu_kirim' => now(),
+            'bukti_kirim' => $path,
+            'catatan_kurir' => $request->catatan_kurir,
+        ]);
+
+        return back()->with('success', 'Pesanan ditandai telah dikirim.');
+    }
+
+    public function kirim(Request $request, TugasKurir $tugas)
+    {
+        abort_if($tugas->user_id !== Auth::id(), 403);
+
+        $request->validate([
+            'bukti_kirim' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'catatan_kurir' => 'nullable|string|max:255',
+        ]);
+
+        $path = $request->file('bukti_kirim')
+            ->store('bukti_kirim', 'public');
+
+        // update tugas kurir
+        $tugas->update([
+            'status' => 'selesai',
+            'waktu_kirim' => now(),
+            'bukti_kirim' => $path,
+            'catatan_kurir' => $request->catatan_kurir,
+        ]);
+
+        // update pesanan → DIKIRIM (BUKAN SELESAI)
+        $tugas->pesanan->update([
+            'status' => 'dikirim'
+        ]);
+
+        return back()->with('success', 'Pesanan berhasil dikirim.');
     }
 
     public function riwayat()

@@ -8,6 +8,7 @@ use App\Models\DetailPesanan;
 use App\Models\Refund;
 use App\Models\TugasKurir;
 use App\Models\Chat;
+use Illuminate\Support\Facades\DB;
 
 class Pesanan extends Model
 {
@@ -95,5 +96,70 @@ class Pesanan extends Model
     {
         return $this->hasOne(Chat::class)->where('type', 'kurir');
     }
+
+    public function getStatusLabelAttribute()
+    {
+        return match ($this->status) {
+            'belum_dibayar'        => 'Belum Dibayar',
+            'menunggu_konfirmasi' => 'Menunggu Konfirmasi',
+            'diproses'            => 'Diproses',
+            'dikirim'             => 'Dikirim',
+            'diterima'            => 'Diterima',
+            'selesai'             => 'Selesai',
+            'dibatalkan'          => 'Dibatalkan',
+            default               => ucfirst(str_replace('_', ' ', $this->status)),
+        };
+    }
+
+    public function getStatusBadgeAttribute()
+    {
+        return match ($this->status) {
+            'belum_dibayar'        => 'bg-danger',
+            'menunggu_konfirmasi' => 'bg-warning text-dark',
+            'diproses'            => 'bg-primary',
+            'dikirim'             => 'bg-info text-dark',
+            'diterima'            => 'bg-secondary',
+            'selesai'             => 'bg-success',
+            'dibatalkan'          => 'bg-dark',
+            default               => 'bg-light text-dark',
+        };
+    }
     
+    public static function autoCancelExpired()
+    {
+        DB::transaction(function () {
+
+            $pesanans = self::with('detail.size', 'detail.paket.detailPakets.size')
+                ->where('status', 'belum_dibayar')
+                ->where('created_at', '<=', now()->subHours(24))
+                ->get();
+
+            foreach ($pesanans as $pesanan) {
+
+                foreach ($pesanan->detail as $item) {
+
+                    // PRODUK BIASA
+                    if ($item->type === 'produk' && $item->size) {
+                        $item->size->increment('stok', $item->quantity);
+                    }
+
+                    // PAKET
+                    if ($item->type === 'paket' && $item->paket) {
+                        foreach ($item->paket->detailPakets as $detail) {
+                            $detail->size->increment(
+                                'stok',
+                                $detail->quantity * $item->quantity
+                            );
+                        }
+                    }
+                }
+
+                // UPDATE STATUS (TIDAK DIHAPUS)
+                $pesanan->update([
+                    'status' => 'dibatalkan'
+                ]);
+            }
+
+        });
+    }
 }
