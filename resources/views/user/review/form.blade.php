@@ -1,42 +1,93 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <h4>Beri Review untuk Produk</h4>
+<div class="container py-4" style="max-width: 720px">
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">{{ $produk->nama_produk }}</h5>
-            @if ($produk->gambar)
-                <img src="{{ asset('storage/' . $produk->gambar) }}" alt="{{ $produk->nama_produk }}" class="img-fluid mb-3" style="max-width: 200px;">
+    <h4 class="mb-4">✍️ Beri Review Produk</h4>
+
+    {{-- CARD PRODUK --}}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body d-flex gap-3 align-items-center">
+
+            {{-- GAMBAR --}}
+            @if ($detail->produk->image)
+                <img src="{{ asset('storage/' . $detail->produk->image) }}"
+                     alt="{{ $detail->produk->nama_produk }}"
+                     style="width:120px;height:120px;object-fit:cover;border-radius:12px">
             @endif
-            <p class="card-text">Harga: Rp {{ number_format($produk->harga, 0, ',', '.') }}</p>
+
+            {{-- INFO --}}
+            <div>
+                <h5 class="mb-1">{{ $detail->produk->nama_produk }}</h5>
+
+                @if($detail->size)
+                    <small class="text-muted">
+                        Ukuran: {{ $detail->size->size }}
+                    </small><br>
+                @endif
+
+                <p class="mb-1 fw-semibold">
+                    Rp {{ number_format($detail->price, 0, ',', '.') }}
+                </p>
+
+                <span class="badge bg-success">Produk yang dibeli</span>
+            </div>
+
         </div>
     </div>
 
-    <form action="{{ route('review.store') }}" method="POST">
-        @csrf
-        <input type="hidden" name="produk_id" value="{{ $produk->id }}">
-        <input type="hidden" name="pesanan_id" value="{{ request('pesanan_id') }}">
-        <div class="mb-3">
-            <label for="rating" class="form-label">Rating (1-5)</label>
-            <select name="rating" id="rating" class="form-select" required>
-                <option value="">Pilih rating</option>
-                @for($i = 1; $i <= 5; $i++)
-                    <option value="{{ $i }}">{{ $i }}</option>
-                @endfor
-            </select>
-        </div>
+    {{-- FORM REVIEW --}}
+    <div class="card shadow-sm">
+        <div class="card-body">
 
-        <div class="mb-3">
-            <label for="comment" class="form-label">Komentar</label>
-            <textarea name="comment" id="comment" class="form-control" rows="4" required></textarea>
-        </div>
+            <form action="{{ route('review.store') }}" method="POST">
+                @csrf
 
-        <div class="d-flex gap-2">
-            <a href="{{ route('pesanan.history') }}" class="btn btn-secondary">Kembali</a>
-            <button type="submit" class="btn btn-primary">Kirim Review</button>
+                <input type="hidden" name="produk_id" value="{{ $detail->produk_id }}">
+                <input type="hidden" name="pesanan_id" value="{{ $pesananId }}">
+
+                {{-- RATING --}}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Rating</label>
+                    <div class="d-flex gap-2">
+                        @for ($i = 5; $i >= 1; $i--)
+                            <input type="radio"
+                                   class="btn-check"
+                                   name="rating"
+                                   id="rating{{ $i }}"
+                                   value="{{ $i }}"
+                                   required>
+                            <label class="btn btn-outline-warning" for="rating{{ $i }}">
+                                ⭐ {{ $i }}
+                            </label>
+                        @endfor
+                    </div>
+                </div>
+
+                {{-- KOMENTAR --}}
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Komentar</label>
+                    <textarea name="comment"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Ceritakan pengalamanmu dengan produk ini..."
+                              required></textarea>
+                </div>
+
+                {{-- AKSI --}}
+                <div class="d-flex gap-2">
+                    <a href="{{ route('pesanan.show', $pesananId) }}"
+                       class="btn btn-outline-secondary">
+                        ← Kembali
+                    </a>
+                    <button type="submit" class="btn btn-primary px-4">
+                        Kirim Review
+                    </button>
+                </div>
+
+            </form>
+
         </div>
-    </form>
+    </div>
 </div>
 @endsection

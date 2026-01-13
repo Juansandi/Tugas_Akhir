@@ -1,43 +1,84 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <h4>Detail Refund Pesanan #{{ $refund->pesanan->id }}</h4>
+<div class="container py-4" style="max-width:720px">
 
-    <div class="card mb-3">
+    <h4 class="fw-bold mb-3">
+        Detail Refund
+        <span class="text-muted">Pesanan #{{ $refund->pesanan->id }}</span>
+    </h4>
+
+    @php
+        $badgeClass = match($refund->status) {
+            'diajukan'  => 'bg-warning text-dark',
+            'disetujui' => 'bg-success text-white',
+            'ditolak'   => 'bg-danger text-white',
+            default     => 'bg-secondary text-white'
+        };
+    @endphp
+
+    <div class="card shadow-sm mb-3">
         <div class="card-body">
-            <p><strong>Alasan Refund:</strong> {{ $refund->alasan }}</p>
-            <p><strong>Metode Pengembalian:</strong> {{ $refund->metode_refund }}</p>
-            <p><strong>Nomor Rekening / E-Wallet:</strong> {{ $refund->nomor_tujuan }}</p>
 
-            @if ($refund->bukti_foto)
-                <p><strong>Bukti Foto:</strong></p>
-                <img src="{{ asset('storage/' . $refund->bukti_foto) }}" alt="Bukti Foto" class="img-thumbnail" width="300">
-            @endif
-
-             @php
-                $badgeClass = match($refund->status) {
-                    'diajukan'  => 'bg-warning text-dark',
-                    'disetujui' => 'bg-success text-white',
-                    'ditolak'   => 'bg-danger text-white',
-                    default     => 'bg-secondary text-white'
-                };
-            @endphp
-
-            <p><strong>Status Refund:</strong>
-                <span class="badge {{ $badgeClass }}">
+            {{-- STATUS --}}
+            <div class="mb-3">
+                <span class="badge {{ $badgeClass }} px-3 py-2">
                     {{ ucfirst($refund->status) }}
                 </span>
-            </p>
+            </div>
 
-            @if ($refund->respon_admin)
-                <p><strong>Respon Admin:</strong> {{ $refund->respon_admin }}</p>
+            {{-- INFO REFUND --}}
+            <table class="table table-borderless mb-0">
+                <tr>
+                    <td width="180" class="text-muted">Alasan Refund</td>
+                    <td class="fw-semibold">{{ $refund->alasan }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Metode Refund</td>
+                    <td>{{ $refund->metode_refund }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Tujuan Pengembalian</td>
+                    <td>{{ $refund->nomor_tujuan }}</td>
+                </tr>
+                <tr>
+                    <td class="text-muted">Tanggal Pengajuan</td>
+                    <td>{{ $refund->created_at->format('d M Y, H:i') }}</td>
+                </tr>
+            </table>
+
+            {{-- BUKTI FOTO --}}
+            @if ($refund->bukti_foto)
+                <hr>
+                <p class="fw-semibold mb-2">Bukti Pendukung</p>
+                <img src="{{ asset('storage/' . $refund->bukti_foto) }}"
+                     alt="Bukti Refund"
+                     class="img-fluid rounded border"
+                     style="max-height:300px; object-fit:contain;">
             @endif
 
-            <p><strong>Tanggal Pengajuan:</strong> {{ $refund->created_at->format('d M Y, H:i') }}</p>
+            {{-- RESPON ADMIN --}}
+            @if ($refund->respon_admin)
+                <hr>
+                <div class="alert
+                    {{ $refund->status === 'disetujui'
+                        ? 'alert-success'
+                        : 'alert-danger' }}">
+                    <strong>Respon Admin:</strong><br>
+                    {{ $refund->respon_admin }}
+                </div>
+            @endif
+
         </div>
     </div>
 
-    <a href="{{ route('pesanan.history') }}" class="btn btn-secondary">← Kembali ke Riwayat Pesanan</a>
+    {{-- FOOTER --}}
+    <div class="d-flex gap-2">
+        <a href="{{ route('pesanan.history') }}"
+           class="btn btn-outline-secondary w-100">
+            ← Kembali ke Riwayat Pesanan
+        </a>
+    </div>
+
 </div>
 @endsection

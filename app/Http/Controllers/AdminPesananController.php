@@ -19,6 +19,7 @@ class AdminPesananController extends Controller
         $query = Pesanan::with([
             'pengguna',
             'detail.produk',
+            'tugasKurir',
             'chatAdmin' => function ($q) {
                 $q->withCount([
                     'messages as unread_count' => function ($mq) {

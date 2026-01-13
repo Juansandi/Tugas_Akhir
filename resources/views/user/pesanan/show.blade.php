@@ -7,7 +7,7 @@
         <span class="text-muted">#{{ $pesanan->id }}</span>
     </h4>
 
-    {{-- INFO PESANAN --}}
+    {{-- ================= INFO PESANAN ================= --}}
     <div class="card mb-4 shadow-sm">
         <div class="card-body">
 
@@ -17,7 +17,7 @@
                 {{ $pesanan->status_label }}
             </span>
 
-            {{-- AKSI --}}
+            {{-- ================= AKSI ================= --}}
             <div class="mt-3 d-flex gap-2 flex-wrap">
 
                 @if($pesanan->status === 'belum_dibayar')
@@ -52,7 +52,53 @@
                 @endif
             </div>
 
-            {{-- RINCIAN HARGA --}}
+            {{-- ================= REFUND INFO ================= --}}
+            @if($pesanan->status === 'selesai')
+                @php
+                    // ===== REFUND WINDOW 24 JAM (ANTI DESIMAL) =====
+                    $lewatMenit = $pesanan->updated_at->diffInMinutes(now());
+                    $sisaJam   = max(0, floor((24 * 60 - $lewatMenit) / 60));
+                @endphp
+
+                <div class="mt-4">
+
+                    {{-- REFUND COUNTDOWN --}}
+                    @if(!$pesanan->refund && $sisaJam > 0)
+                        <div class="alert alert-warning d-flex align-items-center">
+                            ⏱️
+                            <div class="ms-1">
+                                Anda masih dapat mengajukan refund dalam
+                                <strong>{{ $sisaJam }} jam</strong>
+                                setelah pesanan selesai.
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- REFUND EXPIRED --}}
+                    @if(!$pesanan->refund && $sisaJam <= 0)
+                        <div class="alert alert-secondary">
+                            ⛔ Batas waktu pengajuan refund telah berakhir
+                            (maksimal 1×24 jam setelah pesanan selesai).
+                        </div>
+                    @endif
+
+                    {{-- TOMBOL REFUND --}}
+                    @if(!$pesanan->refund && $sisaJam > 0)
+                        <a href="{{ route('refund.create', ['pesanan_id' => $pesanan->id]) }}"
+                           class="btn btn-outline-warning">
+                            Ajukan Refund
+                        </a>
+                    @elseif($pesanan->refund)
+                        <a href="{{ route('refund.show', $pesanan->refund->id) }}"
+                           class="btn btn-outline-info">
+                            Lihat Detail Refund
+                        </a>
+                    @endif
+
+                </div>
+            @endif
+
+            {{-- ================= RINCIAN HARGA ================= --}}
             <hr>
             <h5>Perincian Harga</h5>
             @php
@@ -62,33 +108,15 @@
                 <li>Subtotal: <strong>Rp {{ number_format($subtotal,0,',','.') }}</strong></li>
                 <li>Diskon Promo: -Rp {{ number_format($pesanan->diskon_dari_promo ?? 0,0,',','.') }}</li>
                 <li>Diskon Poin: -Rp {{ number_format($pesanan->diskon_dari_poin ?? 0,0,',','.') }}</li>
-                @if(in_array($pesanan->status, ['diproses','dikirim','diterima','selesai']))
-                    <li>
-                        <strong>Total Dibayar:</strong>
-                        <span class="fw-bold text-success">
-                            Rp {{ number_format($pesanan->total, 0, ',', '.') }}
-                        </span>
-                    </li>
-                @else
-                    <li>
-                        <strong>Total Dibayar:</strong>
-                        <span class="text-muted">Belum dibayar</span>
-                    </li>
-                @endif
+                <li>
+                    <strong>Total Dibayar:</strong>
+                    <span class="fw-bold text-success">
+                        Rp {{ number_format($pesanan->total, 0, ',', '.') }}
+                    </span>
+                </li>
             </ul>
-            @if($pesanan->status === 'selesai')
-                <hr>
-                <h5>Poin Diperoleh</h5>
-                <p class="mb-0">
-                    🎉 Anda mendapatkan
-                    <strong class="text-success">
-                        {{ $pesanan->poin_diperoleh }} poin
-                    </strong>
-                    dari pesanan ini.
-                </p>
-            @endif
 
-            {{-- ALAMAT --}}
+            {{-- ================= ALAMAT ================= --}}
             <h5 class="mt-4">Alamat Pengiriman</h5>
             <div class="border rounded p-3 bg-light">
                 {{ $pesanan->alamat_pengiriman }}
@@ -97,42 +125,10 @@
                 @endif
             </div>
 
-            @if(in_array($pesanan->status, ['dikirim','selesai']) && $pesanan->tugasKurir)
-                <hr>
-                <h5>Bukti Pengiriman</h5>
-
-                @if($pesanan->tugasKurir->bukti_kirim)
-                   <img src="{{ asset('storage/'.$pesanan->tugasKurir->bukti_kirim) }}"
-                        class="img-fluid rounded border mb-2"
-                        style="max-height:250px; object-fit:contain;">
-
-                    @if($pesanan->tugasKurir->catatan_kurir)
-                        <p class="text-muted">
-                            <strong>Catatan Kurir:</strong><br>
-                            {{ $pesanan->tugasKurir->catatan_kurir }}
-                        </p>
-                    @endif
-                @else
-                    <p class="text-muted">
-                        Bukti pengiriman belum tersedia.
-                    </p>
-                @endif
-            @endif
-
-            {{-- KONFIRMASI TERIMA --}}
-            @if ($pesanan->status === 'dikirim')
-                <form method="POST" action="{{ route('pesanan.updateStatus', $pesanan->id) }}" class="mt-3">
-                    @csrf
-                    <input type="hidden" name="status" value="diterima">
-                    <button class="btn btn-success">
-                        Konfirmasi Diterima
-                    </button>
-                </form>
-            @endif
         </div>
     </div>
 
-    {{-- DETAIL PRODUK --}}
+    {{-- ================= DETAIL PRODUK ================= --}}
     <div class="card shadow-sm">
         <div class="card-body">
             <h5>Produk dalam Pesanan</h5>
@@ -172,11 +168,29 @@
                         Rp {{ number_format($item->price * $item->quantity,0,',','.') }}
                     </div>
                 </div>
+
+                {{-- REVIEW --}}
+                @if($pesanan->status === 'selesai' && $item->type === 'produk' && !$pesanan->refund)
+                    <div class="mt-2">
+                        @if(in_array($item->produk_id, $reviewedProdukIds))
+                            <span class="badge bg-success">⭐ Sudah direview</span>
+                        @else
+                            <a href="{{ route('review.form', [
+                                    'produk' => $item->produk_id,
+                                    'pesanan' => $pesanan->id
+                                ]) }}"
+                               class="btn btn-sm btn-outline-warning">
+                                ✍️ Beri Review
+                            </a>
+                        @endif
+                    </div>
+                @endif
+
             @endforeach
         </div>
     </div>
 
-    {{-- NAVIGASI --}}
+    {{-- ================= NAVIGASI ================= --}}
     <div class="d-flex gap-3 mt-4">
         <a href="{{ route('pesanan.history') }}" class="btn btn-outline-primary w-100">
             Riwayat Pesanan

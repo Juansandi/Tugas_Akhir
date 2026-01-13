@@ -93,7 +93,7 @@
 
                 {{-- PESANAN --}}
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('pesanan.*') ? 'active' : '' }}"
+                    <a class="nav-link {{ request()->routeIs('admin.pesanan.*') ? 'active' : '' }}"
                        href="{{ route('admin.pesanan.index') }}">
                         <i class="bi bi-cart-check me-1"></i> Pesanan
                     </a>

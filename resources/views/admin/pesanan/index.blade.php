@@ -90,18 +90,34 @@
                 <tr>
 
                     {{-- NO --}}
-                    <td>{{ $index + 1 }}</td>
+                   <td>{{ $pesananList->firstItem() + $index }}</td>
 
                     {{-- USER --}}
                     <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
 
                     {{-- STATUS --}}
                     <td>
-                        <span class="badge {{ $pesanan->status_badge }}">
-                            {{ $pesanan->status_label }}
-                        </span>
-                    </td>
+                        <div class="d-flex justify-content-center align-items-center gap-1 flex-wrap">
 
+                            {{-- STATUS UTAMA --}}
+                            <span class="badge {{ $pesanan->status_badge }}">
+                                {{ $pesanan->status_label }}
+                            </span>
+
+                            {{-- 📦 INDIKATOR BUKTI KIRIM --}}
+                            @if(
+                                $pesanan->status === 'dikirim' &&
+                                $pesanan->tugasKurir &&
+                                $pesanan->tugasKurir->bukti_kirim
+                            )
+                                <span class="badge bg-success"
+                                    title="Kurir sudah upload bukti kirim">
+                                    📦 Bukti Kirim
+                                </span>
+                            @endif
+
+                        </div>
+                    </td>
                     {{-- TOTAL --}}
                     <td class="fw-semibold text-success">
                         Rp {{ number_format($pesanan->total, 0, ',', '.') }}
@@ -132,6 +148,9 @@
                 @endforelse
             </tbody>
         </table>
+        <div class="d-flex justify-content-center mt-3">
+            {{ $pesananList->withQueryString()->links() }}
+        </div>
     </div>
 
 </div>

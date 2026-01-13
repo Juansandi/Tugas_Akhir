@@ -12,10 +12,20 @@ use Illuminate\Support\Facades\Auth;
 class ReviewController extends Controller
 {
     // Tampilkan form review untuk produk tertentu
-    public function form($produkId)
+   public function form(Request $request, $produkId)
     {
-        $produk = Produk::findOrFail($produkId);
-        return view('user.review.form', compact('produk'));
+        $pesananId = $request->pesanan;
+
+        $detail = DetailPesanan::with(['produk', 'size'])
+            ->where('pesanan_id', $pesananId)
+            ->where('produk_id', $produkId)
+            ->whereHas('pesanan', function ($q) {
+                $q->where('user_id', auth()->id())
+                ->where('status', 'selesai');
+            })
+            ->firstOrFail();
+
+        return view('user.review.form', compact('detail', 'pesananId'));
     }
 
     // Simpan review
@@ -27,6 +37,13 @@ class ReviewController extends Controller
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string',
         ]);
+
+        DetailPesanan::where('pesanan_id', $request->pesanan_id)
+        ->where('produk_id', $request->produk_id)
+        ->whereHas('pesanan', fn ($q) =>
+            $q->where('user_id', auth()->id())
+            ->where('status', 'selesai')
+        )->firstOrFail();
 
         // Cek apakah user sudah pernah review produk di pesanan itu
         $exists = Review::where('user_id', Auth::id())

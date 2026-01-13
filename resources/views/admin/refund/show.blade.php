@@ -3,65 +3,149 @@
 @section('title', 'Detail Refund')
 
 @section('content')
-<div class="container py-4">
-    <h4>Detail Pengajuan Refund</h4>
+<div class="container py-4" style="max-width:900px">
 
-    <div class="card mb-3">
+    {{-- HEADER --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">
+            Detail Pengajuan Refund
+        </h4>
+        <a href="{{ route('refund.index') }}"
+           class="btn btn-outline-secondary btn-sm">
+            ← Kembali
+        </a>
+    </div>
+
+    @php
+        $badgeClass = match($refund->status) {
+            'diajukan'  => 'bg-warning text-dark',
+            'disetujui' => 'bg-success text-white',
+            'ditolak'   => 'bg-danger text-white',
+            default     => 'bg-secondary text-white'
+        };
+    @endphp
+
+    {{-- STATUS --}}
+    <div class="mb-3">
+        <span class="badge {{ $badgeClass }} px-3 py-2 fs-6">
+            {{ strtoupper($refund->status) }}
+        </span>
+    </div>
+
+    <div class="row g-4">
+
+        {{-- LEFT : INFO --}}
+        <div class="col-md-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+
+                    <h6 class="fw-bold mb-3">Informasi Refund</h6>
+
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <td width="180" class="text-muted">ID Refund</td>
+                            <td class="fw-semibold">#{{ $refund->id }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Pesanan</td>
+                            <td>#{{ $refund->pesanan->id }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Customer</td>
+                            <td>{{ $refund->pengguna->username }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Alasan</td>
+                            <td>{{ $refund->alasan }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Metode Refund</td>
+                            <td>{{ $refund->metode_refund }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Tujuan</td>
+                            <td>{{ $refund->nomor_tujuan }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Diajukan</td>
+                            <td>{{ $refund->created_at->format('d M Y, H:i') }}</td>
+                        </tr>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        {{-- RIGHT : BUKTI --}}
+        <div class="col-md-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Bukti Pendukung</h6>
+
+                    @if($refund->bukti_foto)
+                        <img src="{{ asset('storage/'.$refund->bukti_foto) }}"
+                             class="img-fluid rounded border"
+                             style="max-height:300px; object-fit:contain;">
+                    @else
+                        <p class="text-muted mb-0">
+                            Tidak ada bukti foto yang dilampirkan.
+                        </p>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {{-- ACTION ADMIN --}}
+    <div class="card shadow-sm mt-4">
         <div class="card-body">
-            @if($refund->bukti_foto)
-                <p><strong>Bukti Foto:</strong></p>
-                <img src="{{ asset('storage/' . $refund->bukti_foto) }}" width="300" class="img-thumbnail">
-            @endif
-            <p><strong>ID Pesanan:</strong> #{{ $refund->pesanan->id }}</p>
-            <p><strong>Customer:</strong> {{ $refund->pengguna->username }}</p>
-            <p><strong>Alasan Refund:</strong> {{ $refund->alasan }}</p>
-            <p><strong>Metode Pengembalian:</strong> {{ $refund->metode_refund }}</p>
-            <p><strong>Nomor Rekening / Nomor E-Wallet:</strong> {{ $refund->nomor_tujuan }}</p>
-            @if($refund->bukti)
-                <p><strong>Bukti Pendukung:</strong></p>
-                <img src="{{ asset('storage/' . $refund->bukti) }}" width="300" class="img-thumbnail">
-            @endif
 
-            @php
-                $badgeClass = match($refund->status) {
-                    'diajukan'  => 'bg-warning text-dark',
-                    'disetujui' => 'bg-success text-white',
-                    'ditolak'   => 'bg-danger text-white',
-                    default     => 'bg-secondary text-white'
-                };
-            @endphp
+            @if ($refund->status === 'diajukan')
+                <h6 class="fw-bold mb-3">Tindakan Admin</h6>
 
-            <p><strong>Status:</strong>
-                <span class="badge {{ $badgeClass }}">
-                    {{ ucfirst($refund->status) }}
-                </span>
-            </p>
-
-            @if ($refund->status == 'diajukan')
-                <form action="{{ route('admin.refund.update', $refund->id) }}" method="POST" class="mt-4">
+                <form action="{{ route('admin.refund.update', $refund->id) }}"
+                      method="POST">
                     @csrf
                     @method('PUT')
 
                     <div class="mb-3">
-                        <label for="respon_admin" class="form-label">Respon Admin</label>
-                        <textarea name="respon_admin" id="respon_admin" rows="3" class="form-control" required></textarea>
+                        <label class="form-label fw-semibold">
+                            Respon Admin <span class="text-danger">*</span>
+                        </label>
+                        <textarea name="respon_admin"
+                                  rows="3"
+                                  class="form-control"
+                                  required></textarea>
                     </div>
 
                     <div class="d-flex gap-3">
-                        <button type="submit" name="action" value="approve" class="btn btn-success">
+                        <button type="submit"
+                                name="action"
+                                value="approve"
+                                class="btn btn-success w-50">
                             Setujui Refund
                         </button>
-                        <button type="submit" name="action" value="reject" class="btn btn-danger">
+                        <button type="submit"
+                                name="action"
+                                value="reject"
+                                class="btn btn-danger w-50">
                             Tolak Refund
                         </button>
                     </div>
                 </form>
             @else
-                <p><strong>Respon Admin:</strong> {{ $refund->respon_admin }}</p>
+                <div class="alert
+                    {{ $refund->status === 'disetujui'
+                        ? 'alert-success'
+                        : 'alert-danger' }}">
+                    <strong>Respon Admin:</strong><br>
+                    {{ $refund->respon_admin }}
+                </div>
             @endif
+
         </div>
     </div>
 
-    <a href="{{ route('refund.index') }}" class="btn btn-secondary">← Kembali</a>
 </div>
 @endsection

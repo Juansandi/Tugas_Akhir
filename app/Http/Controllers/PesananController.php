@@ -12,6 +12,7 @@ use App\Models\Produk;
 use App\Models\Cart;
 use App\Models\Promo;
 use App\Models\AlamatPengguna;
+use App\Models\Review;
 use App\Models\AdminNotification;
 use Carbon\Carbon;
 
@@ -262,7 +263,12 @@ class PesananController extends Controller
     {
         $pesanan = Pesanan::with('detail.produk')->findOrFail($id);
 
-        return view('user.pesanan.show', compact('pesanan'));
+        $reviewedProdukIds = Review::where('user_id', auth()->id())
+        ->where('pesanan_id', $pesanan->id)
+        ->pluck('produk_id')
+        ->toArray();
+
+        return view('user.pesanan.show', compact('pesanan', 'reviewedProdukIds'));
     }
 
     public function history()

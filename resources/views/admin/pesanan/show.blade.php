@@ -153,21 +153,26 @@
         </form>
     @endif
 
-    @if($pesanan->status === 'dikirim')
-        <div class="alert alert-warning mt-4">
-            <strong>Perhatian:</strong><br>
-            Pesanan telah dikirim oleh kurir.  
-            Admin dapat menyelesaikan pesanan walaupun customer belum konfirmasi.
-        </div>
+   @if($pesanan->status === 'dikirim')
+        @if(
+            $pesanan->tugasKurir &&
+            $pesanan->tugasKurir->status === 'selesai' &&
+            $pesanan->tugasKurir->bukti_kirim
+        )
+            <form method="POST"
+                action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}">
+                @csrf
+                <input type="hidden" name="status" value="selesai">
+                <button class="btn btn-success">
+                    Selesaikan Pesanan
+                </button>
+            </form>
+        @else
+            <div class="alert alert-secondary mt-3">
+                ⏳ Menunggu kurir menyelesaikan pengiriman dan mengunggah bukti kirim.
+            </div>
+        @endif
 
-        <form method="POST"
-              action="{{ route('admin.pesanan.updateStatus', $pesanan->id) }}">
-            @csrf
-            <input type="hidden" name="status" value="selesai">
-            <button class="btn btn-success">
-                Selesaikan Pesanan
-            </button>
-        </form>
     @endif
 
     <hr class="my-4">

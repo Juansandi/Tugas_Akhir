@@ -30,7 +30,24 @@
                         </button>
                     </form>
                 </div>
-
+                {{-- RATING SUMMARY --}}
+                @if($totalReviews > 0)
+                    <div class="mb-3">
+                        <div class="text-warning fs-5">
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="bi {{ $i <= floor($avgRating) ? 'bi-star-fill' : 'bi-star' }}"></i>
+                            @endfor
+                            <span class="text-dark fw ms-2">
+                                {{ $avgRating }}/5
+                            </span>
+                        </div>
+                        <small class="text-muted">
+                            Dari {{ $totalReviews }} ulasan
+                        </small>
+                    </div>
+                @else
+                    <small class="text-muted">Belum ada ulasan</small>
+                @endif
                 <p class="text-muted mb-2">
                     Kategori: {{ $product->kategori->nama_kategori ?? '-' }}
                 </p>
@@ -105,23 +122,62 @@
     {{-- REVIEWS --}}
     <div class="row mt-5">
         <div class="col-12">
-            <h4>Ulasan Pengguna</h4>
 
-            @forelse($product->reviews as $review)
-                <div class="card mb-3">
+            <h4 class="mb-4">⭐ Ulasan Pengguna</h4>
+
+            @forelse($limitedReviews as $review)
+                <div class="card mb-3 shadow-sm border-0">
                     <div class="card-body">
-                        <strong>{{ $review->user->username ?? 'Anonim' }}</strong>
-                        <div class="text-warning">
-                            {{ str_repeat('★', $review->rating) }}{{ str_repeat('☆', 5 - $review->rating) }}
+
+                        <div class="d-flex gap-3">
+
+                            {{-- AVATAR --}}
+                            <div class="rounded-circle bg-secondary text-white
+                                        d-flex align-items-center justify-content-center"
+                                style="width:48px;height:48px;font-weight:600;">
+                                {{ strtoupper(substr($review->user->username ?? 'U', 0, 1)) }}
+                            </div>
+
+                            {{-- CONTENT --}}
+                            <div class="flex-grow-1">
+
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ $review->user->username ?? 'Anonim' }}</strong>
+                                    <small class="text-muted">
+                                        {{ $review->created_at->diffForHumans() }}
+                                    </small>
+                                </div>
+
+                                <div class="text-warning mb-1">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="bi {{ $i <= $review->rating ? 'bi-star-fill' : 'bi-star' }}"></i>
+                                    @endfor
+                                </div>
+
+                                <p class="mb-0 text-muted">{{ $review->comment }}</p>
+
+                            </div>
                         </div>
-                        <p class="mb-0">{{ $review->comment }}</p>
+
                     </div>
                 </div>
             @empty
                 <p class="text-muted">Belum ada ulasan.</p>
             @endforelse
+
+            {{-- LIHAT SEMUA --}}
+            @if($totalReviews > 3)
+                <div class="text-center mt-3">
+                    <a href="{{ route('user.products.reviews', $product->id) }}"
+                    class="btn btn-outline-secondary">
+                        Lihat semua ulasan ({{ $totalReviews }})
+                    </a>
+                </div>
+            @endif
+
         </div>
     </div>
+
 </div>
 
 {{-- SCRIPT --}}

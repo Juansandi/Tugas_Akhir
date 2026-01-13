@@ -229,10 +229,32 @@ class ProdukController extends Controller
     
     public function showToUserDetail($id)
     {
-        $product = Produk::with(['kategori', 'sizes'])->findOrFail($id);
-        return view('user.products.show', compact('product'));
+        $product = Produk::with(['kategori', 'sizes', 'reviews.user'])->findOrFail($id);
+        
+        $avgRating = round($product->reviews()->avg('rating'), 1);
+        $totalReviews = $product->reviews()->count();
+
+        $limitedReviews = $product->reviews()
+        ->latest()
+        ->take(3)
+        ->get();
+
+        return view('user.products.show', compact('product', 'avgRating', 'totalReviews', 'limitedReviews'));
     }
 
+    public function reviews($id)
+    {
+        $product = Produk::with('reviews.user')->findOrFail($id);
+
+        return view('user.products.reviews', compact('product'));
+    }
+   
+    public function showReviews($id)
+    {
+        $product = Produk::with('reviews.user')->findOrFail($id);
+
+        return view('admin.products.review', compact('product'));
+    }
 
     public function destroyReview($id)
     {

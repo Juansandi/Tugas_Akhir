@@ -8,59 +8,151 @@ use App\Models\AdminNotification;
 use App\Models\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class RefundController extends Controller
 {
-    public function create($pesanan_id) {
-        $pesanan = Pesanan::findOrFail($pesanan_id);
+    // ⏱️ BATAS JAM REFUND (BAHAN POKOK)
+    const REFUND_WINDOW_HOURS = 24;
+
+    /**
+     * FORM AJUKAN REFUND (USER)
+     */
+    public function create($pesanan_id)
+    {
+        $pesanan = Pesanan::with('refund')->findOrFail($pesanan_id);
+
+        // 1️⃣ Pastikan pesanan milik user
+        if ($pesanan->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // 2️⃣ Status harus selesai
+        if ($pesanan->status !== 'selesai') {
+            return redirect()->route('pesanan.show', $pesanan->id)
+                ->with('error', 'Refund hanya dapat diajukan setelah pesanan selesai.');
+        }
+
+        // 3️⃣ Cegah refund ganda
+        if ($pesanan->refund) {
+            return redirect()->route('pesanan.show', $pesanan->id)
+                ->with('error', 'Refund untuk pesanan ini sudah diajukan.');
+        }
+
+        // 4️⃣ Cek refund window (24 JAM)
+        $jamSejakSelesai = Carbon::parse($pesanan->updated_at)
+            ->diffInHours(now());
+
+        if ($jamSejakSelesai > self::REFUND_WINDOW_HOURS) {
+            return redirect()->route('pesanan.show', $pesanan->id)
+                ->with(
+                    'error',
+                    'Refund hanya dapat diajukan maksimal '
+                    . self::REFUND_WINDOW_HOURS
+                    . ' jam setelah pesanan selesai.'
+                );
+        }
+
         return view('user.refund.create', compact('pesanan'));
     }
 
-    public function store(Request $request, $pesanan_id) {
-        $request->validate([
-            'alasan' => 'required',
-            'metode_refund' => 'required',
-            'nomor_tujuan' => 'required',
-            'bukti_foto' => 'nullable|image|max:2048'
-        ]);
+    /**
+     * SIMPAN REFUND (USER)
+     */
+    public function store(Request $request, $pesanan_id)
+    {
+        $pesanan = Pesanan::with('refund')->findOrFail($pesanan_id);
 
-        $data = $request->only('alasan', 'metode_refund', 'nomor_tujuan');
-        $data['pesanan_id'] = $pesanan_id;
-        $data['user_id'] = Auth::id();
-
-        if ($request->hasFile('bukti_foto')) {
-            $data['bukti_foto'] = $request->file('bukti_foto')->store('bukti_refund', 'public');
+        // ⛔ Double protection
+        if ($pesanan->user_id !== Auth::id() || $pesanan->status !== 'selesai') {
+            abort(403);
         }
 
-        $refund = Refund::create($data);
+        if ($pesanan->refund) {
+            return redirect()->route('pesanan.show', $pesanan->id)
+                ->with('error', 'Refund untuk pesanan ini sudah diajukan.');
+        }
 
-        // Buat notifikasi admin bahwa refund diajukan user
-        AdminNotification::create([
-            'tipe' => 'refund_diajukan',
-            'pesan' => 'User ' . Auth::user()->username . ' mengajukan refund untuk pesanan #' . $pesanan_id,
-            'url' => route('admin.refund.show', $refund->id),
+        // ⏱️ Refund window (24 JAM)
+        $jamSejakSelesai = Carbon::parse($pesanan->updated_at)
+            ->diffInHours(now());
+
+        if ($jamSejakSelesai > self::REFUND_WINDOW_HOURS) {
+            return redirect()->route('pesanan.show', $pesanan->id)
+                ->with('error', 'Batas waktu pengajuan refund telah berakhir.');
+        }
+
+        $request->validate([
+            'alasan'         => 'required|string',
+            'alasan_lainnya' => 'nullable|string',
+            'metode_refund'  => 'required|string',
+            'nomor_tujuan'   => 'required|string',
+            'bukti_foto'     => 'nullable|image|max:2048',
         ]);
 
+        // 🧠 Handle alasan "Lainnya"
+        $alasan = $request->alasan === 'Lainnya'
+            ? $request->alasan_lainnya
+            : $request->alasan;
 
-        return redirect()->route('pesanan.history')->with('success', 'Permintaan refund berhasil diajukan.');
+        $refund = Refund::create([
+            'pesanan_id'    => $pesanan->id,
+            'user_id'       => Auth::id(),
+            'alasan'        => $alasan,
+            'metode_refund' => $request->metode_refund,
+            'nomor_tujuan'  => $request->nomor_tujuan,
+            'status'        => 'diajukan',
+            'bukti_foto'    => $request->hasFile('bukti_foto')
+                                ? $request->file('bukti_foto')
+                                    ->store('bukti_refund', 'public')
+                                : null,
+        ]);
+
+        // 🔔 Notifikasi admin
+        AdminNotification::create([
+            'tipe'  => 'refund_diajukan',
+            'pesan' => 'User ' . Auth::user()->username
+                     . ' mengajukan refund untuk pesanan #'
+                     . $pesanan->id,
+            'url'   => route('admin.refund.show', $refund->id),
+        ]);
+
+        return redirect()->route('pesanan.history')
+            ->with('success', 'Permintaan refund berhasil diajukan.');
     }
 
+    /**
+     * DETAIL REFUND (USER)
+     */
     public function show($id)
     {
         $refund = Refund::with(['pesanan', 'pengguna'])->findOrFail($id);
+
+        if ($refund->user_id !== Auth::id()) {
+            abort(403);
+        }
+
         return view('user.refund.show', compact('refund'));
     }
 
+    /* =========================
+       ADMIN AREA
+    ========================= */
 
-    // Untuk admin
-    public function adminIndex() {
-        $refunds = Refund::with('pengguna', 'pesanan')->latest()->get();
+    public function adminIndex()
+    {
+        $refunds = Refund::with(['pengguna', 'pesanan'])
+            ->latest()
+            ->get();
+
         return view('admin.refund.index', compact('refunds'));
     }
 
-    public function adminShow($id) {
-        $refund = Refund::with('pengguna', 'pesanan')->findOrFail($id);
+    public function adminShow($id)
+    {
+        $refund = Refund::with(['pengguna', 'pesanan'])
+            ->findOrFail($id);
+
         return view('admin.refund.show', compact('refund'));
     }
 
@@ -68,27 +160,35 @@ class RefundController extends Controller
     {
         $refund = Refund::findOrFail($id);
 
+        if ($refund->status !== 'diajukan') {
+            return back()->with('error', 'Refund ini sudah diproses.');
+        }
+
         $request->validate([
             'respon_admin' => 'required|string',
+            'action'       => 'required|in:approve,reject',
         ]);
 
         $refund->respon_admin = $request->respon_admin;
-
-        if ($request->action === 'approve') {
-            $refund->status = 'disetujui';
-        } elseif ($request->action === 'reject') {
-            $refund->status = 'ditolak';
-        }
+        $refund->status = $request->action === 'approve'
+            ? 'disetujui'
+            : 'ditolak';
 
         $refund->save();
 
+        // 🔔 Notifikasi user
         UserNotification::create([
             'user_id' => $refund->user_id,
-            'tipe' => $refund->status === 'disetujui' ? 'refund_disetujui' : 'refund_ditolak',
-            'pesan' => 'Permintaan refund untuk pesanan #' . $refund->pesanan_id . '  ' . $refund->status . '.',
-            'url' => route('refund.show', $refund->id),
+            'tipe'    => $refund->status === 'disetujui'
+                        ? 'refund_disetujui'
+                        : 'refund_ditolak',
+            'pesan'   => 'Refund pesanan #'
+                        . $refund->pesanan_id
+                        . ' ' . $refund->status . '.',
+            'url'     => route('refund.show', $refund->id),
         ]);
 
-        return redirect()->route('refund.index')->with('success', 'Status refund berhasil diperbarui.');
+        return redirect()->route('refund.index')
+            ->with('success', 'Status refund berhasil diperbarui.');
     }
 }

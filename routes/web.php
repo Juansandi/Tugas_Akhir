@@ -43,6 +43,7 @@ Route::get('/', [HomeController::class, 'index']);
 Route::get('/products', [ProdukController::class, 'showToUser'])->name('user.products');
 Route::get('/produk/{id}', [ProdukController::class, 'showToUserDetail'])->name('produk.detail');
 Route::get('/produk', [ProdukController::class, 'showToUser'])->name('produk.index');
+Route::get('/produk/{id}/reviews', [ProdukController::class, 'reviews'])->name('produk.reviews');
 
 Route::get('/paket', [PaketUserController::class, 'index'])->name('paket.index');
 Route::get('/paket/{paket}', [PaketUserController::class, 'show'])->name('paket.show');
