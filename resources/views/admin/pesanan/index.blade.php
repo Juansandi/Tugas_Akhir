@@ -82,12 +82,18 @@
                     <th>Nama Pembeli</th>
                     <th>Status</th>
                     <th>Total</th>
+                    <th>Refund</th>
+                    <th>Bersih</th>
                     <th width="160">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($pesananList as $index => $pesanan)
-                <tr>
+                @php
+                    $refund = $pesanan->refund_total ?? 0;
+                    $bersih = $pesanan->total - $refund;
+                @endphp
+                <tr class="{{ $refund > 0 ? 'table-warning' : '' }}">
 
                     {{-- NO --}}
                    <td>{{ $pesananList->firstItem() + $index }}</td>
@@ -115,12 +121,32 @@
                                     📦 Bukti Kirim
                                 </span>
                             @endif
-
+                            @if($refund > 0)
+                                <span class="badge bg-warning text-dark">
+                                    🔁 Refund
+                                </span>
+                            @endif
                         </div>
                     </td>
                     {{-- TOTAL --}}
                     <td class="fw-semibold text-success">
                         Rp {{ number_format($pesanan->total, 0, ',', '.') }}
+                    </td>
+                    @php
+                        $refund = $pesanan->refund_total ?? 0;
+                        $bersih = $pesanan->total - $refund;
+                    @endphp
+    
+                    <td class="fw-semibold text-danger">
+                        @if($refund > 0)
+                            - Rp {{ number_format($refund, 0, ',', '.') }}
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
+                    </td>
+
+                    <td class="fw-bold text-primary">
+                        Rp {{ number_format($bersih, 0, ',', '.') }}
                     </td>
 
                     {{-- AKSI --}}

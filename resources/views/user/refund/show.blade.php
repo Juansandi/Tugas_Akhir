@@ -68,6 +68,14 @@
                     {{ $refund->respon_admin }}
                 </div>
             @endif
+            @if($refund->status === 'disetujui' && $refund->refund_amount)
+                <tr>
+                    <td class="text-muted">Nominal Refund</td>
+                    <td class="fw-bold text-success">
+                        Rp {{ number_format($refund->refund_amount,0,',','.') }}
+                    </td>
+                </tr>
+            @endif
 
         </div>
     </div>

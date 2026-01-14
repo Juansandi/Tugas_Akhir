@@ -132,6 +132,7 @@
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{ route('laporan.index') }}">Laporan Penjualan</a></li>
                         <li><a class="dropdown-item" href="{{ route('admin.laporan.detail') }}">Detail Penjualan</a></li>
+                        <li><a class="dropdown-item" href="{{ route('admin.laporan.refund') }}">Laporan Refund</a></li>
                         <li><a class="dropdown-item" href="{{ route('admin.laporan.produk_terlaris') }}">Produk Terlaris</a></li>
                         <li><a class="dropdown-item" href="{{ route('admin.laporan.paket_terlaris') }}">Paket Terlaris</a></li>
                         <li><a class="dropdown-item" href="{{ route('admin.price_histories.index') }}">Histori Harga</a></li>

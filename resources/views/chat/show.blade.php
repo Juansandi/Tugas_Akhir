@@ -92,12 +92,16 @@
             🔒 Chat ditutup. Pesanan telah selesai.
         </div>
     @else
-        <form method="POST" action="{{ route('chat.send', $chat->id) }}">
+        <form action="{{ route('chat.send', $chat->id) }}" method="POST">
             @csrf
-            <textarea name="message"
+            <div class="input-group">
+                <input type="text"
+                    name="message"
                     class="form-control"
-                    placeholder="Tulis pesan..."></textarea>
-            <button class="btn btn-primary mt-2">Kirim</button>
+                    placeholder="Ketik balasan..."
+                    required>
+                <button class="btn btn-primary">Kirim</button>
+            </div>
         </form>
     @endif
 </div>

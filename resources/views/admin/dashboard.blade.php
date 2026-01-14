@@ -4,148 +4,157 @@
 
 @section('content')
 <div class="container py-4">
+
     <h2 class="fw-bold mb-4">Dashboard Admin</h2>
 
-    {{-- Statistik Singkat --}}
+    {{-- ===================== --}}
+    {{-- ZONA 1 : STATISTIK --}}
+    {{-- ===================== --}}
+    <div class="row g-3 mb-4">
+        {{-- PRODUK --}}
+        <div class="col-md-4">
+            <div class="card border-primary shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-box-seam fs-2 text-primary mb-2"></i>
+                    <h6 class="text-primary mb-1">Total Produk</h6>
+                    <h4 class="fw-bold text-primary">{{ $totalProduk }}</h4>
+                </div>
+            </div>
+        </div>
+
+        {{-- PESANAN MASUK --}}
+        <div class="col-md-4">
+            <div class="card border-info shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-cart-plus fs-2 text-info mb-2"></i>
+                    <h6 class="text-info mb-1">Pesanan Masuk Hari Ini</h6>
+                    <h4 class="fw-bold text-info">{{ $pesananMasukHariIni }}</h4>
+                </div>
+            </div>
+        </div>
+
+        {{-- PESANAN AKTIF --}}
+        <div class="col-md-4">
+            <div class="card border-warning shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-hourglass-split fs-2 text-warning mb-2"></i>
+                    <h6 class="text-warning mb-1">Pesanan Aktif</h6>
+                    <h4 class="fw-bold text-warning">{{ $pesananAktifHariIni }}</h4>
+                </div>
+            </div>
+        </div>
+
+        {{-- PENJUALAN KOTOR --}}
+        <div class="col-md-4">
+            <div class="card border-success shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-cash-stack fs-2 text-success mb-2"></i>
+                    <h6 class="text-success mb-1">Total Penjualan Kotor</h6>
+                    <h4 class="fw-bold text-success">Rp {{ number_format($totalPenjualanKotor,0,',','.') }}</h4>
+                </div>
+            </div>
+        </div>
+
+        {{-- REFUND --}}
+        <div class="col-md-4">
+            <div class="card border-danger shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-arrow-counterclockwise fs-2 text-danger mb-2"></i>
+                    <h6 class="text-danger mb-1">Refund Bulan Ini</h6>
+                    <h4 class="fw-bold text-danger">- Rp {{ number_format($totalRefundBulanIni,0,',','.') }}</h4>
+                </div>
+            </div>
+        </div>
+
+        {{-- PENJUALAN BERSIH --}}
+        <div class="col-md-4">
+            <div class="card border-dark shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-wallet2 fs-2 text-dark mb-2"></i>
+                    <h6 class="text-dark mb-1">Total Penjualan Bersih</h6>
+                    <h4 class="fw-bold text-dark">Rp {{ number_format($totalPenjualanBulanIni,0,',','.') }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- ===================== --}}
+    {{-- ZONA 2 : PESANAN & PRODUK --}}
+    {{-- ===================== --}}
     <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card text-white bg-primary shadow-sm h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-box-seam fs-2 mb-2"></i>
-                    <h6>Total Produk</h6>
-                    <h4>{{ $totalProduk }}</h4>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="card text-white bg-success shadow-sm h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-cart-check fs-2 mb-2"></i>
-                    <h6>Pesanan Hari Ini</h6>
-                    <h4>{{ $totalPesanan }}</h4>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card text-white bg-info shadow-sm h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-cash-coin fs-2 mb-2"></i>
-                    <h6>Penjualan Bulan Ini</h6>
-                    <h4>Rp {{ number_format($totalPenjualanBulanIni, 0, ',', '.') }}</h4>
-                </div>
-            </div>
-        </div>
-
-        @if($produkTerlaris && $produkTerlaris->produk)
-        <div class="col-md-3 mb-3">
-            <div class="card bg-warning shadow-sm h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-star-fill fs-2 mb-2"></i>
-                    <h6>Produk Terlaris</h6>
-                    <p class="mb-0 fw-bold">{{ $produkTerlaris->produk->nama_produk }}</p>
-                    <small>Total Dipesan: {{ $produkTerlaris->total_terjual }}</small>
-                </div>
-            </div>
-            <a href="{{ route('admin.laporan.produk_terlaris') }}" class="small text-dark">
-                Lihat laporan →
-            </a>
-        </div>
-        @endif
-    </div>
-
-    {{-- Pesanan Terbaru --}}
-    <div class="card mb-4">
-        <div class="card-header bg-light">
-            <strong>Pesanan Terbaru (Belum Selesai)</strong>
-        </div>
-        <div class="card-body">
-            @if($pesananTerbaru->isEmpty())
-                <p class="text-center text-muted">Tidak ada pesanan terbaru.</p>
-            @else
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
-                        <thead class="table-light">
+        {{-- PESANAN TERBARU --}}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header fw-semibold">Pesanan Terbaru</div>
+            <div class="card-body table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Pembeli</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($pesananTerbaru as $i => $pesanan)
                             <tr>
-                                <th>#</th>
-                                <th>Nama Pembeli</th>
-                                <th>Produk</th>
-                                <th>Total</th>
-                                <th>Status</th>
+                                <td>{{ $i+1 }}</td>
+                                <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
+                                <td>Rp {{ number_format($pesanan->total,0,',','.') }}</td>
+                                <td>
+                                    <span class="badge {{ $pesanan->status_badge }}">
+                                        {{ $pesanan->status_label }}
+                                    </span>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($pesananTerbaru as $index => $pesanan)
-                                @php
-                                    $status = strtolower($pesanan->status);
-                                    $badgeClass = match($status) {
-                                        'menunggu konfirmasi' => 'bg-secondary text-light',
-                                        'diproses'            => 'bg-primary text-light',
-                                        'dikirim'             => 'bg-info text-dark',
-                                        'diterima'            => 'bg-warning text-dark',
-                                        'selesai'             => 'bg-success text-light',
-                                        default               => 'bg-light text-dark'
-                                    };
-                                @endphp
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
-                                    <td>
-                                        @foreach($pesanan->detail as $detail)
-                                            @if($detail->type === 'produk' && $detail->produk)
-                                                {{ $detail->produk->nama_produk }}
-                                            @elseif($detail->type === 'paket' && $detail->paket)
-                                                {{ $detail->paket->nama_paket }} (Paket)
-                                            @endif
-                                            @if(!$loop->last), @endif
-                                        @endforeach
-                                    </td>
-                                    <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
-                                    <td><span class="badge {{ $badgeClass }}">{{ ucfirst($pesanan->status) }}</span></td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">
+                                    Tidak ada data
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
+
     </div>
 
-    {{-- Grafik Penjualan --}}
+    {{-- ===================== --}}
+    {{-- ZONA 3 : GRAFIK --}}
+    {{-- ===================== --}}
     <div class="card shadow-sm">
         <div class="card-body">
-            <h5 class="card-title mb-3">Grafik Penjualan Bulanan</h5>
-            <canvas id="salesChart" height="100"></canvas>
+            <h6 class="fw-semibold mb-3">Grafik Penjualan Bulanan</h6>
+            <canvas id="salesChart" height="120"></canvas>
         </div>
     </div>
+
 </div>
 @endsection
 
 @section('scripts')
-<!-- Bootstrap Icons (opsional) -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     const ctx = document.getElementById('salesChart').getContext('2d');
-    const salesChart = new Chart(ctx, {
+
+    new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+            labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
             datasets: [{
-                label: 'Penjualan (Rp)',
+                label: 'Penjualan Bersih',
                 data: @json($salesDataFull),
-                backgroundColor: 'rgba(13, 110, 253, 0.8)',
-                borderColor: '#0a58ca',
-                borderWidth: 1
+                backgroundColor: 'rgba(25, 135, 84, 0.7)'
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { display: false },
-                title: { display: true, text: 'Total Penjualan per Bulan' }
+                legend: { display: false }
             },
             scales: {
                 y: {

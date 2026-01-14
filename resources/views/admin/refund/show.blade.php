@@ -7,11 +7,8 @@
 
     {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">
-            Detail Pengajuan Refund
-        </h4>
-        <a href="{{ route('refund.index') }}"
-           class="btn btn-outline-secondary btn-sm">
+        <h4 class="fw-bold mb-0">Detail Pengajuan Refund</h4>
+        <a href="{{ route('refund.index') }}" class="btn btn-outline-secondary btn-sm">
             ← Kembali
         </a>
     </div>
@@ -19,9 +16,9 @@
     @php
         $badgeClass = match($refund->status) {
             'diajukan'  => 'bg-warning text-dark',
-            'disetujui' => 'bg-success text-white',
-            'ditolak'   => 'bg-danger text-white',
-            default     => 'bg-secondary text-white'
+            'disetujui' => 'bg-success',
+            'ditolak'   => 'bg-danger',
+            default     => 'bg-secondary'
         };
     @endphp
 
@@ -34,7 +31,7 @@
 
     <div class="row g-4">
 
-        {{-- LEFT : INFO --}}
+        {{-- INFO --}}
         <div class="col-md-7">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
@@ -43,12 +40,18 @@
 
                     <table class="table table-borderless mb-0">
                         <tr>
-                            <td width="180" class="text-muted">ID Refund</td>
+                            <td class="text-muted">ID Refund</td>
                             <td class="fw-semibold">#{{ $refund->id }}</td>
                         </tr>
                         <tr>
                             <td class="text-muted">Pesanan</td>
-                            <td>#{{ $refund->pesanan->id }}</td>
+                            <td>
+                                #{{ $refund->pesanan->id }}
+                                <a href="{{ route('admin.pesanan.show', $refund->pesanan->id) }}"
+                                   class="ms-2 small">
+                                    (Lihat Pesanan)
+                                </a>
+                            </td>
                         </tr>
                         <tr>
                             <td class="text-muted">Customer</td>
@@ -67,16 +70,28 @@
                             <td>{{ $refund->nomor_tujuan }}</td>
                         </tr>
                         <tr>
+                            <td class="text-muted">Nominal Refund</td>
+                            <td class="fw-bold text-danger">
+                                Rp {{ number_format($refund->refund_amount ?? 0,0,',','.') }}
+                            </td>
+                        </tr>
+                        <tr>
                             <td class="text-muted">Diajukan</td>
                             <td>{{ $refund->created_at->format('d M Y, H:i') }}</td>
                         </tr>
+                        @if($refund->approved_at)
+                        <tr>
+                            <td class="text-muted">Diproses</td>
+                            <td>{{ $refund->approved_at->format('d M Y, H:i') }}</td>
+                        </tr>
+                        @endif
                     </table>
 
                 </div>
             </div>
         </div>
 
-        {{-- RIGHT : BUKTI --}}
+        {{-- BUKTI --}}
         <div class="col-md-5">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
@@ -87,14 +102,11 @@
                              class="img-fluid rounded border"
                              style="max-height:300px; object-fit:contain;">
                     @else
-                        <p class="text-muted mb-0">
-                            Tidak ada bukti foto yang dilampirkan.
-                        </p>
+                        <p class="text-muted mb-0">Tidak ada bukti foto.</p>
                     @endif
                 </div>
             </div>
         </div>
-
     </div>
 
     {{-- ACTION ADMIN --}}
@@ -110,9 +122,20 @@
                     @method('PUT')
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">
-                            Respon Admin <span class="text-danger">*</span>
-                        </label>
+                        <label class="form-label fw-semibold">Nominal Refund</label>
+                        <input type="number"
+                               name="refund_amount"
+                               class="form-control"
+                               min="0"
+                               max="{{ $refund->pesanan->total }}"
+                               required>
+                        <small class="text-muted">
+                            Maksimal Rp {{ number_format($refund->pesanan->total,0,',','.') }}
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Respon Admin</label>
                         <textarea name="respon_admin"
                                   rows="3"
                                   class="form-control"

@@ -167,12 +167,18 @@ class RefundController extends Controller
         $request->validate([
             'respon_admin' => 'required|string',
             'action'       => 'required|in:approve,reject',
+            'refund_amount'=> 'required_if:action,approve|numeric|min:1',
         ]);
 
         $refund->respon_admin = $request->respon_admin;
-        $refund->status = $request->action === 'approve'
-            ? 'disetujui'
-            : 'ditolak';
+        if ($request->action === 'approve') {
+            $refund->status = 'disetujui';
+            $refund->refund_amount = $request->refund_amount; // input admin
+            $refund->approved_at = now();
+        } else {
+            $refund->status = 'ditolak';
+        }
+
 
         $refund->save();
 

@@ -6,6 +6,9 @@
 <div class="container py-4">
 
     <h2 class="mb-4">Laporan Detail Penjualan</h2>
+    <small class="text-muted">
+        *Nilai penjualan belum dikurangi refund
+    </small>
 
     {{-- FILTER TANGGAL --}}
     <form method="GET" class="row g-3 mb-4">

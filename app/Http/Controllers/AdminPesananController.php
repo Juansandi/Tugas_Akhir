@@ -13,7 +13,6 @@ class AdminPesananController extends Controller
 {
     public function index(Request $request)
     {
-        // 🔥 AUTO CANCEL (sementara, tanpa scheduler)
         Pesanan::autoCancelExpired();
 
         $query = Pesanan::with([
@@ -24,13 +23,19 @@ class AdminPesananController extends Controller
                 $q->withCount([
                     'messages as unread_count' => function ($mq) {
                         $mq->where('sender_type', 'user')
-                           ->where('is_read', false);
+                        ->where('is_read', false);
                     }
                 ]);
             }
-        ])->orderBy('created_at', 'desc');
+        ])
+        ->withSum(
+            ['refund as refund_total' => function ($q) {
+                $q->where('status', 'disetujui');
+            }],
+            'refund_amount'
+        )
+        ->orderBy('created_at', 'desc');
 
-        // 🔍 FILTER STATUS
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -48,7 +53,17 @@ class AdminPesananController extends Controller
             'detail.paket.detailPakets.size',
             'pengguna',
             'tugasKurir',
+            'chatAdmin',
         ])->findOrFail($id);
+
+        if (!$pesanan->chatAdmin) {
+            Chat::create([
+                'pesanan_id' => $pesanan->id,
+                'type'       => 'admin',
+            ]);
+
+            $pesanan->load('chatAdmin');
+        }
 
         $kurirs = Pengguna::where('role', 'kurir')->get();
 

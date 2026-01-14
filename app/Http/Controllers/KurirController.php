@@ -49,6 +49,18 @@ class KurirController extends Controller
         ->where('status', 'aktif')
         ->get();
 
+        foreach ($tugas as $item) {
+            if (!$item->pesanan->chatKurir) {
+                Chat::create([
+                    'pesanan_id' => $item->pesanan->id,
+                    'type'       => 'kurir',
+                ]);
+            }
+        }
+
+        // reload relasi setelah create
+        $tugas->load('pesanan.chatKurir.messages');
+
         return view('kurir.pesanan', compact('tugas'));
     }
 

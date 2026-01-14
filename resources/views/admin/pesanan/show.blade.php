@@ -40,6 +40,42 @@
             {{ $pesanan->status_label }}
         </span>
     </p>
+    {{-- CHAT ADMIN KE CUSTOMER --}}
+    @if(in_array($pesanan->status, ['diproses','dikirim','diterima','selesai']) &&
+        $pesanan->chatAdmin)
+        <div class="mb-3">
+        <a href="{{ route('admin.chat.show', $pesanan->chatAdmin->id) }}"
+        class="btn btn-outline-primary btn-sm position-relative">
+
+            💬 Chat Customer
+
+            @if($pesanan->chatAdmin->unread_count > 0)
+                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                    {{ $pesanan->chatAdmin->unread_count }}
+                </span>
+            @endif
+        </a>
+        </div>
+    @endif
+
+    
+    @if($pesanan->refund && $pesanan->refund->status === 'disetujui')
+        <div class="alert alert-warning mt-3">
+            🔄 <strong>Pesanan ini telah direfund</strong><br>
+            Nominal Refund:
+            <strong class="text-danger">
+                Rp {{ number_format($pesanan->refund->refund_amount,0,',','.') }}
+            </strong><br>
+            Disetujui pada:
+            {{ optional($pesanan->refund->approved_at)->format('d M Y H:i') }}
+            <div>
+             <a href="{{ route('admin.refund.show', $pesanan->refund->id) }}"
+                class="btn btn-sm btn-outline-danger mt-2">
+                    Lihat Detail Refund
+            </a>
+            </div>
+        </div>
+    @endif
 
     {{-- BATAS BAYAR --}}
     @if($pesanan->status === 'belum_dibayar')
@@ -109,8 +145,15 @@
 
     {{-- RINCIAN HARGA --}}
     <h5 class="mt-4">Perincian Harga</h5>
+
     @php
         $subtotal = $pesanan->detail->sum(fn($i) => $i->price * $i->quantity);
+
+        $refundAmount = ($pesanan->refund && $pesanan->refund->status === 'disetujui')
+            ? $pesanan->refund->refund_amount
+            : 0;
+
+        $totalBersih = $pesanan->total - $refundAmount;
     @endphp
 
     <ul class="list-unstyled ps-3">
@@ -118,17 +161,20 @@
         <li>Diskon Promo: -Rp {{ number_format($pesanan->diskon_dari_promo ?? 0,0,',','.') }}</li>
         <li>Diskon Poin: -Rp {{ number_format($pesanan->diskon_dari_poin ?? 0,0,',','.') }}</li>
 
-        @if(in_array($pesanan->status, ['diproses','dikirim','diterima','selesai']))
-            <li>
-                <strong>Total Dibayar:</strong>
-                <span class="fw-bold text-success">
-                    Rp {{ number_format($pesanan->total,0,',','.') }}
-                </span>
+        <li>
+            <strong>Total Dibayar:</strong>
+            Rp {{ number_format($pesanan->total,0,',','.') }}
+        </li>
+
+        @if($refundAmount > 0)
+            <li class="text-danger">
+                Refund: -Rp {{ number_format($refundAmount,0,',','.') }}
             </li>
-        @else
             <li>
-                <strong>Total Dibayar:</strong>
-                <span class="text-muted">Belum dibayar</span>
+                <strong>Total Bersih:</strong>
+                <span class="fw-bold text-success">
+                    Rp {{ number_format($totalBersih,0,',','.') }}
+                </span>
             </li>
         @endif
     </ul>

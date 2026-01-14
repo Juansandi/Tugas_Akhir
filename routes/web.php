@@ -212,14 +212,22 @@ Route::get('admin/notifications/read/{id}', [AdminNotificationController::class,
 // Menandai semua notifikasi sebagai dibaca (dari halaman daftar notifikasi)
 Route::post('admin/notifications/read-all', [AdminNotificationController::class, 'markAllAsRead'])->name('admin.notifications.readAll');
 
-Route::get('/admin/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-Route::get('/admin/laporan/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.pdf');
-Route::get('/admin/laporan/detail', [LaporanController::class, 'detail'])->name('admin.laporan.detail');
-Route::get('/admin/laporan/detail/pdf', [LaporanController::class, 'detailPdf'])->name('admin.laporan.detail.pdf');
-Route::get('/admin/laporan/produk-terlaris',[LaporanController::class, 'produkTerlaris'])->name('admin.laporan.produk_terlaris');
-Route::get('/admin/laporan/produk-terlaris/pdf',[LaporanController::class, 'produkTerlarisPdf'])->name('admin.laporan.produk_terlaris_pdf');
-Route::get('/admin/laporan/paket-terlaris',[LaporanController::class, 'paketTerlaris'])->name('admin.laporan.paket_terlaris');
-Route::get('/admin/laporan/paket-terlaris/pdf',[LaporanController::class, 'paketTerlarisPdf'])->name('admin.laporan.paket_terlaris_pdf');
+Route::prefix('admin/laporan')->middleware(['auth','role:admin'])->group(function () {
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.pdf');
+    Route::get('/laporan/detail', [LaporanController::class, 'detail'])->name('admin.laporan.detail');
+    Route::get('/laporan/detail/pdf', [LaporanController::class, 'detailPdf'])->name('admin.laporan.detail.pdf');
+    Route::get('/laporan/produk-terlaris',[LaporanController::class, 'produkTerlaris'])->name('admin.laporan.produk_terlaris');
+    Route::get('/laporan/produk-terlaris/pdf',[LaporanController::class, 'produkTerlarisPdf'])->name('admin.laporan.produk_terlaris_pdf');
+    Route::get('/laporan/paket-terlaris',[LaporanController::class, 'paketTerlaris'])->name('admin.laporan.paket_terlaris');
+    Route::get('/laporan/paket-terlaris/pdf',[LaporanController::class, 'paketTerlarisPdf'])->name('admin.laporan.paket_terlaris_pdf');
+    Route::get('/refund', [LaporanController::class, 'refund'])
+        ->name('admin.laporan.refund');
+
+    Route::get('/refund/pdf', [LaporanController::class, 'refundPdf'])
+        ->name('admin.laporan.refund.pdf');
+});
+
 
 Route::middleware(['auth', 'role:admin'])
     ->prefix('admin/akun')

@@ -10,6 +10,8 @@ use App\Models\Pesanan;
 use App\Models\DetailPesanan;
 use App\Models\ProductSize;
 use App\Models\PriceHistory;
+use App\Models\Refund;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -269,54 +271,75 @@ class ProdukController extends Controller
 
     public function dashboard()
     {
-        $totalProduk = \App\Models\Produk::count();
+        $totalProduk = Produk::count();
 
-        $totalPesanan = \App\Models\Pesanan::whereDate('created_at', Carbon::today())
+        $pesananMasukHariIni = Pesanan::whereDate('created_at', today())->count();
+
+        $pesananAktifHariIni = Pesanan::whereDate('created_at', today())
             ->where('status', '!=', 'selesai')
             ->count();
 
-        $totalPenjualanBulanIni = \App\Models\Pesanan::whereYear('created_at', Carbon::now()->year)
-            ->whereMonth('created_at', Carbon::now()->month)
+        $totalPenjualanKotor = Pesanan::whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
             ->where('status', 'selesai')
             ->sum('total');
 
-        $salesData = \App\Models\Pesanan::select(
+        $totalRefundBulanIni = Refund::where('status', 'disetujui')
+            ->whereYear('approved_at', now()->year)
+            ->whereMonth('approved_at', now()->month)
+            ->sum('refund_amount');
+
+        $totalPenjualanBulanIni = $totalPenjualanKotor - $totalRefundBulanIni;
+
+        $salesKotor = Pesanan::select(
                 DB::raw('MONTH(created_at) as month'),
-                DB::raw('SUM(total) as total_penjualan')
+                DB::raw('SUM(total) as total')
             )
-            ->whereYear('created_at', Carbon::now()->year)
+            ->whereYear('created_at', now()->year)
             ->where('status', 'selesai')
             ->groupBy('month')
-            ->orderBy('month')
-            ->pluck('total_penjualan', 'month')
+            ->pluck('total', 'month')
             ->toArray();
 
-        $months = range(1, 12);
+        $refunds = Refund::select(
+                DB::raw('MONTH(approved_at) as month'),
+                DB::raw('SUM(refund_amount) as total')
+            )
+            ->whereYear('approved_at', now()->year)
+            ->where('status', 'disetujui')
+            ->groupBy('month')
+            ->pluck('total', 'month')
+            ->toArray();
+
         $salesDataFull = [];
-        foreach ($months as $month) {
-            $salesDataFull[] = $salesData[$month] ?? 0;
+        for ($i = 1; $i <= 12; $i++) {
+            $kotor  = $salesKotor[$i] ?? 0;
+            $refund = $refunds[$i] ?? 0;
+            $salesDataFull[] = $kotor - $refund;
         }
 
-        $pesananTerbaru = \App\Models\Pesanan::where('status', '!=', 'selesai')
+        $pesananTerbaru = Pesanan::where('status', '!=', 'selesai')
             ->with(['pengguna', 'detail.produk', 'detail.paket'])
             ->latest()
             ->limit(5)
             ->get();
-        
+
         $produkTerlaris = DetailPesanan::join('pesanans', 'detail_pesanans.pesanan_id', '=', 'pesanans.id')
             ->where('pesanans.status', 'selesai')
-            ->whereYear('pesanans.created_at', Carbon::now()->year)
-            ->whereMonth('pesanans.created_at', Carbon::now()->month)
+            ->whereYear('pesanans.created_at', now()->year)
+            ->whereMonth('pesanans.created_at', now()->month)
             ->select('produk_id', DB::raw('SUM(quantity) as total_terjual'))
             ->groupBy('produk_id')
             ->orderByDesc('total_terjual')
             ->with('produk')
             ->first();
 
-
         return view('admin.dashboard', compact(
             'totalProduk',
-            'totalPesanan',
+            'pesananMasukHariIni',
+            'pesananAktifHariIni',
+            'totalPenjualanKotor',
+            'totalRefundBulanIni',
             'totalPenjualanBulanIni',
             'salesDataFull',
             'pesananTerbaru',

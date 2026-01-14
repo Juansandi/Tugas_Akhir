@@ -18,6 +18,12 @@ class Refund extends Model
         'nomor_tujuan', 
         'status', 
         'respon_admin',
+        'refund_amount', 
+        'approved_at',
+    ];
+
+    protected $casts = [
+        'approved_at' => 'datetime',
     ];
 
     public function pesanan() {
