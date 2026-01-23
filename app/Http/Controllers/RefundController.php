@@ -12,74 +12,58 @@ use Carbon\Carbon;
 
 class RefundController extends Controller
 {
-    // ⏱️ BATAS JAM REFUND (BAHAN POKOK)
     const REFUND_WINDOW_HOURS = 24;
 
-    /**
-     * FORM AJUKAN REFUND (USER)
-     */
+    /* =========================
+       USER AREA
+    ========================= */
+
     public function create($pesanan_id)
     {
         $pesanan = Pesanan::with('refund')->findOrFail($pesanan_id);
 
-        // 1️⃣ Pastikan pesanan milik user
         if ($pesanan->user_id !== Auth::id()) {
             abort(403);
         }
 
-        // 2️⃣ Status harus selesai
         if ($pesanan->status !== 'selesai') {
-            return redirect()->route('pesanan.show', $pesanan->id)
-                ->with('error', 'Refund hanya dapat diajukan setelah pesanan selesai.');
+            return back()->with('error', 'Refund hanya dapat diajukan setelah pesanan selesai.');
         }
 
-        // 3️⃣ Cegah refund ganda
         if ($pesanan->refund) {
-            return redirect()->route('pesanan.show', $pesanan->id)
-                ->with('error', 'Refund untuk pesanan ini sudah diajukan.');
+            return back()->with('error', 'Refund untuk pesanan ini sudah diajukan.');
         }
 
-        // 4️⃣ Cek refund window (24 JAM)
-        $jamSejakSelesai = Carbon::parse($pesanan->updated_at)
-            ->diffInHours(now());
+        $jamSejakSelesai = Carbon::parse($pesanan->updated_at)->diffInHours(now());
 
         if ($jamSejakSelesai > self::REFUND_WINDOW_HOURS) {
-            return redirect()->route('pesanan.show', $pesanan->id)
-                ->with(
-                    'error',
-                    'Refund hanya dapat diajukan maksimal '
-                    . self::REFUND_WINDOW_HOURS
-                    . ' jam setelah pesanan selesai.'
-                );
+            return back()->with(
+                'error',
+                'Refund hanya dapat diajukan maksimal '
+                . self::REFUND_WINDOW_HOURS
+                . ' jam setelah pesanan selesai.'
+            );
         }
 
         return view('user.refund.create', compact('pesanan'));
     }
 
-    /**
-     * SIMPAN REFUND (USER)
-     */
     public function store(Request $request, $pesanan_id)
     {
         $pesanan = Pesanan::with('refund')->findOrFail($pesanan_id);
 
-        // ⛔ Double protection
         if ($pesanan->user_id !== Auth::id() || $pesanan->status !== 'selesai') {
             abort(403);
         }
 
         if ($pesanan->refund) {
-            return redirect()->route('pesanan.show', $pesanan->id)
-                ->with('error', 'Refund untuk pesanan ini sudah diajukan.');
+            return back()->with('error', 'Refund untuk pesanan ini sudah diajukan.');
         }
 
-        // ⏱️ Refund window (24 JAM)
-        $jamSejakSelesai = Carbon::parse($pesanan->updated_at)
-            ->diffInHours(now());
+        $jamSejakSelesai = Carbon::parse($pesanan->updated_at)->diffInHours(now());
 
         if ($jamSejakSelesai > self::REFUND_WINDOW_HOURS) {
-            return redirect()->route('pesanan.show', $pesanan->id)
-                ->with('error', 'Batas waktu pengajuan refund telah berakhir.');
+            return back()->with('error', 'Batas waktu pengajuan refund telah berakhir.');
         }
 
         $request->validate([
@@ -90,7 +74,6 @@ class RefundController extends Controller
             'bukti_foto'     => 'nullable|image|max:2048',
         ]);
 
-        // 🧠 Handle alasan "Lainnya"
         $alasan = $request->alasan === 'Lainnya'
             ? $request->alasan_lainnya
             : $request->alasan;
@@ -102,13 +85,12 @@ class RefundController extends Controller
             'metode_refund' => $request->metode_refund,
             'nomor_tujuan'  => $request->nomor_tujuan,
             'status'        => 'diajukan',
+            'refund_amount' => 0,
             'bukti_foto'    => $request->hasFile('bukti_foto')
-                                ? $request->file('bukti_foto')
-                                    ->store('bukti_refund', 'public')
-                                : null,
+                ? $request->file('bukti_foto')->store('bukti_refund', 'public')
+                : null,
         ]);
 
-        // 🔔 Notifikasi admin
         AdminNotification::create([
             'tipe'  => 'refund_diajukan',
             'pesan' => 'User ' . Auth::user()->username
@@ -121,9 +103,6 @@ class RefundController extends Controller
             ->with('success', 'Permintaan refund berhasil diajukan.');
     }
 
-    /**
-     * DETAIL REFUND (USER)
-     */
     public function show($id)
     {
         $refund = Refund::with(['pesanan', 'pengguna'])->findOrFail($id);
@@ -141,18 +120,13 @@ class RefundController extends Controller
 
     public function adminIndex()
     {
-        $refunds = Refund::with(['pengguna', 'pesanan'])
-            ->latest()
-            ->get();
-
+        $refunds = Refund::with(['pengguna', 'pesanan'])->latest()->get();
         return view('admin.refund.index', compact('refunds'));
     }
 
     public function adminShow($id)
     {
-        $refund = Refund::with(['pengguna', 'pesanan'])
-            ->findOrFail($id);
-
+        $refund = Refund::with(['pengguna', 'pesanan'])->findOrFail($id);
         return view('admin.refund.show', compact('refund'));
     }
 
@@ -165,36 +139,45 @@ class RefundController extends Controller
         }
 
         $request->validate([
-            'respon_admin' => 'required|string',
-            'action'       => 'required|in:approve,reject',
-            'refund_amount'=> 'required_if:action,approve|numeric|min:1',
+            'keputusan'     => 'required|in:approve,reject',
+            'respon_admin'  => 'required|string',
+            'refund_amount' => 'required|numeric|min:0',
         ]);
 
-        $refund->respon_admin = $request->respon_admin;
-        if ($request->action === 'approve') {
+        if ($request->keputusan === 'approve') {
+
+            if ($request->refund_amount <= 0) {
+                return back()->withErrors([
+                    'refund_amount' => 'Nominal refund harus lebih dari 0 jika disetujui.'
+                ])->withInput();
+            }
+
             $refund->status = 'disetujui';
-            $refund->refund_amount = $request->refund_amount; // input admin
+            $refund->refund_amount = $request->refund_amount;
             $refund->approved_at = now();
+
         } else {
+
+            // DITOLAK
             $refund->status = 'ditolak';
+            $refund->refund_amount = 0;
         }
 
-
+        $refund->respon_admin = $request->respon_admin;
         $refund->save();
 
-        // 🔔 Notifikasi user
         UserNotification::create([
             'user_id' => $refund->user_id,
             'tipe'    => $refund->status === 'disetujui'
-                        ? 'refund_disetujui'
-                        : 'refund_ditolak',
+                ? 'refund_disetujui'
+                : 'refund_ditolak',
             'pesan'   => 'Refund pesanan #'
-                        . $refund->pesanan_id
-                        . ' ' . $refund->status . '.',
+                . $refund->pesanan_id
+                . ' ' . $refund->status . '.',
             'url'     => route('refund.show', $refund->id),
         ]);
 
-        return redirect()->route('refund.index')
+        return redirect()->route('admin.refund.index')
             ->with('success', 'Status refund berhasil diperbarui.');
     }
 }

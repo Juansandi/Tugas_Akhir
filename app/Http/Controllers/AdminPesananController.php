@@ -76,13 +76,26 @@ class AdminPesananController extends Controller
 
         if ($request->aksi === 'terima') {
             $pesanan->update(['status' => 'diproses']);
+
+            UserNotification::create([
+                'user_id' => $pesanan->user_id,
+                'tipe'    => 'pesanan_diproses',
+                'pesan'   => 'Pesanan #' . $pesanan->id . ' sedang diproses.',
+                'url'     => route('pesanan.show', $pesanan->id),
+            ]);
         } else {
             $pesanan->update(['status' => 'belum_dibayar']);
+
+            UserNotification::create([
+                'user_id' => $pesanan->user_id,
+                'tipe'    => 'pembayaran_ditolak',
+                'pesan'   => 'Pembayaran pesanan #' . $pesanan->id . ' ditolak.',
+                'url'     => route('pesanan.show', $pesanan->id),
+            ]);
         }
 
         return back()->with('success', 'Status pembayaran diperbarui.');
     }
-
 
     public function updateStatus(Request $request, $id)
     {
@@ -124,6 +137,24 @@ class AdminPesananController extends Controller
         }
 
         $pesanan->update(['status' => $target]);
+
+        if ($target === 'dikirim') {
+            UserNotification::create([
+                'user_id' => $pesanan->user_id,
+                'tipe'    => 'pesanan_dikirim',
+                'pesan'   => 'Pesanan #' . $pesanan->id . ' telah dikirim.',
+                'url'     => route('pesanan.show', $pesanan->id),
+            ]);
+        }
+
+        if ($target === 'selesai') {
+            UserNotification::create([
+                'user_id' => $pesanan->user_id,
+                'tipe'    => 'pesanan_selesai',
+                'pesan'   => 'Pesanan #' . $pesanan->id . ' telah selesai.',
+                'url'     => route('pesanan.show', $pesanan->id),
+            ]);
+        }
 
         return back()->with('success', 'Status pesanan diperbarui.');
     }

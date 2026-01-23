@@ -8,7 +8,8 @@
     {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold mb-0">Detail Pengajuan Refund</h4>
-        <a href="{{ route('refund.index') }}" class="btn btn-outline-secondary btn-sm">
+        <a href="{{ route('admin.refund.index') }}"
+           class="btn btn-outline-secondary btn-sm">
             ← Kembali
         </a>
     </div>
@@ -115,47 +116,87 @@
 
             @if ($refund->status === 'diajukan')
                 <h6 class="fw-bold mb-3">Tindakan Admin</h6>
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-                <form action="{{ route('admin.refund.update', $refund->id) }}"
-                      method="POST">
+                <form action="{{ route('admin.refund.update', $refund->id) }}" method="POST">
                     @csrf
                     @method('PUT')
 
+                    {{-- TAMPILKAN ERROR (WAJIB) --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    {{-- KEPUTUSAN --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Keputusan Admin</label>
+
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                type="radio"
+                                name="keputusan"
+                                id="approve"
+                                value="approve"
+                                required>
+                            <label class="form-check-label text-success fw-semibold" for="approve">
+                                Setujui Refund
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                type="radio"
+                                name="keputusan"
+                                id="reject"
+                                value="reject"
+                                required>
+                            <label class="form-check-label text-danger fw-semibold" for="reject">
+                                Tolak Refund
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- NOMINAL (SELALU ADA) --}}
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Nominal Refund</label>
                         <input type="number"
-                               name="refund_amount"
-                               class="form-control"
-                               min="0"
-                               max="{{ $refund->pesanan->total }}"
-                               required>
+                            name="refund_amount"
+                            class="form-control"
+                            value="0"
+                            min="0"
+                            max="{{ $refund->pesanan->total }}"
+                            required>
                         <small class="text-muted">
-                            Maksimal Rp {{ number_format($refund->pesanan->total,0,',','.') }}
+                            Isi <strong>0</strong> jika refund ditolak
                         </small>
                     </div>
 
+                    {{-- RESPON ADMIN --}}
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Respon Admin</label>
                         <textarea name="respon_admin"
-                                  rows="3"
-                                  class="form-control"
-                                  required></textarea>
+                                rows="3"
+                                class="form-control"
+                                required></textarea>
                     </div>
 
-                    <div class="d-flex gap-3">
-                        <button type="submit"
-                                name="action"
-                                value="approve"
-                                class="btn btn-success w-50">
-                            Setujui Refund
-                        </button>
-                        <button type="submit"
-                                name="action"
-                                value="reject"
-                                class="btn btn-danger w-50">
-                            Tolak Refund
-                        </button>
-                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        Simpan Keputusan
+                    </button>
                 </form>
             @else
                 <div class="alert

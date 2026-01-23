@@ -153,6 +153,12 @@ class Pesanan extends Model
                         }
                     }
                 }
+                UserNotification::create([
+                    'user_id' => $pesanan->user_id,
+                    'tipe'    => 'pesanan_dibatalkan',
+                    'pesan'   => 'Pesanan #' . $pesanan->id . ' dibatalkan karena belum dibayar.',
+                    'url'     => route('pesanan.show', $pesanan->id),
+                ]);
 
                 // UPDATE STATUS (TIDAK DIHAPUS)
                 $pesanan->update([

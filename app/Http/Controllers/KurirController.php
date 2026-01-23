@@ -8,6 +8,7 @@ use App\Models\TugasKurir;
 use App\Models\Chat;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\AdminNotification;
 
 class KurirController extends Controller
 {
@@ -146,6 +147,18 @@ class KurirController extends Controller
         $tugas->pesanan->update([
             'status' => 'dikirim'
         ]);
+
+        // ===============================
+        // 🔔 NOTIFIKASI KE ADMIN
+        // ===============================
+        AdminNotification::create([
+            'tipe'  => 'kurir_selesai_kirim',
+            'pesan' => 'Kurir ' . auth()->user()->username .
+                    ' telah menyelesaikan pengiriman pesanan #' .
+                    $tugas->pesanan->id,
+            'url'   => route('admin.pesanan.show', $tugas->pesanan->id),
+        ]);
+
 
         return back()->with('success', 'Pesanan berhasil dikirim.');
     }

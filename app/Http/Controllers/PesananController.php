@@ -206,7 +206,12 @@ class PesananController extends Controller
             Cart::where('user_id', $user->id)->delete();
 
             DB::commit();
-
+            
+            AdminNotification::create([
+                'tipe'  => 'pesanan_baru',
+                'pesan' => 'Pesanan baru #' . $pesanan->id . ' dibuat oleh ' . $user->username,
+                'url'   => route('admin.pesanan.show', $pesanan->id),
+            ]);
             return redirect()
                 ->route('pesanan.show', $pesanan->id)
                 ->with('success', 'Pesanan berhasil dibuat.');
@@ -253,6 +258,13 @@ class PesananController extends Controller
             'waktu_bayar' => now(),
             'status' => 'menunggu_konfirmasi'
         ]);
+        
+        AdminNotification::create([
+            'tipe'  => 'bukti_bayar_dikirim',
+            'pesan' => 'Bukti pembayaran untuk pesanan #' . $pesanan->id . ' telah diupload oleh ' . auth()->user()->username,
+            'url'   => route('admin.pesanan.show', $pesanan->id),
+        ]);
+
 
         return redirect()
             ->route('pesanan.show', $pesanan->id)

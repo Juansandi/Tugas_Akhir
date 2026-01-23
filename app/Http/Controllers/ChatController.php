@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Chat;
 use App\Models\DetailChat;
 use App\Models\Pesanan;
+use App\Models\UserNotification;
+use App\Models\AdminNotification;
 use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
@@ -45,13 +47,48 @@ class ChatController extends Controller
             'message' => 'required|string'
         ]);
 
-        DetailChat::create([
+        $message = DetailChat::create([
             'chat_id' => $chat->id,
             'sender_id' => auth()->id(),
-            'sender_type' => auth()->user()->role,
+            'sender_type' => auth()->user()->role, // user | admin | kurir
             'message' => $request->message,
             'is_read' => false,
         ]);
+
+        // ==============================
+        // 🔔 NOTIFIKASI KE CUSTOMER
+        // ==============================
+        if (in_array(auth()->user()->role, ['admin', 'kurir'])) {
+
+            $pesanan = $chat->pesanan;
+
+            UserNotification::create([
+                'user_id' => $pesanan->user_id, // customer
+                'tipe'    => auth()->user()->role === 'admin'
+                    ? 'chat_admin'
+                    : 'chat_kurir',
+                'pesan'   => auth()->user()->role === 'admin'
+                    ? 'Admin mengirim pesan pada pesanan #' . $pesanan->id
+                    : 'Kurir mengirim pesan pada pesanan #' . $pesanan->id,
+                'url'     => route('chat.show', [
+                    'pesanan' => $pesanan->id,
+                    'type' => $chat->type
+                ]),
+            ]);
+        }
+
+        // ==============================
+        // 🔔 NOTIFIKASI KE ADMIN
+        // ==============================
+        if (auth()->user()->role === 'user') {
+
+            AdminNotification::create([
+                'tipe'  => 'chat_user',
+                'pesan' => 'Pesan baru dari ' . auth()->user()->username .
+                        ' pada pesanan #' . $chat->pesanan_id,
+                'url'   => route('admin.chat.show', $chat->id),
+            ]);
+        }
 
         return back();
     }
@@ -91,5 +128,4 @@ class ChatController extends Controller
             'isReadOnly' => $isReadOnly
         ]);
     }
-
 }

@@ -23,7 +23,21 @@
             font-weight: 600;
             background-color: rgba(13,110,253,.1);
         }
-    </style>
+        .notif-item {
+            white-space: normal;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* maksimal 2 baris */
+            -webkit-box-orient: vertical;
+            line-height: 1.3;
+            font-size: 0.875rem;
+        }
+
+        .notif-time {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+        </style>
 </head>
 <body>
 
@@ -110,7 +124,7 @@
                 {{-- REFUND --}}
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('refund.*') ? 'active' : '' }}"
-                       href="{{ route('refund.index') }}">
+                       href="{{ route('admin.refund.index') }}">
                         <i class="bi bi-arrow-counterclockwise me-1"></i> Refund
                     </a>
                 </li>
@@ -168,10 +182,13 @@
                     <ul class="dropdown-menu dropdown-menu-end" style="width:300px; max-height:400px; overflow:auto">
                         @forelse($notifs as $notif)
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.notifications.read', $notif->id) }}">
-                                    {{ \Illuminate\Support\Str::limit($notif->pesan, 60) }}
-                                    <br>
-                                    <small class="text-muted">{{ $notif->created_at->diffForHumans() }}</small>
+                                <a class="dropdown-item py-2" href="{{ route('admin.notifications.read', $notif->id) }}">
+                                    <div class="notif-item" title="{{ $notif->pesan }}">
+                                        {{ $notif->pesan }}
+                                    </div>
+                                    <div class="notif-time">
+                                        {{ $notif->created_at->diffForHumans() }}
+                                    </div>
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>

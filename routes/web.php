@@ -199,7 +199,7 @@ Route::prefix('admin')
     });
 
 
-Route::get('admin/refund', [RefundController::class, 'adminIndex'])->name('refund.index');
+Route::get('admin/refund', [RefundController::class, 'adminIndex'])->name('admin.refund.index');
 Route::get('admin/refund/{id}', [RefundController::class, 'adminShow'])->name('admin.refund.show');
 Route::put('admin/refund/{id}', [RefundController::class, 'adminUpdate'])->name('admin.refund.update');
 
