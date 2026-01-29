@@ -14,6 +14,25 @@
         {{ ucfirst($tugas->status) }}
     </span>
 
+    {{-- WAKTU PENGANTARAN --}}
+    <div class="card mb-3 border-info">
+        <div class="card-body">
+            <h6>Waktu Pengantaran</h6>
+
+            @if ($tugas->pesanan->deliverySlot)
+                <p class="mb-0 fw-semibold text-info">
+                    {{ substr($tugas->pesanan->deliverySlot->waktu_mulai,0,5) }}
+                    –
+                    {{ substr($tugas->pesanan->deliverySlot->waktu_selesai,0,5) }}
+                </p>
+            @else
+                <p class="mb-0 text-muted">
+                    Secepatnya
+                </p>
+            @endif
+        </div>
+    </div>
+
     {{-- Nama Customer --}}
     <div class="card mb-3">
         <div class="card-body">

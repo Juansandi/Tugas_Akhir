@@ -14,6 +14,7 @@ use App\Models\Promo;
 use App\Models\AlamatPengguna;
 use App\Models\Review;
 use App\Models\AdminNotification;
+use App\Models\DeliverySlot;
 use Carbon\Carbon;
 
 class PesananController extends Controller
@@ -24,34 +25,44 @@ class PesananController extends Controller
         /** @var \App\Models\Pengguna $user */
         $user = Auth::user();
         $cartItems = Cart::where('user_id', $user->id)
-        ->with(['produk', 'size', 'paket.detailPakets.size'])
-        ->get();
+            ->with(['produk', 'size', 'paket.detailPakets.size'])
+            ->get();
 
         $alamatList = $user->alamatPengguna()->get();
         $alamatUtama = $user->alamatUtama;
 
         if ($alamatList->isEmpty()) {
-        return redirect()
-            ->route('profile.show')
-            ->with('error', 'Silakan tambahkan alamat terlebih dahulu sebelum checkout.');
+            return redirect()
+                ->route('profile.show')
+                ->with('error', 'Silakan tambahkan alamat terlebih dahulu sebelum checkout.');
         }
 
         $subtotal = 0;
-
         foreach ($cartItems as $item) {
-
-            if ($item->type === 'paket') {
-                $subtotal += $item->paket->harga_paket * $item->quantity;
-            } else {
-                $subtotal += $item->size->harga * $item->quantity;
-            }
+            $subtotal += $item->type === 'paket'
+                ? $item->paket->harga_paket * $item->quantity
+                : $item->size->harga * $item->quantity;
         }
 
         $promos = Promo::where('mulai', '<=', now())
-                        ->where('akhir', '>=', now())
-                        ->get();
+            ->where('akhir', '>=', now())
+            ->get();
 
-        return view('user.pesanan.checkout', compact('cartItems', 'alamatList','alamatUtama' , 'subtotal', 'promos'));
+        // ===============================
+        // 🔹 SLOT WAKTU (INTI FITUR BARU)
+        // ===============================
+        $now = now()->format('H:i:s');
+
+        $deliverySlots = DeliverySlot::where('waktu_mulai', '>', $now)->get();
+
+        return view('user.pesanan.checkout', compact(
+            'cartItems',
+            'alamatList',
+            'alamatUtama',
+            'subtotal',
+            'promos',
+            'deliverySlots' // ✅ dikirim ke blade
+        ));
     }
 
     public function store(Request $request)
@@ -68,7 +79,8 @@ class PesananController extends Controller
                 'metode_pembayaran' => 'required|in:transfer,cod',
                 'promo_id' => 'nullable|exists:promos,id',
                 'poin' => 'nullable|integer|min:0',
-                'alamat_id' => 'required|exists:alamat_pengguna,id', // ⬅️ WAJIB
+                'alamat_id' => 'required|exists:alamat_pengguna,id',
+                'delivery_slot_id' => 'nullable|exists:delivery_slots,id', 
             ]);
 
             // ===============================
@@ -157,6 +169,7 @@ class PesananController extends Controller
                 'diskon_dari_poin' => $diskonPoin,
                 'alamat_pengiriman' => $alamat->alamat,
                 'no_telp_pengiriman' => $alamat->no_telp,
+                'delivery_slot_id' => $request->delivery_slot_id,
             ]);
 
             // ===============================

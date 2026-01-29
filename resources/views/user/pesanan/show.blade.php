@@ -17,6 +17,23 @@
                 {{ $pesanan->status_label }}
             </span>
 
+            {{-- ================= WAKTU PENGANTARAN ================= --}}
+            <div class="mt-3">
+                <h6>Waktu Pengantaran</h6>
+
+                @if ($pesanan->deliverySlot)
+                    <span class="badge bg-info px-3 py-2">
+                        {{ substr($pesanan->deliverySlot->waktu_mulai,0,5) }}
+                        –
+                        {{ substr($pesanan->deliverySlot->waktu_selesai,0,5) }}
+                    </span>
+                @else
+                    <span class="text-muted">
+                        Secepatnya
+                    </span>
+                @endif
+            </div>
+
             {{-- ================= AKSI ================= --}}
             <div class="mt-3 d-flex gap-2 flex-wrap">
 

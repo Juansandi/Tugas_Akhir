@@ -54,6 +54,7 @@ class AdminPesananController extends Controller
             'pengguna',
             'tugasKurir',
             'chatAdmin',
+            'deliverySlot',
         ])->findOrFail($id);
 
         if (!$pesanan->chatAdmin) {
@@ -120,11 +121,13 @@ class AdminPesananController extends Controller
                 'kurir_id' => 'required|exists:pengguna,id'
             ]);
 
-            TugasKurir::create([
-                'pesanan_id' => $pesanan->id,
-                'user_id'    => $request->kurir_id,
-                'status'     => 'aktif'
-            ]);
+            TugasKurir::firstOrCreate(
+                ['pesanan_id' => $pesanan->id],
+                [
+                    'user_id' => $request->kurir_id,
+                    'status'  => 'aktif'
+                ]
+            );
         }
 
         if ($target === 'selesai') {

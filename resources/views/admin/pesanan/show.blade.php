@@ -58,7 +58,22 @@
         </div>
     @endif
 
-    
+    {{-- ========================= --}}
+    {{-- WAKTU PENGANTARAN --}}
+    {{-- ========================= --}}
+    <tr>
+        <td class="fw-semibold">Waktu Pengantaran</td>
+        <td>
+            @if ($pesanan->deliverySlot)
+                {{ substr($pesanan->deliverySlot->waktu_mulai,0,5) }}
+                –
+                {{ substr($pesanan->deliverySlot->waktu_selesai,0,5) }}
+            @else
+                <span class="text-muted">Secepatnya</span>
+            @endif
+        </td>
+    </tr>
+ 
     @if($pesanan->refund && $pesanan->refund->status === 'disetujui')
         <div class="alert alert-warning mt-3">
             🔄 <strong>Pesanan ini telah direfund</strong><br>

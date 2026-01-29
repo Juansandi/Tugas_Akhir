@@ -29,6 +29,7 @@ class Pesanan extends Model
         'diskon_dari_promo',
         'bukti_bayar',
         'waktu_bayar',
+        'delivery_slot_id',
     ];
 
     public function pengguna()
@@ -168,4 +169,10 @@ class Pesanan extends Model
 
         });
     }
+
+    public function deliverySlot()
+    {
+        return $this->belongsTo(DeliverySlot::class);
+    }
+
 }

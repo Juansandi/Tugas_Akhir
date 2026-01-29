@@ -82,6 +82,7 @@
                     <th>Nama Pembeli</th>
                     <th>Status</th>
                     <th>Total</th>
+                    <th>Waktu Kirim</th>
                     <th>Refund</th>
                     <th>Bersih</th>
                     <th width="160">Aksi</th>
@@ -131,6 +132,17 @@
                     {{-- TOTAL --}}
                     <td class="fw-semibold text-success">
                         Rp {{ number_format($pesanan->total, 0, ',', '.') }}
+                    </td>
+                    <td>
+                        @if($pesanan->deliverySlot)
+                            <span class="badge bg-info">
+                                {{ substr($pesanan->deliverySlot->waktu_mulai,0,5) }}
+                                –
+                                {{ substr($pesanan->deliverySlot->waktu_selesai,0,5) }}
+                            </span>
+                        @else
+                            <span class="text-muted">Secepatnya</span>
+                        @endif
                     </td>
                     @php
                         $refund = $pesanan->refund_total ?? 0;

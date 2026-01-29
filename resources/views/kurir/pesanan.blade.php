@@ -15,6 +15,7 @@
             <th>No</th>
             <th>ID Pesanan</th>
             <th>Status</th>
+            <th>Jadwal Kirim</th>
             <th>Aksi</th>
         </tr>
     </thead>
@@ -34,6 +35,17 @@
                 <td>{{ $loop->iteration }}</td>
                 <td>#{{ $item->pesanan->id }}</td>
                 <td>{{ ucfirst($item->pesanan->status) }}</td>
+                <td>
+                    @if($item->pesanan->deliverySlot)
+                        <span class="badge bg-info">
+                            {{ substr($item->pesanan->deliverySlot->waktu_mulai,0,5) }}
+                            –
+                            {{ substr($item->pesanan->deliverySlot->waktu_selesai,0,5) }}
+                        </span>
+                    @else
+                        <span class="text-muted">Secepatnya</span>
+                    @endif
+                </td>
                 <td>
                     <div class="d-flex gap-2 flex-wrap">
 

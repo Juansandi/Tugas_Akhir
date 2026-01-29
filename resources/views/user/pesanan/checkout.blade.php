@@ -68,6 +68,52 @@
             @endif
         @endforeach
 
+        {{-- ========================= --}}
+        {{-- SLOT PENGANTARAN --}}
+        {{-- ========================= --}}
+        <div class="card mb-4">
+            <div class="card-header fw-bold">
+                Pilih Waktu Pengantaran
+            </div>
+            <div class="card-body">
+
+                {{-- OPSI SECEPATNYA --}}
+                <div class="form-check mb-2">
+                    <input class="form-check-input"
+                        type="radio"
+                        name="delivery_slot_id"
+                        id="slot_now"
+                        value=""
+                        checked>
+                    <label class="form-check-label" for="slot_now">
+                        Secepatnya
+                    </label>
+                </div>
+
+                {{-- OPSI SLOT --}}
+                @forelse ($deliverySlots as $slot)
+                    <div class="form-check mb-2">
+                        <input class="form-check-input"
+                            type="radio"
+                            name="delivery_slot_id"
+                            id="slot_{{ $slot->id }}"
+                            value="{{ $slot->id }}">
+                        <label class="form-check-label" for="slot_{{ $slot->id }}">
+                            {{ substr($slot->waktu_mulai,0,5) }} –
+                            {{ substr($slot->waktu_selesai,0,5) }}
+                        </label>
+                    </div>
+                @empty
+                    <p class="text-muted mb-0">
+                        Tidak ada slot waktu tersisa hari ini.
+                        Pesanan akan dikirim secepatnya.
+                    </p>
+                @endforelse
+
+            </div>
+        </div>
+
+
         {{-- PEMBAYARAN --}}
         <h5 class="mt-4">Metode Pembayaran</h5>
         <select name="metode_pembayaran" class="form-select mb-3" required>
