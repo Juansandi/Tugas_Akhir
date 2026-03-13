@@ -55,6 +55,17 @@
                 </span>
             @endif
         </a>
+        @if($pesanan->status === 'selesai')
+            @if($pesanan->chatMasihAktif())
+                <div class="text-muted small mt-1">
+                    💬 Chat masih aktif hingga 24 jam setelah pesanan selesai.
+                </div>
+            @else
+                <div class="text-muted small mt-1">
+                    🔒 Chat masih dapat dibuka tetapi sudah read-only.
+                </div>
+            @endif
+        @endif
         </div>
     @endif
 

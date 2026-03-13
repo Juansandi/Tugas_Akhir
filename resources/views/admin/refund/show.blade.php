@@ -100,8 +100,11 @@
 
                     @if($refund->bukti_foto)
                         <img src="{{ asset('storage/'.$refund->bukti_foto) }}"
-                             class="img-fluid rounded border"
-                             style="max-height:300px; object-fit:contain;">
+                            class="img-fluid rounded border"
+                            style="max-height:300px; object-fit:contain; cursor:pointer"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalFotoRefund">
+
                     @else
                         <p class="text-muted mb-0">Tidak ada bukti foto.</p>
                     @endif
@@ -212,4 +215,21 @@
     </div>
 
 </div>
+@if($refund->bukti_foto)
+<div class="modal fade" id="modalFotoRefund" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0">
+
+            <div class="text-end">
+                <button type="button"
+                        class="btn-close bg-white p-2 m-2"
+                        data-bs-dismiss="modal"></button>
+            </div>
+
+            <img src="{{ asset('storage/'.$refund->bukti_foto) }}"
+                 class="img-fluid rounded shadow">
+        </div>
+    </div>
+</div>
+@endif
 @endsection

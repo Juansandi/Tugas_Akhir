@@ -24,12 +24,20 @@
     <td>{{ ucfirst($item->status) }}</td>
     <td>{{ $item->updated_at->format('d M Y H:i') }}</td>
 
-    <td>
-        {{-- 🔽 TAMBAHKAN TOMBOL DETAIL --}}
+    <td class="d-flex gap-1">
+
         <a href="{{ route('kurir.pesanan.detail', $item->id) }}"
-           class="btn btn-sm btn-outline-primary">
+        class="btn btn-sm btn-outline-primary">
             📦 Detail
         </a>
+
+        @if($item->pesanan->chatKurir)
+            <a href="{{ route('kurir.chat.show', $item->pesanan->chatKurir->id) }}"
+            class="btn btn-sm btn-outline-success">
+                💬 Chat
+            </a>
+        @endif
+
     </td>
 </tr>
 @endforeach

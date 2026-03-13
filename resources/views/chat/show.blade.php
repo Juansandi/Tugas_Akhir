@@ -35,7 +35,9 @@
     opacity: .7;
 }
 </style>
-
+@php
+$isReadOnly = !$pesanan->chatMasihAktif();
+@endphp
 <div class="container py-4">
 
     {{-- HEADER --}}
@@ -86,23 +88,26 @@
 
     </div>
 
+    
+
     {{-- FORM INPUT --}}
-    @if($isReadOnly)
-        <div class="alert alert-info">
-            🔒 Chat ditutup. Pesanan telah selesai.
+    @if($pesanan->status === 'selesai' && !$isReadOnly)
+    <div class="alert alert-warning py-2">
+        💬 Chat masih tersedia hingga 24 jam setelah pesanan selesai.
+    </div>
+    @endif
+   @if(!$isReadOnly)
+    <form action="{{ route('chat.send', $chat->id) }}" method="POST">
+        @csrf
+        <div class="input-group">
+            <input type="text"
+                name="message"
+                class="form-control"
+                placeholder="Ketik balasan..."
+                required>
+            <button class="btn btn-primary">Kirim</button>
         </div>
-    @else
-        <form action="{{ route('chat.send', $chat->id) }}" method="POST">
-            @csrf
-            <div class="input-group">
-                <input type="text"
-                    name="message"
-                    class="form-control"
-                    placeholder="Ketik balasan..."
-                    required>
-                <button class="btn btn-primary">Kirim</button>
-            </div>
-        </form>
+    </form>
     @endif
 </div>
 

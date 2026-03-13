@@ -131,12 +131,16 @@ class AdminPesananController extends Controller
         }
 
         if ($target === 'selesai') {
+
             $poin = intval($pesanan->total / 1000);
             $pesanan->poin_diperoleh = $poin;
 
             if ($pesanan->pengguna) {
                 $pesanan->pengguna->increment('jumlah_poin', $poin);
             }
+
+            // simpan waktu pesanan selesai
+            $pesanan->selesai_at = now();
         }
 
         $pesanan->update(['status' => $target]);

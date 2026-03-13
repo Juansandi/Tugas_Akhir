@@ -12,8 +12,8 @@
         <div class="card-body">
 
             {{-- STATUS --}}
-            <h5>Status Pesanan</h5>
-            <span class="badge {{ $pesanan->status_badge }} px-3 py-2">
+            <h6>Status Pesanan</h6>
+            <span class="badge {{ $pesanan->status_badge }} px-4 py-2 fs-6">
                 {{ $pesanan->status_label }}
             </span>
 
@@ -44,7 +44,7 @@
                     </a>
                 @endif
 
-                @if(in_array($pesanan->status, ['diproses','dikirim','selesai']))
+                @if(in_array($pesanan->status, ['diproses','dikirim','selesai']))   
                     <a href="{{ route('chat.show', ['pesanan'=>$pesanan->id,'type'=>'admin']) }}"
                        class="btn btn-outline-primary position-relative">
                         💬 Chat Admin
@@ -56,9 +56,9 @@
                     </a>
                 @endif
 
-                @if(in_array($pesanan->status, ['dikirim','selesai']))
+               @if(in_array($pesanan->status, ['dikirim','selesai']))
                     <a href="{{ route('chat.show', ['pesanan'=>$pesanan->id,'type'=>'kurir']) }}"
-                       class="btn btn-outline-success position-relative">
+                    class="btn btn-outline-success position-relative">
                         🚚 Chat Kurir
                         @if(optional($pesanan->chatKurirUnreadForUser)->unread_count > 0)
                             <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
@@ -68,6 +68,18 @@
                     </a>
                 @endif
             </div>
+
+            @if($pesanan->status === 'selesai' && $pesanan->chatMasihAktif())
+            <div class="text-muted small mt-2">
+                💬 Chat dengan admin dan kurir masih tersedia hingga 24 jam setelah pesanan selesai.
+            </div>
+            @endif
+
+            @if($pesanan->status === 'selesai' && !$pesanan->chatMasihAktif())
+            <div class="alert-muted small mt-3">
+                ⛔ Waktu chat telah berakhir (maksimal 24 jam setelah pesanan selesai).
+            </div>
+            @endif
 
             {{-- ================= REFUND INFO ================= --}}
             @if($pesanan->status === 'selesai')

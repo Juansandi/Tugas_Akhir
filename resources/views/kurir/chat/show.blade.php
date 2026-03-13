@@ -69,10 +69,15 @@
     </div>
 
     @if($isReadOnly)
-        <div class="alert alert-info">
-            🔒 Chat ditutup karena pesanan telah selesai.
+        <div class="alert alert-secondary">
+            🔒 Chat ditutup karena sudah melewati 24 jam setelah pesanan selesai.
         </div>
     @else
+        @if(!$isReadOnly && $pesanan->status === 'selesai')
+            <div class="alert alert-warning py-2">
+            💬 Chat masih aktif hingga 24 jam setelah pesanan selesai.
+            </div>
+        @endif
         <form action="{{ route('chat.send', $chat->id) }}" method="POST">
             @csrf
             <div class="input-group">

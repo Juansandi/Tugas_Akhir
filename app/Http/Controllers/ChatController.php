@@ -30,7 +30,7 @@ class ChatController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
-        $isReadOnly = $pesanan->status === 'selesai';
+        $isReadOnly = !$pesanan->chatMasihAktif();
 
         return view('chat.show', compact('chat', 'pesanan', 'type', 'isReadOnly'));
     }
@@ -38,9 +38,9 @@ class ChatController extends Controller
 
     public function send(Request $request, Chat $chat)
     {
-        // ⛔ BLOK CHAT JIKA PESANAN SELESAI
-        if ($chat->pesanan->status === 'selesai') {
-            abort(403, 'Chat sudah ditutup.');
+        // ⛔ BLOK CHAT JIKA PESANAN SELESAI > 24 JAM
+        if (!$chat->pesanan->chatMasihAktif()) {
+            return back()->with('error', 'Chat sudah ditutup karena melewati 24 jam.');
         }
 
         $request->validate([
@@ -100,7 +100,7 @@ class ChatController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true]);
 
-        $isReadOnly = $chat->pesanan->status === 'selesai';
+        $isReadOnly = !$chat->pesanan->chatMasihAktif();
 
         return view('admin.chat.show', [
             'chat' => $chat,
@@ -119,7 +119,7 @@ class ChatController extends Controller
 
         $chat->load('messages');
 
-        $isReadOnly = $chat->pesanan->status === 'selesai';
+        $isReadOnly = !$chat->pesanan->chatMasihAktif();
 
         return view('kurir.chat.show', [
             'chat' => $chat,

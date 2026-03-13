@@ -18,6 +18,7 @@ class Pesanan extends Model
         'user_id',
         'total',
         'status',
+        'selesai_at',
         'metode_pembayaran',
         'alamat_pengiriman',
         'no_telp_pengiriman',
@@ -30,6 +31,12 @@ class Pesanan extends Model
         'bukti_bayar',
         'waktu_bayar',
         'delivery_slot_id',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'selesai_at' => 'datetime',
     ];
 
     public function pengguna()
@@ -55,6 +62,19 @@ class Pesanan extends Model
     public function chats()
     {
         return $this->hasMany(Chat::class);
+    }
+
+    public function chatMasihAktif()
+    {
+        if ($this->status !== 'selesai') {
+            return true;
+        }
+
+        if (!$this->selesai_at) {
+            return false;
+        }
+
+        return $this->selesai_at->diffInMinutes(now()) <= 1440;
     }
 
     public function chatAdminUnreadForUser()
