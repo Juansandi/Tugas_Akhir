@@ -24,10 +24,16 @@ class LoginController extends Controller
         $pengguna = Pengguna::where('username', $request->username)->first();
 
         if ($pengguna && Hash::check($request->password, $pengguna->password)) {
+            if (!$pengguna->is_active) {
+                return back()->withErrors([
+                    'username' => 'Akun Anda telah dinonaktifkan oleh administrator.'
+                ]);
+            }
+            
             Auth::login($pengguna);
             $request->session()->regenerate();
 
-            if ($pengguna->role === 'admin') {
+            if (in_array($pengguna->role, ['admin','super_admin'])) {
                 return redirect('/admin/dashboard');
             }
 

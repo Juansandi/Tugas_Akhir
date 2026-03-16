@@ -66,7 +66,9 @@ class AdminPesananController extends Controller
             $pesanan->load('chatAdmin');
         }
 
-        $kurirs = Pengguna::where('role', 'kurir')->get();
+        $kurirs = Pengguna::where('role', 'kurir')
+            ->where('is_active', true)
+            ->get();
 
         return view('admin.pesanan.show', compact('pesanan', 'kurirs'));
     }
@@ -121,10 +123,19 @@ class AdminPesananController extends Controller
                 'kurir_id' => 'required|exists:pengguna,id'
             ]);
 
+            $kurir = Pengguna::where('id', $request->kurir_id)
+                ->where('role', 'kurir')
+                ->where('is_active', true)
+                ->first();
+
+            if (!$kurir) {
+                return back()->with('error', 'Kurir tidak valid atau sudah dinonaktifkan.');
+            }
+
             TugasKurir::firstOrCreate(
                 ['pesanan_id' => $pesanan->id],
                 [
-                    'user_id' => $request->kurir_id,
+                    'user_id' => $kurir->id,
                     'status'  => 'aktif'
                 ]
             );

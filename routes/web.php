@@ -122,12 +122,10 @@ Route::middleware('auth')->group(function () {
 
 Route::post('/review', [ReviewController::class, 'store'])->name('review.store');
 
-Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin', function() {
-        return view('admin.dashboard'); // tampilan dashboard admin
-    })->name('admin.dashboard');
+Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [ProdukController::class, 'dashboard'])
+        ->name('admin.dashboard');
 });
-Route::get('/admin/dashboard', [ProdukController::class, 'dashboard'])->name('admin.dashboard');
 
 Route::get('/admin/products', [ProdukController::class, 'index'])->name('products.index');
 Route::get('/admin/products/create', [ProdukController::class, 'create'])->name('products.create');
@@ -138,12 +136,12 @@ Route::delete('/admin/products/{product}', [ProdukController::class, 'destroy'])
 Route::get('/admin/products/{id}/reviews', [ProdukController::class, 'showReviews'])->name('products.reviews');
 Route::delete('/admin/reviews/{id}', [ProdukController::class, 'destroyReview'])->name('reviews.destroy');
 
-Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::get('/stok', [StokController::class, 'index'])->name('admin.stok.index');
     Route::post('/stok/update', [StokController::class, 'update'])->name('admin.stok.update');
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::get('/harga', [HargaController::class, 'index'])->name('admin.harga.index');
     Route::post('/harga/update', [HargaController::class, 'update'])->name('admin.harga.update');
 });
@@ -153,7 +151,7 @@ Route::get('/admin/histori-harga', [PriceHistoryController::class, 'index'])->na
 Route::get('/admin/categories', [KategoriController::class, 'index'])->name('categories.index');
 Route::post('/admin/categories/store', [KategoriController::class, 'store'])->name('categories.store');
 
-Route::middleware(['auth', 'role:admin'])
+Route::middleware(['auth', 'role:admin,super_admin'])
     ->prefix('admin/paket')
     ->name('admin.paket.')
     ->group(function () {
@@ -165,7 +163,7 @@ Route::middleware(['auth', 'role:admin'])
     Route::delete('/{paket}', [PaketController::class, 'destroy'])->name('destroy');
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::get('/admin/chat/{chat}', [ChatController::class, 'adminShow'])->name('admin.chat.show');
 });
 
@@ -180,7 +178,7 @@ Route::delete('/admin/promos/{promo}', [PromoController::class, 'destroy'])->nam
 Route::get('/admin/pengguna', [PenggunaController::class, 'index'])->name('pengguna.index');
 Route::get('/admin/pengguna/{id}/riwayat', [PenggunaController::class, 'riwayat'])->name('pengguna.riwayat');
 Route::prefix('admin')
-    ->middleware(['auth', 'role:admin'])
+    ->middleware(['auth', 'role:admin,super_admin'])
     ->name('admin.')
     ->group(function () {
 
@@ -212,7 +210,7 @@ Route::get('admin/notifications/read/{id}', [AdminNotificationController::class,
 // Menandai semua notifikasi sebagai dibaca (dari halaman daftar notifikasi)
 Route::post('admin/notifications/read-all', [AdminNotificationController::class, 'markAllAsRead'])->name('admin.notifications.readAll');
 
-Route::prefix('admin/laporan')->middleware(['auth','role:admin'])->group(function () {
+Route::prefix('admin/laporan')->middleware(['auth','role:admin,super_admin'])->group(function () {
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/pdf', [LaporanController::class, 'exportPdf'])->name('admin.laporan.pdf');
     Route::get('/laporan/detail', [LaporanController::class, 'detail'])->name('admin.laporan.detail');
@@ -229,7 +227,7 @@ Route::prefix('admin/laporan')->middleware(['auth','role:admin'])->group(functio
 });
 
 
-Route::middleware(['auth', 'role:admin'])
+Route::middleware(['auth', 'role:admin,super_admin'])
     ->prefix('admin/akun')
     ->name('admin.user.')
     ->group(function () {
@@ -242,6 +240,9 @@ Route::middleware(['auth', 'role:admin'])
 
     Route::post('/store', [ManagementController::class, 'store'])
         ->name('store');
+
+    Route::post('/{id}/toggle', [ManagementController::class,'toggleStatus'])
+    ->name('toggle');
 });
 
 

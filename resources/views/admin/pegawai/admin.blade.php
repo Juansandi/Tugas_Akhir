@@ -22,6 +22,8 @@
                 <th>Username</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Status</th>
+                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>
@@ -32,6 +34,32 @@
                 <td>{{ $item->email }}</td>
                 <td>
                     <span class="badge bg-primary">Admin</span>
+                </td>
+
+                <td>
+                    @if($item->is_active)
+                        <span class="badge bg-success">Aktif</span>
+                    @else
+                        <span class="badge bg-secondary">Nonaktif</span>
+                    @endif
+                </td>
+
+                <td>
+                    @if($item->is_active)
+                    <form action="{{ route('admin.user.toggle',$item->id) }}" method="POST">
+                        @csrf
+                        <button class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menonaktifkan akun ini?')">
+                            Nonaktifkan
+                        </button>
+                    </form>
+                    @else
+                    <form action="{{ route('admin.user.toggle',$item->id) }}" method="POST">
+                        @csrf
+                        <button class="btn btn-sm btn-success">
+                            Aktifkan
+                        </button>
+                    </form>
+                    @endif
                 </td>
             </tr>
             @endforeach

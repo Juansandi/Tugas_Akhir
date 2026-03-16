@@ -28,6 +28,7 @@ class Pengguna extends Authenticatable
         'no_telp', 
         'jumlah_poin', 
         'role',
+        'is_active',
     ];
 
     /**
@@ -64,4 +65,8 @@ class Pengguna extends Authenticatable
                     ->where('is_default', true);
     }
 
+    public function isAdmin()
+    {
+        return in_array($this->role, ['admin','super_admin']);
+    }
 }

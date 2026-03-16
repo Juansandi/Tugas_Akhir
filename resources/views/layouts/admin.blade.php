@@ -37,6 +37,12 @@
             font-size: 0.75rem;
             color: #6c757d;
         }
+
+        .super-admin-bar {
+            background: linear-gradient(90deg,#dc3545,#ff6b6b);
+            color: white;
+            font-size: 13px;
+        }
         </style>
 </head>
 <body>
@@ -154,16 +160,26 @@
                 </li>
 
                 {{-- MANAJEMEN AKUN --}}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle {{ request()->is('admin/akun/*') ? 'active' : '' }}"
-                       href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-shield-lock me-1"></i> Manajemen Akun
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ route('admin.user.admin') }}">Admin</a></li>
-                        <li><a class="dropdown-item" href="{{ route('admin.user.kurir') }}">Pegawai / Kurir</a></li>
-                    </ul>
-                </li>
+                @if(auth()->user()->role === 'super_admin')
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ request()->is('admin/akun/*') ? 'active' : '' }}"
+                        href="#" data-bs-toggle="dropdown">
+                            <i class="bi bi-shield-lock me-1"></i> Manajemen Akun
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('admin.user.admin') }}">
+                                    Admin
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('admin.user.kurir') }}">
+                                    Pegawai / Kurir
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
             </ul>
 
             {{-- ================= MENU KANAN ================= --}}
@@ -209,11 +225,21 @@
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle me-1"></i>
                         {{ auth()->user()->username }}
+                        @if(auth()->user()->role === 'super_admin')
+                            <span class="badge bg-danger ms-1">Super Admin</span>
+                        @endif
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <span class="dropdown-item-text text-muted">
-                                Role: {{ ucfirst(auth()->user()->role) }}
+                            <span class="dropdown-item-text">
+                                Role:
+                                @if(auth()->user()->role === 'super_admin')
+                                    <span class="badge bg-danger">Super Admin</span>
+                                @elseif(auth()->user()->role === 'admin')
+                                    <span class="badge bg-primary">Admin</span>
+                                @elseif(auth()->user()->role === 'kurir')
+                                    <span class="badge bg-success">Kurir</span>
+                                @endif
                             </span>
                         </li>
                         <li><hr class="dropdown-divider"></li>
