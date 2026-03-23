@@ -23,7 +23,7 @@
                         </div>
                         <p class="mb-0">{{ $review->comment }}</p>
                     </div>
-                    <form action="{{ route('reviews.destroy', $review->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus ulasan ini?')">
+                    <form action="{{ route('admin.reviews.destroy', $review->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus ulasan ini?')">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-danger">Hapus</button>
@@ -35,6 +35,6 @@
         <p class="text-muted">Belum ada ulasan untuk produk ini.</p>
     @endforelse
 
-    <a href="{{ route('products.index') }}" class="btn btn-secondary mt-3">Kembali ke Daftar Produk</a>
+    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary mt-3">Kembali ke Daftar Produk</a>
 </div>
 @endsection

@@ -29,7 +29,7 @@
                         <td>{{ $pengguna->alamat }}</td>
                         <td>{{ $pengguna->jumlah_poin }}</td>
                         <td>
-                            <a href="{{ route('pengguna.riwayat', $pengguna->id) }}" class="btn btn-sm btn-primary">
+                            <a href="{{ route('admin.pengguna.riwayat', $pengguna->id) }}" class="btn btn-sm btn-primary">
                                 Lihat Riwayat
                             </a>
                         </td>

@@ -45,7 +45,10 @@
                 @endif
 
                 @if(in_array($pesanan->status, ['diproses','dikirim','selesai']))   
-                    <a href="{{ route('chat.show', ['pesanan'=>$pesanan->id,'type'=>'admin']) }}"
+                    <a href="{{ route('chat.show', [
+                                'pesanan' => $pesanan->id,
+                                'type' => 'admin'
+                            ]) }}"
                        class="btn btn-outline-primary position-relative">
                         💬 Chat Admin
                         @if(optional($pesanan->chatAdminUnreadForUser)->unread_count > 0)
@@ -57,7 +60,10 @@
                 @endif
 
                @if(in_array($pesanan->status, ['dikirim','selesai']))
-                    <a href="{{ route('chat.show', ['pesanan'=>$pesanan->id,'type'=>'kurir']) }}"
+                    <a href="{{ route('chat.show', [
+                                'pesanan' => $pesanan->id,
+                                'type' => 'kurir'
+                            ]) }}"
                     class="btn btn-outline-success position-relative">
                         🚚 Chat Kurir
                         @if(optional($pesanan->chatKurirUnreadForUser)->unread_count > 0)

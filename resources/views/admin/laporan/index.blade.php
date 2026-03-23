@@ -29,7 +29,7 @@
             <button class="btn btn-primary w-100">
                 Filter
             </button>
-            <a href="{{ route('laporan.index') }}"
+            <a href="{{ route('admin.laporan.index') }}"
                class="btn btn-secondary w-100">
                 Reset
             </a>

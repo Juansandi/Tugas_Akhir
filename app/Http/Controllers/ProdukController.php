@@ -88,7 +88,7 @@ class ProdukController extends Controller
             }
         }
 
-        return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil ditambahkan.');
     }
 
     public function edit(Produk $product)
@@ -177,7 +177,7 @@ class ProdukController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('products.index')
+            return redirect()->route('admin.products.index')
                 ->with('success', 'Produk berhasil diperbarui.');
 
         } catch (\Exception $e) {
@@ -194,7 +194,7 @@ class ProdukController extends Controller
 
         $product->delete();
 
-        return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus.');
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dihapus.');
     }
 
     public function showToUser(Request $request)
@@ -265,7 +265,7 @@ class ProdukController extends Controller
 
         $review->delete();
 
-        return redirect()->route('products.reviews', $produkId)
+        return redirect()->route('admin.products.reviews', $produkId)
             ->with('success', 'Ulasan berhasil dihapus.');
     }
 

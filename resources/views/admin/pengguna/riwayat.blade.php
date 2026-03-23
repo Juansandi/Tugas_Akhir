@@ -93,6 +93,6 @@
         @endforeach
     @endif
 
-    <a href="{{ route('pengguna.index') }}" class="btn btn-secondary">← Kembali ke Manajemen Pengguna</a>
+    <a href="{{ route('admin.pengguna.index') }}" class="btn btn-secondary">← Kembali ke Manajemen Pengguna</a>
 </div>
 @endsection

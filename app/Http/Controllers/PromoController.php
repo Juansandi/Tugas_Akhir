@@ -30,7 +30,7 @@ class PromoController extends Controller
 
         Promo::create($request->all());
 
-        return redirect()->route('promos.index')->with('success', 'Promo ditambahkan.');
+        return redirect()->route('admin.promos.index')->with('success', 'Promo ditambahkan.');
     }
 
     public function edit(Promo $promo)
@@ -50,13 +50,13 @@ class PromoController extends Controller
 
         $promo->update($request->all());
 
-        return redirect()->route('promos.index')->with('success', 'Promo diperbarui.');
+        return redirect()->route('admin.promos.index')->with('success', 'Promo diperbarui.');
     }
 
     public function destroy(Promo $promo)
     {
         $promo->delete();
 
-        return redirect()->route('promos.index')->with('success', 'Promo dihapus.');
+        return redirect()->route('admin.promos.index')->with('success', 'Promo dihapus.');
     }
 }

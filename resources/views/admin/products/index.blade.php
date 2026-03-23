@@ -10,7 +10,7 @@
         <h2 class="fw-bold mb-0">Manajemen Produk</h2>
 
         <div class="d-flex gap-2">
-            <a href="{{ route('products.create') }}" class="btn btn-dark">
+            <a href="{{ route('admin.products.create') }}" class="btn btn-dark">
                 Tambah Produk
             </a>
             <button class="btn btn-outline-secondary"
@@ -28,7 +28,7 @@
         </div>
     @endif
 
-    <form method="GET" action="{{ route('products.index') }}" class="mb-3">
+    <form method="GET" action="{{ route('admin.products.index') }}" class="mb-3">
         <div class="row g-2 align-items-center">
             <div class="col-md-4">
                 <input type="text"
@@ -51,7 +51,7 @@
 
             @if(request('q') || request('kategori'))
                 <div class="col-auto">
-                    <a href="{{ route('products.index') }}" class="btn btn-link">
+                    <a href="{{ route('admin.products.index') }}" class="btn btn-link">
                         Reset
                     </a>
                 </div>
@@ -64,13 +64,13 @@
         <strong>Kategori:</strong>
 
         {{-- SEMUA --}}
-        <a href="{{ route('products.index', ['q' => request('q')]) }}"
+        <a href="{{ route('admin.products.index', ['q' => request('q')]) }}"
         class="btn btn-sm {{ request('kategori') ? 'btn-outline-secondary' : 'btn-secondary' }}">
             Semua
         </a>
 
         @foreach($categories as $category)
-            <a href="{{ route('products.index', [
+            <a href="{{ route('admin.products.index', [
                     'kategori' => $category->id,
                     'q' => request('q')
                 ]) }}"
@@ -154,17 +154,17 @@
 
                     {{-- AKSI --}}
                     <td class="text-center">
-                        <a href="{{ route('products.edit', $product->id) }}"
+                        <a href="{{ route('admin.products.edit', $product->id) }}"
                            class="btn btn-sm btn-primary mb-1 w-100">
                             Edit
                         </a>
 
-                        <a href="{{ route('products.reviews', $product->id) }}"
+                        <a href="{{ route('admin.products.reviews', $product->id) }}"
                            class="btn btn-sm btn-outline-secondary mb-1 w-100">
                             Review
                         </a>
 
-                        <form action="{{ route('products.destroy', $product->id) }}"
+                        <form action="{{ route('admin.products.destroy', $product->id) }}"
                               method="POST"
                               onsubmit="return confirm('Hapus produk ini?')">
                             @csrf
@@ -248,7 +248,7 @@ document.getElementById('btnSimpanKategori').addEventListener('click', function 
     const form = document.getElementById('formKategori');
     const formData = new FormData(form);
 
-    fetch("{{ route('categories.store') }}", {
+    fetch("{{ route('admin.categories.store') }}", {
         method: "POST",
         headers: {
             "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value

@@ -6,7 +6,7 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">Manajemen Promo</h2>
-        <a href="{{ route('promos.create') }}" class="btn btn-dark">Tambah Promo</a>
+        <a href="{{ route('admin.promos.create') }}" class="btn btn-dark">Tambah Promo</a>
     </div>
 
     @if (session('success'))
@@ -36,8 +36,8 @@
                         <td>{{ $promo->mulai }}</td>
                         <td>{{ $promo->akhir }}</td>
                         <td>
-                            <a href="{{ route('promos.edit', $promo->id) }}" class="text-primary">Edit</a> |
-                            <form action="{{ route('promos.destroy', $promo->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus promo ini?')">
+                            <a href="{{ route('admin.promos.edit', $promo->id) }}" class="text-primary">Edit</a> |
+                            <form action="{{ route('admin.promos.destroy', $promo->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus promo ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-link text-danger p-0 m-0 align-baseline">Hapus</button>

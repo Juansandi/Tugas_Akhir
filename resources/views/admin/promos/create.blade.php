@@ -6,7 +6,7 @@
 <div class="container py-4">
     <h2 class="fw-bold mb-4">Tambah Promo</h2>
 
-    <form action="{{ route('promos.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.promos.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-3">
@@ -35,7 +35,7 @@
         </div>
 
         <button type="submit" class="btn btn-success">Simpan</button>
-        <a href="{{ route('promos.index') }}" class="btn btn-secondary">Kembali</a>
+        <a href="{{ route('admin.promos.index') }}" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
 @endsection

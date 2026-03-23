@@ -50,7 +50,9 @@ class ChatController extends Controller
         $message = DetailChat::create([
             'chat_id' => $chat->id,
             'sender_id' => auth()->id(),
-            'sender_type' => auth()->user()->role, // user | admin | kurir
+            'sender_type' => in_array(auth()->user()->role, ['admin','super_admin'])
+                ? 'admin'
+                : auth()->user()->role,
             'message' => $request->message,
             'is_read' => false,
         ]);

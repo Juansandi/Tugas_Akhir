@@ -18,7 +18,7 @@
         </div>
     @endif
 
-    <form action="{{ route('products.update', $product->id) }}"
+    <form action="{{ route('admin.products.update', $product->id) }}"
           method="POST"
           enctype="multipart/form-data">
         @csrf
@@ -152,7 +152,7 @@
             <button type="submit" class="btn btn-success">
                 Simpan Perubahan
             </button>
-            <a href="{{ route('products.index') }}" class="btn btn-secondary">
+            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">
                 Batal
             </a>
         </div>

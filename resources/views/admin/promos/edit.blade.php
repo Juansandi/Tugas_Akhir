@@ -5,7 +5,7 @@
 @section('content')
 <div class="container mt-4">
     <h2>Edit Promo</h2>
-    <form action="{{ route('promos.update', $promo->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.promos.update', $promo->id) }}" method="POST" enctype="multipart/form-data">
         @csrf @method('PUT')
         <div class="mb-3">
             <label>Kode Promo</label>
@@ -33,7 +33,7 @@
         </div>
       
         <button type="submit" class="btn btn-primary">Update</button>
-        <a href="{{ route('promos.index') }}" class="btn btn-secondary">Kembali</a>
+        <a href="{{ route('admin.promos.index') }}" class="btn btn-secondary">Kembali</a>
     </form>
 </div>
 @endsection
