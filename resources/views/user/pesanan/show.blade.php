@@ -133,6 +133,23 @@
                 </div>
             @endif
 
+            @if($pesanan->status === 'selesai')
+                {{-- BELUM DAPAT POIN --}}
+                @if(!$pesanan->poin_sudah_diberikan)
+                    <div class="alert alert-info mt-3">
+                        🎁 Poin akan diberikan setelah 24 jam (masa refund).
+                    </div>
+                @endif
+
+                {{-- SUDAH DAPAT POIN --}}
+                @if($pesanan->poin_sudah_diberikan)
+                    <div class="alert alert-success mt-3">
+                        🎉 Anda mendapatkan <strong>{{ $pesanan->poin_diperoleh }}</strong> poin dari pesanan ini.
+                    </div>
+                @endif
+
+            @endif
+
             {{-- ================= RINCIAN HARGA ================= --}}
             <hr>
             <h5>Perincian Harga</h5>

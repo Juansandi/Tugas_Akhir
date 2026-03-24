@@ -24,6 +24,7 @@ class Pesanan extends Model
         'no_telp_pengiriman',
         'no_resi',
         'poin_diperoleh',
+        'poin_sudah_diberikan',
         'poin_digunakan',
         'promo_id',
         'diskon_dari_poin',
@@ -188,6 +189,36 @@ class Pesanan extends Model
             }
 
         });
+    }
+
+    public function releasePoinJikaSudahAman()
+    {
+        if ($this->status !== 'selesai') return;
+
+        if (!$this->selesai_at) return;
+
+        // sudah lewat 24 jam?
+        if ($this->selesai_at->diffInHours(now()) < 24) return;
+
+        // sudah pernah dikasih poin?
+        if ($this->poin_sudah_diberikan ?? false) return;
+
+        $totalRefund = $this->refund()
+            ->where('status', 'disetujui')
+            ->sum('refund_amount');
+
+        $totalBersih = $this->total - $totalRefund;
+
+        $poinFinal = intval($totalBersih / 1000);
+
+        if ($this->pengguna) {
+            $this->pengguna->increment('jumlah_poin', $poinFinal);
+        }
+
+        $this->update([
+            'poin_diperoleh' => $poinFinal,
+            'poin_sudah_diberikan' => true
+        ]);
     }
 
     public function deliverySlot()

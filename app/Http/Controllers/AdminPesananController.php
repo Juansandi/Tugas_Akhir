@@ -40,6 +40,12 @@ class AdminPesananController extends Controller
             $query->where('status', $request->status);
         }
 
+        Pesanan::where('status','selesai')
+            ->where('poin_sudah_diberikan', false)
+            ->get()
+            ->each
+            ->releasePoinJikaSudahAman();
+
         $pesananList = $query->paginate(10)->withQueryString();
 
         return view('admin.pesanan.index', compact('pesananList'));
@@ -57,6 +63,8 @@ class AdminPesananController extends Controller
             'deliverySlot',
         ])->findOrFail($id);
 
+        $pesanan->releasePoinJikaSudahAman();
+        
         if (!$pesanan->chatAdmin) {
             Chat::create([
                 'pesanan_id' => $pesanan->id,
@@ -142,18 +150,14 @@ class AdminPesananController extends Controller
         }
 
         if ($target === 'selesai') {
-
-            $poin = intval($pesanan->total / 1000);
-            $pesanan->poin_diperoleh = $poin;
-
-            if ($pesanan->pengguna) {
-                $pesanan->pengguna->increment('jumlah_poin', $poin);
-            }
-
-            // simpan waktu pesanan selesai
-            $pesanan->selesai_at = now();
+            $pesanan->update([
+                'status' => $target,
+                'selesai_at' => now(),
+                'poin_diperoleh' => 0,
+                'poin_sudah_diberikan' => false
+            ]);
         }
-
+        
         $pesanan->update(['status' => $target]);
 
         if ($target === 'dikirim') {

@@ -288,6 +288,8 @@ class PesananController extends Controller
     {
         $pesanan = Pesanan::with('detail.produk')->findOrFail($id);
 
+        $pesanan->releasePoinJikaSudahAman();
+
         $reviewedProdukIds = Review::where('user_id', auth()->id())
         ->where('pesanan_id', $pesanan->id)
         ->pluck('produk_id')
