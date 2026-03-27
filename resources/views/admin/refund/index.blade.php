@@ -16,9 +16,9 @@
         <table class="table table-bordered table-hover align-middle mb-0">
             <thead class="table-light text-center">
                 <tr>
-                    <th width="90">Refund</th>
+                    <th width="90">Pengembalian</th>
                     <th width="100">Pesanan</th>
-                    <th>Customer</th>
+                    <th>Pembeli</th>
                     <th>Alasan</th>
                     <th width="140">Nominal</th>
                     <th width="120">Status</th>

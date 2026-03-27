@@ -19,7 +19,7 @@
                     Beras & sayur segar langsung dari petani
                 </p>
                 <a href="{{ route('login') }}" class="btn btn-success btn-lg px-4">
-                    Login & Mulai Belanja
+                    Masuk & Mulai Belanja
                 </a>
             @endguest
 

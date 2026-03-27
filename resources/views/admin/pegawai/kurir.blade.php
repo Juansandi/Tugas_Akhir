@@ -18,7 +18,7 @@
                 <th>No</th>
                 <th>Username</th>
                 <th>Email</th>
-                <th>Role</th>
+                <th>Peran</th>
                 <th>Status</th>
                 <th>Aksi</th>
             </tr>

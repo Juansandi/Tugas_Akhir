@@ -18,7 +18,7 @@
 
 <h2>LAPORAN DETAIL PENJUALAN</h2>
 <p style="font-size:10px;color:#666;">
-    Catatan: Detail penjualan ini belum dikurangi refund.
+    Catatan: Detail penjualan ini belum dikurangi pengembalian dana.
 </p>
 
 <div class="periode">

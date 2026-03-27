@@ -7,7 +7,7 @@
 
     {{-- HEADER --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">Detail Pengajuan Refund</h4>
+        <h4 class="fw-bold mb-0">Detail Pengajuan Pengembalian Dana</h4>
         <a href="{{ route('admin.refund.index') }}"
            class="btn btn-outline-secondary btn-sm">
             ← Kembali
@@ -37,11 +37,11 @@
             <div class="card shadow-sm h-100">
                 <div class="card-body">
 
-                    <h6 class="fw-bold mb-3">Informasi Refund</h6>
+                    <h6 class="fw-bold mb-3">Informasi Pengembalian Dana</h6>
 
                     <table class="table table-borderless mb-0">
                         <tr>
-                            <td class="text-muted">ID Refund</td>
+                            <td class="text-muted">ID Pengembalian</td>
                             <td class="fw-semibold">#{{ $refund->id }}</td>
                         </tr>
                         <tr>
@@ -55,7 +55,7 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="text-muted">Customer</td>
+                            <td class="text-muted">Pembeli</td>
                             <td>{{ $refund->pengguna->username }}</td>
                         </tr>
                         <tr>
@@ -63,7 +63,7 @@
                             <td>{{ $refund->alasan }}</td>
                         </tr>
                         <tr>
-                            <td class="text-muted">Metode Refund</td>
+                            <td class="text-muted">Metode Pengembalian</td>
                             <td>{{ $refund->metode_refund }}</td>
                         </tr>
                         <tr>
@@ -71,7 +71,7 @@
                             <td>{{ $refund->nomor_tujuan }}</td>
                         </tr>
                         <tr>
-                            <td class="text-muted">Nominal Refund</td>
+                            <td class="text-muted">Nominal Pengembalian</td>
                             <td class="fw-bold text-danger">
                                 Rp {{ number_format($refund->refund_amount ?? 0,0,',','.') }}
                             </td>

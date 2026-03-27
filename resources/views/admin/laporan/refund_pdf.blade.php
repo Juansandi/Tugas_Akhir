@@ -12,7 +12,7 @@
     </head>
     
     <body>
-        <h3 style="text-align:center">LAPORAN REFUND</h3>
+        <h3 style="text-align:center">LAPORAN PENGEMBALIAN DANA</h3>
         <p style="text-align:center">
             {{ $startDate->format('d M Y') }} –
             {{ $endDate->format('d M Y') }}
@@ -22,9 +22,9 @@
             <thead>
                 <tr>
                     <th>No</th>
-                    <th>Refund</th>
+                    <th>Pengembalian</th>
                     <th>Pesanan</th>
-                    <th>Customer</th>
+                    <th>Pembeli</th>
                     <th>Nominal</th>
                     <th>Tanggal</th>
                 </tr>
@@ -46,7 +46,7 @@
 
             <tfoot>
                 <tr>
-                    <th colspan="4">TOTAL REFUND</th>
+                    <th colspan="4">TOTAL PENGEMBALIAN DANA</th>
                     <th colspan="2" class="text-right">
                         Rp {{ number_format($totalRefund,0,',','.') }}
                     </th>

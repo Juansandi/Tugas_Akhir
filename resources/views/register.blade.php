@@ -9,9 +9,9 @@
     <div class="col-md-6 d-flex align-items-center">
         <div class="p-5 w-100">
 
-            <h2 class="fw-bold mb-2">Create Account ✨</h2>
+            <h2 class="fw-bold mb-2">Buat Akun ✨</h2>
             <p class="text-muted mb-4">
-                Please fill the form below to register
+                Silakan isi formulir di bawah untuk mendaftar
             </p>
 
             <form method="POST" action="{{ route('register') }}">
@@ -23,7 +23,7 @@
                     <input type="text"
                            class="form-control form-control-lg"
                            name="username"
-                           placeholder="Choose a username"
+                           placeholder="Masukan username Anda"
                            required>
                 </div>
 
@@ -33,7 +33,7 @@
                     <input type="email"
                            class="form-control form-control-lg"
                            name="email"
-                           placeholder="Enter your email"
+                           placeholder="Masukan email Anda"
                            required>
                 </div>
 
@@ -54,7 +54,7 @@
                            class="form-control form-control-lg"
                            id="password"
                            name="password"
-                           placeholder="Create a password"
+                           placeholder="Masukan password Anda"
                            required>
                     <button type="button"
                             class="password-toggle"
@@ -70,7 +70,7 @@
                            class="form-control form-control-lg"
                            id="confirm_password"
                            name="password_confirmation"
-                           placeholder="Repeat your password"
+                           placeholder="Masukan ulang password Anda"
                            required>
                     <button type="button"
                             class="password-toggle"
@@ -95,14 +95,14 @@
                 {{-- Button --}}
                 <div class="d-grid mt-4">
                     <button type="submit" class="btn btn-dark btn-lg">
-                        Create Account
+                        Daftar
                     </button>
                 </div>
 
                 <p class="text-muted small mt-4">
-                    Already have an account?
+                    Sudah punya akun?
                     <a href="{{ route('login') }}" class="fw-semibold auth-link">
-                        Login here
+                        Masuk di sini
                     </a>
                 </p>
 

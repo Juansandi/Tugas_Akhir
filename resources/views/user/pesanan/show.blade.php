@@ -40,7 +40,7 @@
                 @if($pesanan->status === 'belum_dibayar')
                     <a href="{{ route('pesanan.pembayaran', $pesanan->id) }}"
                        class="btn btn-warning">
-                        Upload Bukti Pembayaran
+                        Unggah Bukti Pembayaran
                     </a>
                 @endif
 
@@ -102,7 +102,7 @@
                         <div class="alert alert-warning d-flex align-items-center">
                             ⏱️
                             <div class="ms-1">
-                                Anda masih dapat mengajukan refund dalam
+                                Anda masih dapat mengajukan pengembalian dana dalam
                                 <strong>{{ $sisaJam }} jam</strong>
                                 setelah pesanan selesai.
                             </div>
@@ -112,7 +112,7 @@
                     {{-- REFUND EXPIRED --}}
                     @if(!$pesanan->refund && $sisaJam <= 0)
                         <div class="alert alert-secondary">
-                            ⛔ Batas waktu pengajuan refund telah berakhir
+                            ⛔ Batas waktu pengajuan pengembalian dana telah berakhir
                             (maksimal 1×24 jam setelah pesanan selesai).
                         </div>
                     @endif
@@ -121,12 +121,12 @@
                     @if(!$pesanan->refund && $sisaJam > 0)
                         <a href="{{ route('refund.create', ['pesanan_id' => $pesanan->id]) }}"
                            class="btn btn-outline-warning">
-                            Ajukan Refund
+                            Ajukan Pengembalian Dana
                         </a>
                     @elseif($pesanan->refund)
                         <a href="{{ route('refund.show', $pesanan->refund->id) }}"
                            class="btn btn-outline-info">
-                            Lihat Detail Refund
+                            Lihat Detail Pengembalian Dana
                         </a>
                     @endif
 
@@ -137,7 +137,7 @@
                 {{-- BELUM DAPAT POIN --}}
                 @if(!$pesanan->poin_sudah_diberikan)
                     <div class="alert alert-info mt-3">
-                        🎁 Poin akan diberikan setelah 24 jam (masa refund).
+                        🎁 Poin akan diberikan setelah 24 jam (masa pengembalian dana).
                     </div>
                 @endif
 
@@ -225,14 +225,14 @@
                 @if($pesanan->status === 'selesai' && $item->type === 'produk' && !$pesanan->refund)
                     <div class="mt-2">
                         @if(in_array($item->produk_id, $reviewedProdukIds))
-                            <span class="badge bg-success">⭐ Sudah direview</span>
+                            <span class="badge bg-success">⭐ Sudah diulas</span>
                         @else
                             <a href="{{ route('review.form', [
                                     'produk' => $item->produk_id,
                                     'pesanan' => $pesanan->id
                                 ]) }}"
                                class="btn btn-sm btn-outline-warning">
-                                ✍️ Beri Review
+                                ✍️ Beri Ulasan
                             </a>
                         @endif
                     </div>

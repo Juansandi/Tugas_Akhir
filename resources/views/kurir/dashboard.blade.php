@@ -3,7 +3,7 @@
 @section('title', 'Dashboard Kurir')
 
 @section('content')
-<h4>Dashboard</h4>
+<h4>Beranda Kurir</h4>
 
 <div class="row mb-4">
     <div class="col-md-6">

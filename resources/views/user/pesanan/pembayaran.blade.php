@@ -3,10 +3,10 @@
 @section('content')
 <div class="container py-4" style="max-width:500px">
 
-    <h4 class="mb-3">Upload Bukti Pembayaran</h4>
+    <h4 class="mb-3">Unggah Bukti Pembayaran</h4>
 
     <div class="alert alert-warning">
-        Silakan upload bukti pembayaran sebelum batas waktu.
+        Silakan unggah bukti pembayaran sebelum batas waktu.
     </div>
 
     <p class="mb-1">Total yang harus dibayar:</p>

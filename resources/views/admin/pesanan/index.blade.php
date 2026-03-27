@@ -83,7 +83,7 @@
                     <th>Status</th>
                     <th>Total</th>
                     <th>Waktu Kirim</th>
-                    <th>Refund</th>
+                    <th>Pengembalian Dana</th>
                     <th>Bersih</th>
                     <th width="160">Aksi</th>
                 </tr>
@@ -124,7 +124,7 @@
                             @endif
                             @if($refund > 0)
                                 <span class="badge bg-warning text-dark">
-                                    🔁 Refund
+                                    🔁 Pengembalian Dana
                                 </span>
                             @endif
                         </div>

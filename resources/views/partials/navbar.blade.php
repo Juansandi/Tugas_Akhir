@@ -178,7 +178,7 @@
                                 @csrf
                                 <button type="submit"
                                         class="dropdown-item text-danger">
-                                    Logout
+                                    Keluar
                                 </button>
                             </form>
                         </li>
@@ -189,7 +189,7 @@
                 {{-- GUEST --}}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('login.form') }}">
-                        Login
+                        Masuk
                     </a>
                 </li>
                 @endauth

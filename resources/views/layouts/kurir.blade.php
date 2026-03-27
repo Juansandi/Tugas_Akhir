@@ -52,7 +52,7 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('kurir.dashboard') ? 'active' : '' }}"
                    href="{{ route('kurir.dashboard') }}">
-                    <i class="bi bi-speedometer2"></i> Dashboard
+                    <i class="bi bi-speedometer2"></i> Beranda
                 </a>
             </li>
 
@@ -80,7 +80,7 @@
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button class="nav-link btn btn-link text-start text-danger">
-                        <i class="bi bi-box-arrow-right"></i> Logout
+                        <i class="bi bi-box-arrow-right"></i> Keluar
                     </button>
                 </form>
             </li>

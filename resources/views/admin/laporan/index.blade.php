@@ -31,7 +31,7 @@
             </button>
             <a href="{{ route('admin.laporan.index') }}"
                class="btn btn-secondary w-100">
-                Reset
+                Atur Ulang
             </a>
         </div>
     </form>
@@ -40,7 +40,7 @@
     <div class="mb-4">
         <a href="{{ route('admin.laporan.pdf', request()->query()) }}"
            class="btn btn-danger">
-            🧾 Download PDF
+            🧾 Unduh PDF
         </a>
     </div>
 
@@ -56,7 +56,7 @@
                         Rp {{ number_format($totalPenjualanKotor, 0, ',', '.') }}
                     </h4>
                     <small class="text-muted">
-                        Total sebelum refund
+                        Total sebelum pengembalian dana
                     </small>
                 </div>
             </div>
@@ -66,12 +66,12 @@
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
-                    <h6 class="text-muted">Total Refund</h6>
+                    <h6 class="text-muted">Total Pengembalian Dana</h6>
                     <h4 class="fw-bold text-danger">
                         - Rp {{ number_format($totalRefund, 0, ',', '.') }}
                     </h4>
                     <small class="text-muted">
-                        Refund disetujui
+                        Pengembalian dana disetujui
                     </small>
                 </div>
             </div>
@@ -86,7 +86,7 @@
                         Rp {{ number_format($totalPenjualanBersih, 0, ',', '.') }}
                     </h4>
                     <small class="text-muted">
-                        Setelah refund
+                        Setelah dikurangi pengembalian dana
                     </small>
                 </div>
             </div>
@@ -113,7 +113,7 @@
     <div class="card shadow-sm p-4">
         <h5 class="mb-1">Grafik Penjualan Berdasarkan Kategori</h5>
         <small class="text-muted mb-3 d-block">
-            Grafik menggunakan nilai penjualan kotor (belum dikurangi refund)
+            Grafik menggunakan nilai penjualan kotor (belum dikurangi pengembalian dana).
         </small>
 
         @if($penjualanKategori->isEmpty())

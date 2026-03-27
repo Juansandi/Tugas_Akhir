@@ -38,7 +38,7 @@
             <input type="number"
                    name="max_price"
                    class="form-control"
-                   placeholder="Harga Max"
+                   placeholder="Harga Maks"
                    value="{{ request('max_price') }}">
         </div>
     </form>

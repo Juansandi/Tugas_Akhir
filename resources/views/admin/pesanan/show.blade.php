@@ -87,8 +87,8 @@
  
     @if($pesanan->refund && $pesanan->refund->status === 'disetujui')
         <div class="alert alert-warning mt-3">
-            🔄 <strong>Pesanan ini telah direfund</strong><br>
-            Nominal Refund:
+            🔄 <strong>Pesanan ini telah diapprove untuk pengembalian dana</strong><br>
+            Nominal pengembalian dana:
             <strong class="text-danger">
                 Rp {{ number_format($pesanan->refund->refund_amount,0,',','.') }}
             </strong><br>
@@ -97,7 +97,7 @@
             <div>
              <a href="{{ route('admin.refund.show', $pesanan->refund->id) }}"
                 class="btn btn-sm btn-outline-danger mt-2">
-                    Lihat Detail Refund
+                    Lihat Detail Pengembalian Dana
             </a>
             </div>
         </div>
@@ -106,7 +106,7 @@
     {{-- BATAS BAYAR --}}
     @if($pesanan->status === 'belum_dibayar')
         <div class="alert alert-danger">
-            ⚠ Batas upload bukti bayar:
+            ⚠ Batas unggah bukti bayar:
             <strong>{{ $pesanan->created_at->addHours(24)->format('d M Y H:i') }}</strong>
         </div>
     @endif
@@ -194,7 +194,7 @@
 
         @if($refundAmount > 0)
             <li class="text-danger">
-                Refund: -Rp {{ number_format($refundAmount,0,',','.') }}
+                Pengembalian Dana: -Rp {{ number_format($refundAmount,0,',','.') }}
             </li>
             <li>
                 <strong>Total Bersih:</strong>

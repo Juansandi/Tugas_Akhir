@@ -15,7 +15,7 @@
             <button class="btn btn-sm btn-primary"
                     data-bs-toggle="modal"
                     data-bs-target="#editProfilKurirModal">
-                ✏️ Edit Profil
+                ✏️ Ubah Profil
             </button>
 
             <button class="btn btn-sm btn-secondary"

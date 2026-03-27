@@ -156,12 +156,12 @@
                     <td class="text-center">
                         <a href="{{ route('admin.products.edit', $product->id) }}"
                            class="btn btn-sm btn-primary mb-1 w-100">
-                            Edit
+                            Ubah
                         </a>
 
                         <a href="{{ route('admin.products.reviews', $product->id) }}"
                            class="btn btn-sm btn-outline-secondary mb-1 w-100">
-                            Review
+                            Ulasan
                         </a>
 
                         <form action="{{ route('admin.products.destroy', $product->id) }}"

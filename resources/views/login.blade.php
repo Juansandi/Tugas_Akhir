@@ -9,12 +9,12 @@
     <div class="col-md-6 d-flex align-items-center">
         <div class="p-5 w-100">
 
-            <h2 class="fw-bold mb-2">Welcome Back 👋</h2>
+            <h2 class="fw-bold mb-2">Selamat Datang 👋</h2>
             <p class="text-muted mb-4">
-                Please login to your account
+                Silakan masuk ke akun Anda
             </p>
 
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('login') }}">  
                 @csrf
 
                 {{-- Username --}}
@@ -23,7 +23,7 @@
                     <input type="text"
                            class="form-control form-control-lg"
                            name="username"
-                           placeholder="Enter your username"
+                           placeholder="Masukan username Anda"
                            required>
                 </div>
 
@@ -34,7 +34,7 @@
                            class="form-control form-control-lg"
                            id="password"
                            name="password"
-                           placeholder="Enter your password"
+                           placeholder="Masukan password Anda"
                            required>
                     <button type="button" class="password-toggle"
                             onclick="togglePassword('password')">
@@ -45,21 +45,21 @@
                 {{-- Button --}}
                 <div class="d-grid mt-4">
                     <button type="submit" class="btn btn-dark btn-lg">
-                        Login
+                        Masuk
                     </button>
                 </div>
 
                 <div class="text-end mt-3">
-                    <a href="#" class="auth-link">Forgot password?</a>
+                    <a href="#" class="auth-link">Lupa Password?</a>
                 </div>
             </form>
 
             <hr class="my-4">
 
             <p class="text-muted small">
-                Don’t have an account?
+                Belum punya akun?
                 <a href="{{ route('register.form') }}" class="fw-semibold text-dark">
-                    Create account
+                    Daftar di sini
                 </a>
             </p>
         </div>

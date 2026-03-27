@@ -15,7 +15,7 @@
     @if(isset($stokError) && $stokError)
         <div class="alert alert-warning">
             Beberapa produk di keranjang sudah tidak tersedia atau stok berubah.
-            Silakan sesuaikan jumlah sebelum checkout.
+            Silakan sesuaikan jumlah sebelum melanjutkan pembayaran.
         </div>
     @endif
 
@@ -191,7 +191,7 @@
             @else
                 <a href="{{ route('pesanan.checkoutForm') }}"
                    class="btn btn-dark mt-3 w-100">
-                    Checkout Sekarang
+                    Lanjut ke Pembayaran
                 </a>
             @endif
         </div>

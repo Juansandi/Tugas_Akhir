@@ -145,7 +145,7 @@ $laporanOpen = isActive(['laporan.*','admin.laporan.*','admin.price_histories.*'
     <a href="{{ route('admin.dashboard') }}"
        class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
         <i class="bi bi-speedometer2"></i>
-        <span>Dashboard</span>
+        <span>Beranda</span>
     </a>
 
     {{-- PRODUK --}}
@@ -192,7 +192,7 @@ $laporanOpen = isActive(['laporan.*','admin.laporan.*','admin.price_histories.*'
     <a href="{{ route('admin.refund.index') }}"
        class="{{ request()->routeIs('admin.refund.*') ? 'active' : '' }}">
         <i class="bi bi-arrow-counterclockwise"></i>
-        <span>Refund</span>
+        <span>Pengembalian Dana</span>
     </a>
 
     {{-- PENGGUNA --}}
@@ -212,7 +212,7 @@ $laporanOpen = isActive(['laporan.*','admin.laporan.*','admin.price_histories.*'
     <div class="collapse submenu {{ $laporanOpen ? 'show' : '' }}" id="menuLaporan">
         <a href="{{ route('admin.laporan.index') }}">Penjualan</a>
         <a href="{{ route('admin.laporan.detail') }}">Detail</a>
-        <a href="{{ route('admin.laporan.refund') }}">Refund</a>
+        <a href="{{ route('admin.laporan.refund') }}">Pengembalian Dana</a>
         <a href="{{ route('admin.laporan.produk_terlaris') }}">Produk</a>
         <a href="{{ route('admin.laporan.paket_terlaris') }}">Paket</a>
         <a href="{{ route('admin.price_histories.index') }}">Histori Harga</a>
@@ -315,7 +315,7 @@ $laporanOpen = isActive(['laporan.*','admin.laporan.*','admin.price_histories.*'
 
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li class="dropdown-item-text">
-                        Role:
+                        Peran:
                         <span class="badge bg-{{ auth()->user()->role === 'super_admin' ? 'danger' : 'primary' }}">
                             {{ auth()->user()->role }}
                         </span>
@@ -324,7 +324,7 @@ $laporanOpen = isActive(['laporan.*','admin.laporan.*','admin.price_histories.*'
                     <li>
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button class="dropdown-item text-danger">Logout</button>
+                            <button class="dropdown-item text-danger">Keluar</button>
                         </form>
                     </li>
                 </ul>

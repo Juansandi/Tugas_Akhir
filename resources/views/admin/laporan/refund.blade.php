@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-4">
 
-    <h4 class="fw-bold mb-4">Laporan Refund</h4>
+    <h4 class="fw-bold mb-4">Laporan Pengembalian Dana</h4>
 
     <form method="GET" class="row g-3 mb-4">
         <div class="col-md-4">
@@ -21,18 +21,18 @@
         <div class="col-md-4 d-flex align-items-end gap-2">
             <button class="btn btn-primary w-100">Filter</button>
             <a href="{{ route('admin.laporan.refund') }}"
-            class="btn btn-secondary w-100">Reset</a>
+            class="btn btn-secondary w-100">Atur Ulang</a>
         </div>
     </form>
 
     <a href="{{ route('admin.laporan.refund.pdf', request()->query()) }}"
     class="btn btn-danger mb-3">
-    🧾 Download PDF
+    🧾 Unduh PDF
     </a>
 
     <div class="card shadow-sm mb-4">
         <div class="card-body">
-            <h6>Total Refund</h6>
+            <h6>Total Pengembalian Dana</h6>
             <h4 class="fw-bold text-danger">
                 Rp {{ number_format($totalRefund,0,',','.') }}
             </h4>
@@ -47,9 +47,9 @@
         <table class="table table-bordered align-middle">
             <thead class="table-light text-center">
                 <tr>
-                    <th>ID Refund</th>
+                    <th>ID Pengembalian</th>
                     <th>Pesanan</th>
-                    <th>Customer</th>
+                    <th>Pembeli</th>
                     <th>Nominal</th>
                     <th>Tanggal</th>
                 </tr>
@@ -68,7 +68,7 @@
                     @empty
                     <tr>
                         <td colspan="5" class="text-center text-muted">
-                            Tidak ada refund
+                            Tidak ada data pengembalian dana.
                         </td>
                     </tr>
                 @endforelse

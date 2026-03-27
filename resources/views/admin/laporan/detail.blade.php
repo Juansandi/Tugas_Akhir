@@ -7,7 +7,7 @@
 
     <h2 class="mb-4">Laporan Detail Penjualan</h2>
     <small class="text-muted">
-        *Nilai penjualan belum dikurangi refund
+        *Nilai penjualan belum dikurangi pengembalian dana
     </small>
 
     {{-- FILTER TANGGAL --}}
@@ -34,7 +34,7 @@
             </button>
             <a href="{{ route('admin.laporan.detail') }}"
                class="btn btn-secondary w-100">
-                Reset
+                Atur Ulang
             </a>
         </div>
     </form>
@@ -42,7 +42,7 @@
     {{-- TOMBOL DOWNLOAD PDF --}}
     <a href="{{ route('admin.laporan.detail.pdf', request()->query()) }}"
         class="btn btn-danger mb-3">
-            🧾 Download PDF
+            🧾 Unduh PDF
     </a>
 
     <div class="card shadow-sm">
@@ -54,9 +54,9 @@
                         <th>No</th>
                         <th>ID Pesanan</th>
                         <th>Tanggal</th>
-                        <th>Item</th>
+                        <th>Produk</th>
                         <th>Jenis</th>
-                        <th>Qty</th>
+                        <th>Jumlah</th>
                         <th>Harga (Rp)</th>
                         <th>Subtotal (Rp)</th>
                     </tr>

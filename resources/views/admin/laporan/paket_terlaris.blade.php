@@ -24,7 +24,7 @@
         <div class="col-md-4 d-flex align-items-end gap-2">
             <button class="btn btn-primary w-100">Filter</button>
             <a href="{{ route('admin.laporan.paket_terlaris') }}"
-               class="btn btn-secondary w-100">Reset</a>
+               class="btn btn-secondary w-100">Atur Ulang</a>
         </div>
     </form>
 
@@ -32,7 +32,7 @@
     <div class="mb-3">
         <a href="{{ route('admin.laporan.paket_terlaris_pdf', request()->query()) }}"
            class="btn btn-danger">
-            🧾 Download PDF
+            🧾 Unduh PDF
         </a>
     </div>
 

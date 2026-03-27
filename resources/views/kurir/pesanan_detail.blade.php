@@ -36,7 +36,7 @@
     {{-- Nama Customer --}}
     <div class="card mb-3">
         <div class="card-body">
-            <h6>Nama Customer</h6>
+            <h6>Nama Pembeli</h6>
             <p class="mb-0 fw-semibold">
                 {{ $tugas->pesanan->pengguna->username ?? '-' }}
             </p>

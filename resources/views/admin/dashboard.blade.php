@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-4">
 
-    <h2 class="fw-bold mb-4">Dashboard Admin</h2>
+    <h2 class="fw-bold mb-4">Beranda Admin</h2>
 
     {{-- ===================== --}}
     {{-- ZONA 1 : STATISTIK --}}
@@ -60,7 +60,7 @@
             <div class="card border-danger shadow-sm h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-arrow-counterclockwise fs-2 text-danger mb-2"></i>
-                    <h6 class="text-danger mb-1">Refund Bulan Ini</h6>
+                    <h6 class="text-danger mb-1">Pengembalian Dana Bulan Ini</h6>
                     <h4 class="fw-bold text-danger">- Rp {{ number_format($totalRefundBulanIni,0,',','.') }}</h4>
                 </div>
             </div>

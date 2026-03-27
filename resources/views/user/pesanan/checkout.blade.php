@@ -29,7 +29,7 @@
         @endforelse
 
         {{-- ITEM --}}
-        <h5>Item dalam Keranjang</h5>
+        <h5>Barang dalam Keranjang</h5>
 
         @php
             $subtotal = 0;
