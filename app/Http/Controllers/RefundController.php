@@ -34,7 +34,7 @@ class RefundController extends Controller
             return back()->with('error', 'Refund untuk pesanan ini sudah diajukan.');
         }
 
-        $jamSejakSelesai = Carbon::parse($pesanan->updated_at)->diffInHours(now());
+        $jamSejakSelesai = Carbon::parse($pesanan->selesai_at)->diffInHours(now());
 
         if ($jamSejakSelesai > self::REFUND_WINDOW_HOURS) {
             return back()->with(

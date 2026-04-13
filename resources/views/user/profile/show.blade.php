@@ -54,7 +54,7 @@
 
         <div class="d-flex gap-2 mt-4">
             <button type="button" class="btn btn-outline-primary flex-grow-1" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                <i class="bi bi-pencil-square me-2"></i> Edit Profil
+                <i class="bi bi-pencil-square me-2"></i> Ubah Profil
             </button>
             <button type="button" class="btn btn-outline-secondary flex-grow-1" data-bs-toggle="modal" data-bs-target="#editPasswordModal">
                 <i class="bi bi-key me-2"></i> Ubah Password

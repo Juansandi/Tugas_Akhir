@@ -28,11 +28,11 @@
                             $kurirUnread = optional($order->chatKurirUnreadForUser)->unread_count ?? 0;
 
                             // ===== REFUND WINDOW 24 JAM (ANTI DESIMAL) =====
-                            if ($order->status === 'selesai') {
-                                $lewatMenit = $order->updated_at->diffInMinutes(now());
+                            if ($order->status === 'selesai' && $order->selesai_at) {
+                                $lewatMenit = $order->selesai_at->diffInMinutes(now());
                                 $sisaJam = max(0, floor((24 * 60 - $lewatMenit) / 60));
                             } else {
-                                $sisaJam = null;
+                                $sisaJam = 0;
                             }
                         @endphp
                         <tr>

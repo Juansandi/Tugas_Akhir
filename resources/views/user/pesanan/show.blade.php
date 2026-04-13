@@ -91,7 +91,7 @@
             @if($pesanan->status === 'selesai')
                 @php
                     // ===== REFUND WINDOW 24 JAM (ANTI DESIMAL) =====
-                    $lewatMenit = $pesanan->updated_at->diffInMinutes(now());
+                    $lewatMenit = $pesanan->selesai_at->diffInMinutes(now());
                     $sisaJam   = max(0, floor((24 * 60 - $lewatMenit) / 60));
                 @endphp
 
