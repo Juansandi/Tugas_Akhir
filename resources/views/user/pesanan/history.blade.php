@@ -73,7 +73,7 @@
                                     {{-- COUNTDOWN --}}
                                     @if($sisaJam > 0 && !$order->refund)
                                         <span class="badge bg-warning text-dark d-block mb-1">
-                                            ⏱ Refund tersisa {{ $sisaJam }} jam
+                                            ⏱ Pengembalian Dana tersisa {{ $sisaJam }} jam
                                         </span>
                                     @endif
 
@@ -81,12 +81,12 @@
                                     @if(!$order->refund && $sisaJam > 0)
                                         <a href="{{ route('refund.create', ['pesanan_id' => $order->id]) }}"
                                         class="btn btn-outline-warning btn-sm w-100 mb-1">
-                                            Ajukan Refund
+                                            Ajukan Pengembalian Dana
                                         </a>
                                     @elseif($order->refund)
                                         <a href="{{ route('refund.show', $order->refund->id) }}"
                                         class="btn btn-outline-info btn-sm w-100 mb-1">
-                                            Detail Refund
+                                            Detail Pengembalian Dana
                                         </a>
                                     @endif
 

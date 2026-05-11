@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-4">
 
-    <h4 class="fw-bold mb-4">Daftar Pengajuan Refund</h4>
+    <h4 class="fw-bold mb-4">Daftar Pengajuan Pengembalian Dana</h4>
 
     @if($refunds->isEmpty())
         <div class="alert alert-info">

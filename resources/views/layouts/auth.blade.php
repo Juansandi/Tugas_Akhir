@@ -141,10 +141,9 @@
 
             <div class="collapse navbar-collapse" id="navbarAuth">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Blog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/">Beranda</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('user.products') }}">Produk</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('paket.index') }}">Paket</a></li>
                 </ul>
             </div>
         </nav>

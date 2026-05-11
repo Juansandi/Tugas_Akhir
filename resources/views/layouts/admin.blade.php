@@ -259,7 +259,8 @@ $laporanOpen = isActive(['laporan.*','admin.laporan.*','admin.price_histories.*'
                 </a>
 
                 {{-- DROPDOWN --}}
-                <ul class="dropdown-menu dropdown-menu-end p-0" style="width:300px">
+                <ul class="dropdown-menu dropdown-menu-end p-0"
+                    style="width:300px; max-height:400px; overflow-y:auto;">
 
                     {{-- HEADER --}}
                     <li class="px-3 py-2 border-bottom fw-semibold">

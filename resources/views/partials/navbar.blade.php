@@ -54,10 +54,6 @@
                     <a class="nav-link" href="{{ route('paket.index') }}">Paket</a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Tentang</a>
-                </li>
-
                 {{-- WISHLIST --}}
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('wishlist.index') }}">
