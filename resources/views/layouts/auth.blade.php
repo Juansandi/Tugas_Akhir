@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') - Toko Beras & Sayur</title>
+    <title>@yield('title') - Toko Bahan Pokok</title>
 
     {{-- Bootstrap CSS --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -121,6 +121,21 @@
             font-size:0.9rem;
             color: #adb5bd;
         }
+
+        /* Field valid tetap normal */
+.was-validated .form-control:valid,
+.form-control.is-valid {
+    border-color: #dee2e6 !important;
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+/* Field tidak valid */
+.was-validated .form-control:invalid,
+.form-control.is-invalid {
+    background-image: none !important;
+    box-shadow: none !important;
+}
     </style>
 </head>
 
@@ -131,7 +146,7 @@
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-light">
             <a class="navbar-brand fw-bold" href="/">
-                Toko Beras & Sayur
+                Toko Bahan Pokok
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
@@ -162,47 +177,26 @@
     <div class="container">
         <div class="row">
 
-            <div class="col-md-3 mb-3">
-                <h5 class="fw-bold">Toko Beras & Sayur</h5>
-                <p class="small">
-                    Jl. Babarsari 3<br>
-                    Yogyakarta, Indonesia
-                </p>
-                <p class="small">
-                    Email: tokoberassayur@gmail.com<br>
-                    Telp: +62 812-3456-7890
+            <div class="col-md-6">
+                <h5 class="fw-bold">Toko Bahan Pokok</h5>
+                <p class="small mb-0">
+                    Sistem Informasi Pengelolaan Transaksi Bahan Pokok Berbasis Website.
                 </p>
             </div>
 
-            <div class="col-md-3 mb-3">
-                <h6>Home</h6>
-                <ul class="list-unstyled small">
-                    <li><a href="#">Tentang Kami</a></li>
-                    <li><a href="#">Visi & Misi</a></li>
-                    <li><a href="#">Testimoni</a></li>
-                </ul>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                <p class="small mb-0">
+                    Email: tokobahanpokok@gmail.com
+                </p>
+                <p class="small mb-0">
+                    Telepon: +62 812-3456-7890
+                </p>
             </div>
 
-            <div class="col-md-3 mb-3">
-                <h6>Products</h6>
-                <ul class="list-unstyled small">
-                    <li><a href="#">Beras</a></li>
-                    <li><a href="#">Sayuran</a></li>
-                    <li><a href="#">Paket Hemat</a></li>
-                </ul>
-            </div>
-
-            <div class="col-md-3 mb-3">
-                <h6>Legal</h6>
-                <ul class="list-unstyled small">
-                    <li><a href="#">Kebijakan Privasi</a></li>
-                    <li><a href="#">Syarat & Ketentuan</a></li>
-                </ul>
-            </div>
         </div>
 
         <div class="border-top pt-3 mt-3 text-center small">
-            © {{ date('Y') }} Toko Beras & Sayur. All rights reserved.
+            © {{ date('Y') }} Toko Bahan Pokok. Seluruh hak cipta dilindungi.
         </div>
     </div>
 </footer>
@@ -216,6 +210,23 @@
         input.type = input.type === "password" ? "text" : "password";
     }
 </script>
+<script>
+(() => {
+    'use strict';
 
+    const forms = document.querySelectorAll('.needs-validation');
+
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            form.classList.add('was-validated');
+        });
+    });
+})();
+</script>
 </body>
 </html>

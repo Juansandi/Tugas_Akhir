@@ -14,28 +14,44 @@
                 Silakan masuk ke akun Anda
             </p>
 
-            <form method="POST" action="{{ route('login') }}">  
+            @if($errors->has('login'))
+                <div class="text-danger small mb-3">
+                    <i class="bi bi-exclamation-circle me-1"></i>
+                    {{ $errors->first('login') }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}" class="needs-validation" novalidate>  
                 @csrf
 
                 {{-- Username --}}
                 <div class="mb-3">
-                    <label class="form-label small text-muted">Username</label>
+                    <label class="form-label small text-muted">Nama Pengguna</label>
                     <input type="text"
-                           class="form-control form-control-lg"
-                           name="username"
-                           placeholder="Masukan username Anda"
-                           required>
+                        class="form-control form-control-lg"
+                        name="username"
+                        value="{{ old('username') }}"
+                        placeholder="Masukkan nama pengguna Anda"
+                        required>
+
+                    <div class="invalid-feedback">
+                        Nama pengguna wajib diisi.
+                    </div>
                 </div>
 
                 {{-- Password --}}
                 <div class="mb-3 password-container">
-                    <label class="form-label small text-muted">Password</label>
+                    <label class="form-label small text-muted">Kata Sandi</label>
                     <input type="password"
-                           class="form-control form-control-lg"
-                           id="password"
-                           name="password"
-                           placeholder="Masukan password Anda"
-                           required>
+                        class="form-control form-control-lg"
+                        id="password"
+                        name="password"
+                        placeholder="Masukkan kata sandi Anda"
+                        required>
+
+                    <div class="invalid-feedback">
+                        Kata sandi wajib diisi.
+                    </div>
                     <button type="button" class="password-toggle"
                             onclick="togglePassword('password')">
                         <i class="bi bi-eye"></i>
@@ -49,9 +65,6 @@
                     </button>
                 </div>
 
-                <div class="text-end mt-3">
-                    <a href="#" class="auth-link">Lupa Password?</a>
-                </div>
             </form>
 
             <hr class="my-4">

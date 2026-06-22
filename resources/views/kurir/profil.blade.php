@@ -21,7 +21,7 @@
             <button class="btn btn-sm btn-secondary"
                     data-bs-toggle="modal"
                     data-bs-target="#editPasswordKurirModal">
-                🔐 Ubah Password
+                🔐 Ubah Kata Sandi
             </button>
         </div>
     </div>
@@ -43,7 +43,7 @@
 
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Username</label>
+            <label class="form-label">Nama Pengguna</label>
             <input type="text"
                    name="username"
                    class="form-control"
@@ -82,13 +82,13 @@
 
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Ubah Password</h5>
+          <h5 class="modal-title">Ubah Kata Sandi</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
 
         <div class="modal-body">
           <div class="mb-3">
-            <label class="form-label">Password Lama</label>
+            <label class="form-label">Kata Sandi Lama</label>
             <input type="password"
                    name="password_lama"
                    class="form-control"
@@ -96,7 +96,7 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Password Baru</label>
+            <label class="form-label">Kata Sandi Baru</label>
             <input type="password"
                    name="password_baru"
                    class="form-control"
@@ -104,7 +104,7 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Konfirmasi Password Baru</label>
+            <label class="form-label">Konfirmasi Kata Sandi Baru</label>
             <input type="password"
                    name="password_baru_confirmation"
                    class="form-control"

@@ -144,7 +144,7 @@
                                 <div class="d-flex justify-content-between">
                                     <strong>{{ $review->user->username ?? 'Anonim' }}</strong>
                                     <small class="text-muted">
-                                        {{ $review->created_at->diffForHumans() }}
+                                        {{ $review->created_at->format('d/m/Y H:i') }}
                                     </small>
                                 </div>
 

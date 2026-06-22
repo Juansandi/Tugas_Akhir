@@ -39,7 +39,7 @@
 
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button class="btn btn-success">Update</button>
+        <button class="btn btn-success">Ubah</button>
       </div>
     </form>
   </div>

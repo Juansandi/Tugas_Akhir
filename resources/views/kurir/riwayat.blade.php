@@ -34,7 +34,7 @@
         @if($item->pesanan->chatKurir)
             <a href="{{ route('kurir.chat.show', $item->pesanan->chatKurir->id) }}"
             class="btn btn-sm btn-outline-success">
-                💬 Chat
+                💬 Pesan
             </a>
         @endif
 

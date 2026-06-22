@@ -109,7 +109,7 @@
                                     @csrf
                                     <button type="submit"
                                             class="btn btn-sm btn-outline-danger"
-                                            title="Tambah Wishlist">
+                                            title="Tambah Favorit">
                                         <i class="bi bi-heart"></i>
                                     </button>
                                 </form>

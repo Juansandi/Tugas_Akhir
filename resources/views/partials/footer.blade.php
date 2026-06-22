@@ -3,9 +3,8 @@
         <div class="row">
             <!-- Brand Description -->
             <div class="col-md-4 mb-4">
-                <a class="navbar-brand" href="{{ route('home') }}">
-                <img src="{{ asset('images/FreshGO.png') }}" alt="TokoSayur" height="50"></a>
-                <p class="small">Belanja beras dan sayur segar langsung dari petani lokal. Kualitas terbaik, harga terjangkau, dan pengiriman cepat ke rumah Anda.</p>
+                <h4 class="fw-bold mb-3">Toko Bahan Pokok</h4>
+                <p class="small">Sistem Informasi Pengelolaan Transaksi Bahan Pokok Berbasis Website yang memudahkan pelanggan melakukan pembelian kebutuhan pokok secara daring.</p>
             </div>
 
             <!-- Quick Links -->

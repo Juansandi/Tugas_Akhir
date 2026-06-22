@@ -59,7 +59,7 @@
                         @if($chat)
                             <a href="{{ route('kurir.chat.show', $chat->id) }}"
                             class="btn btn-sm btn-outline-success position-relative">
-                                💬 Chat
+                                💬 Pesan
 
                                 @if($unread > 0)
                                     <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">

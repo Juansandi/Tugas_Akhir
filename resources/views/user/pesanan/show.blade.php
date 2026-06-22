@@ -50,7 +50,7 @@
                                 'type' => 'admin'
                             ]) }}"
                        class="btn btn-outline-primary position-relative">
-                        💬 Chat Admin
+                        💬 Pesan Admin
                         @if(optional($pesanan->chatAdminUnreadForUser)->unread_count > 0)
                             <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
                                 {{ $pesanan->chatAdminUnreadForUser->unread_count }}
@@ -65,7 +65,7 @@
                                 'type' => 'kurir'
                             ]) }}"
                     class="btn btn-outline-success position-relative">
-                        🚚 Chat Kurir
+                        🚚 Pesan Kurir
                         @if(optional($pesanan->chatKurirUnreadForUser)->unread_count > 0)
                             <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
                                 {{ $pesanan->chatKurirUnreadForUser->unread_count }}

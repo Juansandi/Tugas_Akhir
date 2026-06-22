@@ -47,7 +47,7 @@
         <a href="{{ route('admin.chat.show', $pesanan->chatAdmin->id) }}"
         class="btn btn-outline-primary btn-sm position-relative">
 
-            💬 Chat Customer
+            💬 Pesan Pembeli
 
             @if($pesanan->chatAdmin->unread_count > 0)
                 <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">

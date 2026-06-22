@@ -28,7 +28,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Merk</label>
+                    <label class="form-label">Merek</label>
                     <input type="text" name="jenis" class="form-control">
                 </div>
 

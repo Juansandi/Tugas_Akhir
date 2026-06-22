@@ -1,10 +1,10 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Paket')
+@section('title', 'Ubah Paket')
 
 @section('content')
 <div class="container">
-    <h4 class="mb-4">Edit Paket</h4>
+    <h4 class="mb-4">Ubah Paket</h4>
 
     <form action="{{ route('admin.paket.update', $paket->id) }}"
           method="POST" enctype="multipart/form-data">
@@ -108,7 +108,7 @@
         {{-- HIDDEN INPUT --}}
         <div id="itemsContainer"></div>
 
-        <button class="btn btn-primary mt-3">Update Paket</button>
+        <button class="btn btn-primary mt-3">Ubah Paket</button>
     </form>
 </div>
 @endsection

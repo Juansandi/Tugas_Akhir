@@ -1,6 +1,6 @@
 @extends('layouts.kurir')
 
-@section('title', 'Chat Customer')
+@section('title', 'Pesan Pemebeli')
 
 <style>
 .chat-wrapper {
@@ -35,7 +35,7 @@
     {{-- HEADER --}}
     <div class="d-flex justify-content-between mb-3">
         <div>
-            <h5 class="mb-0">💬 Chat Customer</h5>
+            <h5 class="mb-0">💬 Pesan Pembeli</h5>
             <small class="text-muted">Pesanan #{{ $pesanan->id }}</small>
         </div>
 
@@ -75,7 +75,7 @@
     @else
         @if(!$isReadOnly && $pesanan->status === 'selesai')
             <div class="alert alert-warning py-2">
-            💬 Chat masih aktif hingga 24 jam setelah pesanan selesai.
+            💬 Pesan masih aktif hingga 24 jam setelah pesanan selesai.
             </div>
         @endif
         <form action="{{ route('chat.send', $chat->id) }}" method="POST">

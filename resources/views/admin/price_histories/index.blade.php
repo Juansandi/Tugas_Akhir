@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'Histori Perubahan Harga')
+@section('title', 'Riwayat Perubahan Harga')
 
 @section('content')
 <div class="container py-4">
 
-    <h2 class="mb-4">Histori Perubahan Harga</h2>
+    <h2 class="mb-4">Riwayat Perubahan Harga</h2>
 
     <div class="card shadow-sm">
         <div class="card-body">
@@ -35,7 +35,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="text-center text-muted">
-                                Belum ada histori perubahan harga
+                                Belum ada riwayat perubahan harga
                             </td>
                         </tr>
                     @endforelse

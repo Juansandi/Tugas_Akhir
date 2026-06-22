@@ -46,7 +46,7 @@
                                 data-alamat="{{ $alamat->alamat }}"
                                 data-telp="{{ $alamat->no_telp }}"
                                 data-default="{{ $alamat->is_default }}">
-                            Edit
+                            Ubah
                         </button>
 
                         <form action="{{ route('alamat.destroy', $alamat->id) }}"

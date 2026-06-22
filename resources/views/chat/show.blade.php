@@ -44,7 +44,7 @@ $isReadOnly = !$pesanan->chatMasihAktif();
     <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h5 class="mb-0">
-                💬 Chat {{ $type === 'admin' ? 'Admin' : 'Kurir' }}
+                💬 Pesan {{ $type === 'admin' ? 'Admin' : 'Kurir' }}
             </h5>
             <small class="text-muted">
                 Pesanan #{{ $pesanan->id }}

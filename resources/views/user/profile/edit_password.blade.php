@@ -4,7 +4,7 @@
     <form action="{{ route('profile.updatePassword') }}" method="POST" class="modal-content">
         @csrf
         <div class="modal-header">
-            <h5 class="modal-title" id="editPasswordModalLabel">Ubah Password</h5>
+            <h5 class="modal-title" id="editPasswordModalLabel">Ubah Kata Sandi</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
 
@@ -24,7 +24,7 @@
             @endif
 
             <div class="mb-3">
-                <label for="current_password" class="form-label">Password Lama</label>
+                <label for="current_password" class="form-label">Kata Sandi Lama</label>
                 <input type="password" name="current_password" id="current_password" class="form-control" required>
                 @error('current_password')
                     <small class="text-danger">{{ $message }}</small>
@@ -32,7 +32,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="new_password" class="form-label">Password Baru</label>
+                <label for="new_password" class="form-label">Kata Sandi Baru</label>
                 <input type="password" name="new_password" id="new_password" class="form-control" required>
                 @error('new_password')
                     <small class="text-danger">{{ $message }}</small>
@@ -40,11 +40,11 @@
             </div>
 
             <div class="mb-3">
-                <label for="new_password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                <label for="new_password_confirmation" class="form-label">Konfirmasi Kata Sandi Baru</label>
                 <input type="password" name="new_password_confirmation" id="new_password_confirmation" class="form-control" required>
             </div>
         </div>
 
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-            <button type="submit" class="btn btn-primary">Simpan Password Baru</button>
+            <button type="submit" class="btn btn-primary">Simpan Kata Sandi Baru</button>

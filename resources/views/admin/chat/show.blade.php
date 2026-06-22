@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Chat Pesanan')
+@section('title', 'Pesan Pesanan')
 
 @section('content')
 
@@ -36,7 +36,7 @@
     {{-- HEADER --}}
     <div class="d-flex justify-content-between mb-3">
         <div>
-            <h5 class="mb-0">💬 Chat Customer</h5>
+            <h5 class="mb-0">💬 Pesan Pembeli</h5>
             <small class="text-muted">Pesanan #{{ $pesanan->id }}</small>
             @if($isReadOnly)
                 <span class="badge bg-secondary ms-2">Read Only</span>

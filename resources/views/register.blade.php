@@ -11,20 +11,23 @@
 
             <h2 class="fw-bold mb-2">Buat Akun ✨</h2>
             <p class="text-muted mb-4">
-                Silakan isi formulir di bawah untuk mendaftar
+                Lengkapi data berikut untuk membuat akun baru
             </p>
 
-            <form method="POST" action="{{ route('register') }}">
+            <form method="POST" action="{{ route('register') }}" class="needs-validation" novalidate>
                 @csrf
 
                 {{-- Username --}}
                 <div class="mb-3">
-                    <label class="form-label small text-muted">Username</label>
+                    <label class="form-label small text-muted">Nama Pengguna</label>
                     <input type="text"
                            class="form-control form-control-lg"
                            name="username"
-                           placeholder="Masukan username Anda"
+                           placeholder="Masukan nama pengguna Anda"
                            required>
+                    <div class="invalid-feedback">
+                        Nama pengguna wajib diisi.
+                    </div>
                 </div>
 
                 {{-- Email --}}
@@ -35,27 +38,36 @@
                            name="email"
                            placeholder="Masukan email Anda"
                            required>
+                    <div class="invalid-feedback">
+                        Email wajib diisi.  
+                    </div>
                 </div>
 
                 {{-- Phone --}}
                 <div class="mb-3">
-                    <label class="form-label small text-muted">Phone Number</label>
+                    <label class="form-label small text-muted">Nomor Telepon</label>
                     <input type="text"
                            class="form-control form-control-lg"
                            name="no_telp"
                            placeholder="e.g. 08123456789"
                            required>
+                    <div class="invalid-feedback">
+                        Nomor telepon wajib diisi.
+                    </div>
                 </div>
 
                 {{-- Password --}}
                 <div class="mb-3 password-container">
-                    <label class="form-label small text-muted">Password</label>
+                    <label class="form-label small text-muted">Kata Sandi</label>
                     <input type="password"
                            class="form-control form-control-lg"
                            id="password"
                            name="password"
-                           placeholder="Masukan password Anda"
+                           placeholder="Masukan kata sandi Anda"
                            required>
+                    <div class="invalid-feedback">
+                        Kata sandi wajib diisi.
+                    </div>
                     <button type="button"
                             class="password-toggle"
                             onclick="togglePassword('password')">
@@ -65,13 +77,16 @@
 
                 {{-- Confirm Password --}}
                 <div class="mb-3 password-container">
-                    <label class="form-label small text-muted">Confirm Password</label>
+                    <label class="form-label small text-muted">Konfirmasi Kata Sandi</label>
                     <input type="password"
                            class="form-control form-control-lg"
                            id="confirm_password"
                            name="password_confirmation"
-                           placeholder="Masukan ulang password Anda"
+                           placeholder="Masukan ulang kata sandi Anda"
                            required>
+                    <div class="invalid-feedback">
+                        Konfirmasi kata sandi wajib diisi.
+                    </div>
                     <button type="button"
                             class="password-toggle"
                             onclick="togglePassword('confirm_password')">
@@ -79,18 +94,6 @@
                     </button>
                 </div>
 
-                {{-- Terms --}}
-                <div class="mb-3 form-check">
-                    <input type="checkbox"
-                           class="form-check-input"
-                           id="terms"
-                           required>
-                    <label class="form-check-label small" for="terms">
-                        I agree to the
-                        <a href="#" class="auth-link">Terms of Service</a> and
-                        <a href="#" class="auth-link">Privacy Policy</a>
-                    </label>
-                </div>
 
                 {{-- Button --}}
                 <div class="d-grid mt-4">

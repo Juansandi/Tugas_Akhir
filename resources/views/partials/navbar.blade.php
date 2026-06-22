@@ -18,13 +18,38 @@
         padding-top: 8px;
         padding-bottom: 8px;
     }
+
+    .navbar {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #fff !important;
+    }
+
+    .navbar .nav-link {
+        color: rgba(255,255,255,0.9) !important;
+        font-weight: 500;
+    }
+
+    .navbar .nav-link:hover,
+    .navbar .nav-link:focus {
+        color: #fff !important;
+    }
+
+    .navbar .nav-link.active {
+        color: #fff !important;
+    }
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
     <div class="container">
         {{-- LOGO --}}
-        <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
-            <img src="{{ asset('images/FreshGO.png') }}" alt="FreshGO" height="40">
+        <a class="navbar-brand fw-bold" href="{{ route('home') }}">
+            Toko Bahan Pokok
         </a>
 
         {{-- TOGGLER --}}

@@ -129,7 +129,31 @@ class ProdukController extends Controller
             }
 
             $product->update($data);
+            // =====================
+            // HAPUS UKURAN YANG DIHILANGKAN
+            // =====================
+            $submittedIds = collect($request->sizes ?? [])
+                ->pluck('id')
+                ->filter()
+                ->toArray();
 
+            $deletedSizes = $product->sizes()
+                ->whereNotIn('id', $submittedIds)
+                ->get();
+
+            foreach ($deletedSizes as $size) {
+
+                if (
+                    $size->detailTransaksiProduks()->exists() ||
+                    $size->carts()->exists()
+                ) {
+                    throw new \Exception(
+                        "Ukuran {$size->size} tidak dapat dihapus karena sudah digunakan."
+                    );
+                }
+
+                $size->delete();
+}
             // =====================
             // UPDATE UKURAN + HISTORI HARGA
             // =====================

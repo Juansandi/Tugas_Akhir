@@ -78,7 +78,7 @@
                     <div class="mt-auto d-flex gap-2">
                         <a href="{{ route('admin.paket.edit', $paket->id) }}"
                            class="btn btn-outline-primary btn-sm w-100">
-                            <i class="bi bi-pencil"></i> Edit
+                            <i class="bi bi-pencil"></i> Ubah
                         </a>
 
                         <form action="{{ route('admin.paket.destroy', $paket->id) }}"

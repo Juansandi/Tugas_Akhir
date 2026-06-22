@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Wishlist Saya')
+@section('title', 'Favorit Saya')
 
 @section('content')
 <div class="container py-5">
-    <h2 class="mb-4">Wishlist Saya</h2>
+    <h2 class="mb-4">Favorit Saya</h2>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -12,7 +12,7 @@
 
     @if($wishlistItems->isEmpty())
         <div class="text-center">
-            <p class="text-muted">Wishlist kamu masih kosong.</p>
+            <p class="text-muted">Favorit kamu masih kosong.</p>
         </div>
     @else
         <div class="row">

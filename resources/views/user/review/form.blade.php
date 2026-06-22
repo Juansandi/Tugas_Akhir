@@ -48,7 +48,7 @@
 
                 {{-- RATING --}}
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Rating</label>
+                    <label class="form-label fw-semibold">Penilaian Produk</label>
                     <div class="d-flex gap-2">
                         @for ($i = 5; $i >= 1; $i--)
                             <input type="radio"

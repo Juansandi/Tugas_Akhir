@@ -26,7 +26,7 @@ class LoginController extends Controller
         if ($pengguna && Hash::check($request->password, $pengguna->password)) {
             if (!$pengguna->is_active) {
                 return back()->withErrors([
-                    'username' => 'Akun Anda telah dinonaktifkan oleh administrator.'
+                    'login' => 'Akun Anda telah dinonaktifkan oleh administrator.'
                 ]);
             }
             
@@ -45,7 +45,7 @@ class LoginController extends Controller
         }
 
         return back()->withErrors([
-            'username' => 'Username atau password salah.',
+            'login' => 'Nama pengguna atau kata sandi salah.',
         ]);
     }
 

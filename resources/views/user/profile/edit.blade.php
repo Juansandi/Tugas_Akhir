@@ -5,7 +5,7 @@
       @csrf
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="editProfileModalLabel">Edit Profil</h5>
+          <h5 class="modal-title" id="editProfileModalLabel">Ubah Profil</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
         <div class="modal-body">
@@ -14,7 +14,7 @@
           @endif
 
           <div class="mb-3">
-              <label for="username" class="form-label">Username</label>
+              <label for="username" class="form-label">Nama Pengguna</label>
               <input type="text" name="username" id="username" class="form-control" value="{{ $user->username }}" required>
           </div>
 

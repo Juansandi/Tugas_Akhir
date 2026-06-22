@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container py-4">
-    <h4>Checkout</h4>
+    <h4>Proses Pembayaran</h4>
 
     @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>

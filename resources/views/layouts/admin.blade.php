@@ -215,7 +215,7 @@ $laporanOpen = isActive(['laporan.*','admin.laporan.*','admin.price_histories.*'
         <a href="{{ route('admin.laporan.refund') }}">Pengembalian Dana</a>
         <a href="{{ route('admin.laporan.produk_terlaris') }}">Produk</a>
         <a href="{{ route('admin.laporan.paket_terlaris') }}">Paket</a>
-        <a href="{{ route('admin.price_histories.index') }}">Histori Harga</a>
+        <a href="{{ route('admin.price_histories.index') }}">Riwayat Harga</a>
     </div>
 
     {{-- SUPER ADMIN --}}
