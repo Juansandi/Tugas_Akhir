@@ -120,7 +120,7 @@
                     {{-- TOMBOL REFUND --}}
                     @if(!$pesanan->refund && $sisaJam > 0)
                         <a href="{{ route('refund.create', ['pesanan_id' => $pesanan->id]) }}"
-                           class="btn btn-outline-warning">
+                           class="btn btn-warning">
                             Ajukan Pengembalian Dana
                         </a>
                     @elseif($pesanan->refund)
@@ -197,8 +197,8 @@
 
                         @if($image)
                             <img src="{{ asset('storage/'.$image) }}"
-                                 style="width:64px;height:64px;object-fit:cover;border-radius:8px"
-                                 class="me-3">
+                                style="width:64px;height:64px;object-fit:cover;border-radius:8px"
+                                class="me-3">
                         @endif
 
                         <div>
@@ -207,6 +207,7 @@
                                     ? $item->paket->nama_paket
                                     : $item->produk->nama_produk }}
                             </div>
+
                             <small class="text-muted">
                                 Jumlah: {{ $item->quantity }}
                                 @if($item->type === 'produk')
@@ -216,28 +217,31 @@
                         </div>
                     </div>
 
-                    <div class="fw-semibold">
-                        Rp {{ number_format($item->price * $item->quantity,0,',','.') }}
-                    </div>
-                </div>
+                    <div class="text-end">
 
-                {{-- REVIEW --}}
-                @if($pesanan->status === 'selesai' && $item->type === 'produk' && !$pesanan->refund)
-                    <div class="mt-2">
-                        @if(in_array($item->produk_id, $reviewedProdukIds))
-                            <span class="badge bg-success">⭐ Sudah diulas</span>
-                        @else
-                            <a href="{{ route('review.form', [
-                                    'produk' => $item->produk_id,
-                                    'pesanan' => $pesanan->id
-                                ]) }}"
-                               class="btn btn-sm btn-outline-warning">
-                                ✍️ Beri Ulasan
-                            </a>
+                        <div class="fw-semibold mb-2">
+                            Rp {{ number_format($item->price * $item->quantity,0,',','.') }}
+                        </div>
+
+                        @if($pesanan->status === 'selesai' && $item->type === 'produk' && !$pesanan->refund)
+                            @if(in_array($item->produk_id, $reviewedProdukIds))
+                                <span class="badge bg-success">
+                                    Sudah diulas
+                                </span>
+                            @else
+                                <a href="{{ route('review.form', [
+                                        'produk' => $item->produk_id,
+                                        'pesanan' => $pesanan->id
+                                    ]) }}"
+                                class="btn btn-sm btn-outline-success">
+                                    ✍️ Beri Ulasan
+                                </a>
+                            @endif
                         @endif
-                    </div>
-                @endif
 
+                    </div>
+
+                </div>
             @endforeach
         </div>
     </div>

@@ -4,7 +4,7 @@
 <div class="container py-4" style="max-width:720px">
 
     <h4 class="fw-bold mb-3">
-        Detail Refund
+        Detail Pengembalian Dana
         <span class="text-muted">Pesanan #{{ $refund->pesanan->id }}</span>
     </h4>
 
@@ -30,15 +30,15 @@
             {{-- INFO REFUND --}}
             <table class="table table-borderless mb-0">
                 <tr>
-                    <td width="180" class="text-muted">Alasan Refund</td>
+                    <td width="180" class="text-muted">Alasan Pengembalian Dana</td>
                     <td class="fw-semibold">{{ $refund->alasan }}</td>
                 </tr>
                 <tr>
-                    <td class="text-muted">Metode Refund</td>
+                    <td class="text-muted">Metode Pengembalian Dana</td>
                     <td>{{ $refund->metode_refund }}</td>
                 </tr>
                 <tr>
-                    <td class="text-muted">Tujuan Pengembalian</td>
+                    <td class="text-muted">Tujuan Pengembalian Dana</td>
                     <td>{{ $refund->nomor_tujuan }}</td>
                 </tr>
                 <tr>

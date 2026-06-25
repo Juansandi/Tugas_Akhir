@@ -13,7 +13,7 @@
             <table class="table table-bordered align-middle text-center">
                 <thead class="table-dark">
                     <tr>
-                        <th>#</th>
+                        <th>ID</th>
                         <th>Tanggal</th>
                         <th>Status</th>
                         <th>Total Bayar</th>

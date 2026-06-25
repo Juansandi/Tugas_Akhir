@@ -4,7 +4,7 @@
 <div class="container py-4" style="max-width:720px">
 
     <h4 class="fw-bold mb-3">
-        Ajukan Refund
+        Ajukan Pengembalian Dana
         <span class="text-muted">Pesanan #{{ $pesanan->id }}</span>
     </h4>
 
@@ -18,14 +18,14 @@
     <div class="alert alert-warning d-flex align-items-start">
         <div class="me-2">⏱️</div>
         <div>
-            <strong>Batas waktu refund:</strong><br>
+            <strong>Batas waktu pengembalian dana:</strong><br>
             @if($sisaJam > 0)
-                Anda masih dapat mengajukan refund dalam
+                Anda masih dapat mengajukan pengembalian dana dalam
                 <strong>{{ $sisaJam }} jam</strong>
                 sejak pesanan dinyatakan selesai.
             @else
                 <span class="text-danger">
-                    Batas waktu pengajuan refund telah berakhir.
+                    Batas waktu pengajuan pengembalian dana telah berakhir.
                 </span>
             @endif
         </div>
@@ -34,7 +34,7 @@
     {{-- JIKA SUDAH LEWAT BATAS --}}
     @if($sisaJam <= 0)
         <div class="alert alert-secondary">
-            ⛔ Refund tidak dapat diajukan karena telah melewati batas waktu 1×24 jam.
+            ⛔ Pengembalian dana tidak dapat diajukan karena telah melewati batas waktu 1×24 jam.
         </div>
 
         <a href="{{ route('pesanan.show', $pesanan->id) }}"
@@ -56,7 +56,7 @@
             {{-- ALASAN --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">
-                    Alasan Refund <span class="text-danger">*</span>
+                    Alasan Pengembalian Dana <span class="text-danger">*</span>
                 </label>
                 <select name="alasan"
                         id="alasanSelect"
@@ -86,7 +86,7 @@
             {{-- BUKTI --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">
-                    Bukti Foto (opsional)
+                    Bukti Foto
                 </label>
                 <input type="file"
                        name="bukti_foto"
@@ -100,7 +100,7 @@
             {{-- METODE --}}
             <div class="mb-3">
                 <label class="form-label fw-semibold">
-                    Metode Refund <span class="text-danger">*</span>
+                    Metode Pengembalian Dana <span class="text-danger">*</span>
                 </label>
                 <select name="metode_refund"
                         class="form-select"
@@ -116,7 +116,7 @@
             {{-- NOMOR TUJUAN --}}
             <div class="mb-4">
                 <label class="form-label fw-semibold">
-                    Nomor Rekening / E-Wallet <span class="text-danger">*</span>
+                    Nomor Rekening / Dompet Digital <span class="text-danger">*</span>
                 </label>
                 <input type="text"
                        name="nomor_tujuan"
@@ -133,7 +133,7 @@
                 </a>
                 <button type="submit"
                         class="btn btn-primary w-50">
-                    Kirim Permintaan Refund
+                    Kirim Permintaan Pengembalian Dana
                 </button>
             </div>
 

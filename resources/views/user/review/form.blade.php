@@ -3,7 +3,7 @@
 @section('content')
 <div class="container py-4" style="max-width: 720px">
 
-    <h4 class="mb-4">✍️ Beri Review Produk</h4>
+    <h4 class="mb-4">Beri Ulasan Produk</h4>
 
     {{-- CARD PRODUK --}}
     <div class="card shadow-sm mb-4">
@@ -81,7 +81,7 @@
                         ← Kembali
                     </a>
                     <button type="submit" class="btn btn-primary px-4">
-                        Kirim Review
+                        Kirim Ulasan
                     </button>
                 </div>
 
