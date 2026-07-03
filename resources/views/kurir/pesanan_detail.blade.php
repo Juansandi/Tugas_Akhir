@@ -3,119 +3,158 @@
 @section('title', 'Detail Pesanan')
 
 @section('content')
+
+@php
+    $badge = match($tugas->status){
+        'aktif' => 'bg-primary',
+        'selesai' => 'bg-success',
+        default => 'bg-secondary'
+    };
+@endphp
+
 <div class="container py-4">
+    <div class="mb-4">
+        <h3 class="fw-bold mb-1">
+            Detail Pesanan #{{ $tugas->pesanan->id }}
+        </h3>
 
-    <h4 class="mb-3">
-        Detail Pesanan #{{ $tugas->pesanan->id }}
-    </h4>
+        <p class="text-muted mb-2">
+            Informasi lengkap pesanan yang menjadi tanggung jawab Anda.
+        </p>
 
-    {{-- STATUS --}}
-    <span class="badge bg-info mb-3">
-        {{ ucfirst($tugas->status) }}
-    </span>
+        <span class="badge {{ $badge }} fs-6 px-3 py-2">
+            {{ ucfirst($tugas->status) }}
+        </span>
+    </div>
 
-    {{-- WAKTU PENGANTARAN --}}
-    <div class="card mb-3 border-info">
+    {{-- Jadwal Pengiriman --}}
+    <div class="card shadow-sm border-info mb-3">
         <div class="card-body">
-            <h6>Waktu Pengantaran</h6>
+            <h6 class="fw-semibold mb-3">
+                <i class="bi bi-clock-history"></i>
+                Waktu Pengantaran
+            </h6>
 
-            @if ($tugas->pesanan->deliverySlot)
-                <p class="mb-0 fw-semibold text-info">
+            @if($tugas->pesanan->deliverySlot)
+                <span class="badge bg-info fs-6">
                     {{ substr($tugas->pesanan->deliverySlot->waktu_mulai,0,5) }}
-                    –
+                    -
                     {{ substr($tugas->pesanan->deliverySlot->waktu_selesai,0,5) }}
-                </p>
+                </span>
             @else
-                <p class="mb-0 text-muted">
+                <span class="text-muted">
                     Secepatnya
-                </p>
+                </span>
             @endif
         </div>
     </div>
 
-    {{-- Nama Customer --}}
-    <div class="card mb-3">
+    {{-- Pembeli --}}
+    <div class="card shadow-sm mb-3">
         <div class="card-body">
-            <h6>Nama Pembeli</h6>
-            <p class="mb-0 fw-semibold">
+            <h6 class="fw-semibold mb-3">
+                <i class="bi bi-person"></i>
+                Nama Pembeli
+            </h6>
+
+            <div class="fw-semibold">
                 {{ $tugas->pesanan->pengguna->username ?? '-' }}
-            </p>
+            </div>
         </div>
     </div>
 
-   {{-- ALAMAT PENGIRIMAN --}}
-    <div class="card mb-3">
+    {{-- Alamat --}}
+    <div class="card shadow-sm mb-3">
         <div class="card-body">
-            <h6>Alamat Pengiriman</h6>
+            <h6 class="fw-semibold mb-3">
+                <i class="bi bi-geo-alt"></i>
+                Alamat Pengiriman
+            </h6>
 
-            @if (!empty($tugas->pesanan->alamat_pengiriman))
-                <p class="mb-1">
+            @if(!empty($tugas->pesanan->alamat_pengiriman))
+                <div>
                     {{ $tugas->pesanan->alamat_pengiriman }}
-                </p>
-
-                @if (!empty($tugas->pesanan->no_telp_pengiriman))
+                </div>
+                @if(!empty($tugas->pesanan->no_telp_pengiriman))
                     <small class="text-muted">
-                        No. Telp: {{ $tugas->pesanan->no_telp_pengiriman }}
+                        No. Telepon :
+                        {{ $tugas->pesanan->no_telp_pengiriman }}
                     </small>
                 @endif
             @else
-                <p class="text-muted mb-0">
-                    Alamat pengiriman tidak tersedia
-                </p>
+                <span class="text-muted">
+
+                    Alamat tidak tersedia.
+                </span>
             @endif
         </div>
     </div>
 
-    {{-- PRODUK --}}
-    <div class="card mb-3">
+    {{-- Produk --}}
+    <div class="card shadow-sm mb-3">
         <div class="card-body">
-            <h6>Produk Pesanan</h6>
+            <h6 class="fw-semibold mb-3">
+                <i class="bi bi-box-seam"></i>
+                Produk Pesanan
+            </h6>
 
             <ul class="list-group list-group-flush">
-            @foreach($tugas->pesanan->detail as $item)
-                <li class="list-group-item">
-                    @if($item->type === 'produk')
-                        {{ $item->produk->nama_produk }}
-                        ({{ $item->size->size }})
-                        × {{ $item->quantity }}
-                    @else
-                        {{ $item->paket->nama_paket }}
-                        × {{ $item->quantity }}
-                        <span class="badge bg-info ms-2">Paket</span>
-                    @endif
-                </li>
-            @endforeach
+                @foreach($tugas->pesanan->detail as $item)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            @if($item->type == 'produk')
+                                {{ $item->produk->nama_produk }}
+                                ({{ $item->size->size }})
+                            @else
+                                {{ $item->paket->nama_paket }}
+                                <span class="badge bg-info ms-2">
+                                    Paket
+                                </span>
+                            @endif
+                        </div>
+
+                        <span class="badge bg-secondary">
+                            x{{ $item->quantity }}
+                        </span>
+                    </li>
+                @endforeach
             </ul>
         </div>
     </div>
 
-    {{-- TOTAL --}}
-    <div class="card mb-3">
-        <div class="card-body">
-            <strong>Total Pesanan:</strong>
-            Rp {{ number_format($tugas->pesanan->total, 0, ',', '.') }}
+    {{-- Total --}}
+    <div class="card shadow-sm border-success mb-3">
+        <div class="card-body text-center">
+            <small class="text-muted">
+                Total Pesanan
+            </small>
+            <h5 class="fw-bold text-success mb-0">
+                Rp {{ number_format($tugas->pesanan->total,0,',','.') }}
+            </h5>
         </div>
     </div>
 
-    @if($tugas->status === 'selesai' && $tugas->bukti_kirim)
-    <div class="card mt-4 border-success">
+    {{-- Bukti Pengiriman --}}
+    @if($tugas->status == 'selesai' && $tugas->bukti_kirim)
+    <div class="card shadow-sm border-success mb-3">
         <div class="card-body">
             <h6 class="fw-semibold text-success mb-3">
+                <i class="bi bi-camera"></i>
                 Bukti Pengiriman
             </h6>
-
+            
             <img src="{{ asset('storage/'.$tugas->bukti_kirim) }}"
-                class="img-fluid rounded border mb-2"
-                style="max-height:250px">
+                 class="img-fluid rounded border mb-3"
+                 style="max-height:300px;">
 
-            <p class="mb-1">
-                <strong>Waktu Kirim:</strong>
+            <p>
+                <strong>Waktu Kirim :</strong>
                 {{ optional($tugas->waktu_kirim)->format('d M Y H:i') }}
             </p>
 
             @if($tugas->catatan_kurir)
                 <p class="mb-0">
-                    <strong>Catatan: </strong>
+                    <strong>Catatan Kurir :</strong>
                     {{ $tugas->catatan_kurir }}
                 </p>
             @endif
@@ -123,54 +162,70 @@
     </div>
     @endif
 
-    {{-- AKSI KURIR --}}
-    @if($tugas->status === 'aktif')
-    <div class="card mt-4">
+    {{-- Upload Bukti --}}
+    @if($tugas->status == 'aktif')
+
+    <div class="card shadow-sm mt-4">
+
         <div class="card-body">
-            <h6 class="fw-semibold mb-3">Bukti Pengiriman</h6>
+            <h6 class="fw-semibold mb-3">
+                <i class="bi bi-cloud-arrow-up"></i>
+                Unggah Bukti Pengiriman
+            </h6>
 
             <form method="POST"
-                action="{{ route('kurir.kirim', $tugas->id) }}"
-                enctype="multipart/form-data">
-                @csrf
+                  action="{{ route('kurir.kirim',$tugas->id) }}"
+                  enctype="multipart/form-data">
 
+                @csrf
                 <div class="mb-3">
-                    <label class="form-label">Foto Bukti Kirim</label>
-                    <input type="file"
-                        name="bukti_kirim"
+                    <label class="form-label">
+                        Foto Bukti Pengiriman
+                    </label>
+                    <input
+                        type="file"
                         class="form-control"
+                        name="bukti_kirim"
                         required>
+                    <small class="text-muted">
+                        Format JPG atau PNG, maksimal 2 MB.
+                    </small>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Catatan Kurir (opsional)</label>
-                    <textarea name="catatan_kurir"
-                            class="form-control"
-                            rows="2"
-                            placeholder="Contoh: paket dititip satpam"></textarea>
+                    <label class="form-label">
+                        Catatan Kurir (Opsional)
+                    </label>
+                    <textarea
+                        name="catatan_kurir"
+                        rows="3"
+                        class="form-control"
+                        placeholder="Contoh: Paket dititipkan kepada satpam."></textarea>
                 </div>
 
                 <button class="btn btn-success w-100">
-                    🚚 Tandai Sudah Dikirim
+                    <i class="bi bi-truck"></i>
+                    Tandai Sudah Dikirim
                 </button>
             </form>
         </div>
     </div>
     @endif
-    {{-- TOMBOL KEMBALI --}}
+    {{-- Tombol kembali --}}
     <div class="mt-4">
-        @if($tugas->status === 'aktif')
+        @if($tugas->status == 'aktif')
             <a href="{{ route('kurir.pesanan') }}"
-            class="btn btn-outline-secondary w-100">
-                ← Kembali ke Pesanan Aktif
+               class="btn btn-outline-secondary w-100">
+                <i class="bi bi-arrow-left"></i>
+                Kembali ke Pesanan Aktif
             </a>
         @else
             <a href="{{ route('kurir.riwayat') }}"
-            class="btn btn-outline-secondary w-100">
-                ← Kembali ke Riwayat Pengiriman
+               class="btn btn-outline-secondary w-100">
+                <i class="bi bi-arrow-left"></i>
+                Kembali ke Riwayat Pengiriman
             </a>
         @endif
     </div>
-
 </div>
 @endsection

@@ -93,7 +93,7 @@ $isReadOnly = !$pesanan->chatMasihAktif();
     {{-- FORM INPUT --}}
     @if($pesanan->status === 'selesai' && !$isReadOnly)
     <div class="alert alert-warning py-2">
-        💬 Chat masih tersedia hingga 24 jam setelah pesanan selesai.
+        💬 Pesan masih tersedia hingga 24 jam setelah pesanan selesai.
     </div>
     @endif
    @if(!$isReadOnly)

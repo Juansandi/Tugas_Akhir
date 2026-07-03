@@ -39,7 +39,7 @@
             <h5 class="mb-0">💬 Pesan Pembeli</h5>
             <small class="text-muted">Pesanan #{{ $pesanan->id }}</small>
             @if($isReadOnly)
-                <span class="badge bg-secondary ms-2">Read Only</span>
+                <span class="badge bg-secondary ms-2">Hanya Baca</span>
             @endif
         </div>
 
@@ -75,12 +75,12 @@
 
     @if($isReadOnly)
          <div class="alert alert-secondary mt-3">
-            🔒 Chat ditutup karena sudah melewati 24 jam setelah pesanan selesai.
+            🔒 Pesan ditutup karena sudah melewati 24 jam setelah pesanan selesai.
         </div>
     @else
         @if(!$isReadOnly && $pesanan->status === 'selesai')
         <div class="alert alert-warning py-2">
-            💬 Chat masih aktif hingga 24 jam setelah pesanan selesai.
+            💬 Pesan masih aktif hingga 24 jam setelah pesanan selesai.
         </div>
         @endif
 

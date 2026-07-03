@@ -94,7 +94,7 @@
                     $refund = $pesanan->refund_total ?? 0;
                     $bersih = $pesanan->total - $refund;
                 @endphp
-                <tr class="{{ $refund > 0 ? 'table-warning' : '' }}">
+                <tr>
 
                     {{-- NO --}}
                    <td>{{ $pesananList->firstItem() + $index }}</td>
@@ -111,22 +111,17 @@
                                 {{ $pesanan->status_label }}
                             </span>
 
-                            {{-- 📦 INDIKATOR BUKTI KIRIM --}}
+                            {{-- INDIKATOR BUKTI KIRIM --}}
                             @if(
                                 $pesanan->status === 'dikirim' &&
                                 $pesanan->tugasKurir &&
                                 $pesanan->tugasKurir->bukti_kirim
                             )
-                                <span class="badge bg-success"
-                                    title="Kurir sudah upload bukti kirim">
+                                <span class="badge bg-success-subtle text-success border border-success">
                                     📦 Bukti Kirim
                                 </span>
                             @endif
-                            @if($refund > 0)
-                                <span class="badge bg-warning text-dark">
-                                    🔁 Pengembalian Dana
-                                </span>
-                            @endif
+
                         </div>
                     </td>
                     {{-- TOTAL --}}
@@ -141,7 +136,9 @@
                                 {{ substr($pesanan->deliverySlot->waktu_selesai,0,5) }}
                             </span>
                         @else
-                            <span class="text-muted">Secepatnya</span>
+                            <span title="Pelanggan tidak memilih slot pengiriman">
+                                Secepatnya
+                            </span>
                         @endif
                     </td>
                     @php
@@ -149,9 +146,11 @@
                         $bersih = $pesanan->total - $refund;
                     @endphp
     
-                    <td class="fw-semibold text-danger">
+                   <td>
                         @if($refund > 0)
-                            - Rp {{ number_format($refund, 0, ',', '.') }}
+                            <span class="fw-bold text-danger">
+                                🔁 Rp {{ number_format($refund, 0, ',', '.') }}
+                            </span>
                         @else
                             <span class="text-muted">-</span>
                         @endif

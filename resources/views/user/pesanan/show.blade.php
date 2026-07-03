@@ -77,13 +77,13 @@
 
             @if($pesanan->status === 'selesai' && $pesanan->chatMasihAktif())
             <div class="text-muted small mt-2">
-                💬 Chat dengan admin dan kurir masih tersedia hingga 24 jam setelah pesanan selesai.
+                💬 Pesan dengan admin dan kurir masih tersedia hingga 24 jam setelah pesanan selesai.
             </div>
             @endif
 
             @if($pesanan->status === 'selesai' && !$pesanan->chatMasihAktif())
             <div class="alert-muted small mt-3">
-                ⛔ Waktu chat telah berakhir (maksimal 24 jam setelah pesanan selesai).
+                ⛔ Waktu pesan telah berakhir (maksimal 24 jam setelah pesanan selesai).
             </div>
             @endif
 

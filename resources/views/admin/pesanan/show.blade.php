@@ -58,11 +58,11 @@
         @if($pesanan->status === 'selesai')
             @if($pesanan->chatMasihAktif())
                 <div class="text-muted small mt-1">
-                    💬 Chat masih aktif hingga 24 jam setelah pesanan selesai.
+                    💬 Pesan masih aktif hingga 24 jam setelah pesanan selesai.
                 </div>
             @else
                 <div class="text-muted small mt-1">
-                    🔒 Chat masih dapat dibuka tetapi sudah read-only.
+                    🔒 Pesan masih dapat dibuka tetapi hanya bisa dibaca.
                 </div>
             @endif
         @endif
@@ -87,7 +87,7 @@
  
     @if($pesanan->refund && $pesanan->refund->status === 'disetujui')
         <div class="alert alert-warning mt-3">
-            🔄 <strong>Pesanan ini telah diapprove untuk pengembalian dana</strong><br>
+            🔄 <strong>Pesanan ini telah disetujui untuk pengembalian dana</strong><br>
             Nominal pengembalian dana:
             <strong class="text-danger">
                 Rp {{ number_format($pesanan->refund->refund_amount,0,',','.') }}

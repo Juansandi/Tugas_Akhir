@@ -3,29 +3,97 @@
 @section('title', 'Profil Kurir')
 
 @section('content')
-<h4>Profil Kurir</h4>
 
-<div class="card">
-    <div class="card-body">
-        <p><strong>Username:</strong> {{ auth()->user()->username }}</p>
-        <p><strong>Email:</strong> {{ auth()->user()->email }}</p>
-        <p><strong>No. Telepon:</strong> {{ auth()->user()->no_telp }}</p>
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Profil Kurir</h3>
+    <p class="text-muted mb-0">
+        Kelola informasi akun dan keamanan akun Anda.
+    </p>
+</div>
 
-        <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-primary"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editProfilKurirModal">
-                ✏️ Ubah Profil
-            </button>
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
 
-            <button class="btn btn-sm btn-secondary"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editPasswordKurirModal">
-                🔐 Ubah Kata Sandi
-            </button>
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body p-4">
+
+                {{-- Header Profil --}}
+                <div class="text-center mb-4">
+
+                    <i class="bi bi-person-circle text-success mb-2"
+                       style="font-size:64px;"></i>
+
+                    <h4 class="mb-1 fw-bold">
+                        {{ auth()->user()->username }}
+                    </h4>
+
+                    <span class="badge bg-success">
+                        Kurir
+                    </span>
+
+                </div>
+
+                <hr>
+
+                {{-- Informasi Profil --}}
+                <div class="row gy-3 mt-2">
+
+                    <div class="col-md-4 text-muted">
+                        Nama Pengguna
+                    </div>
+
+                    <div class="col-md-8 fw-semibold">
+                        {{ auth()->user()->username }}
+                    </div>
+
+                    <div class="col-md-4 text-muted">
+                        Email
+                    </div>
+
+                    <div class="col-md-8 fw-semibold">
+                        {{ auth()->user()->email }}
+                    </div>
+
+                    <div class="col-md-4 text-muted">
+                        Nomor Telepon
+                    </div>
+
+                    <div class="col-md-8 fw-semibold">
+                        {{ auth()->user()->no_telp }}
+                    </div>
+
+                </div>
+
+                <hr>
+
+                {{-- Tombol --}}
+                <div class="d-flex justify-content-center gap-3 mt-4">
+
+                    <button
+                        class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editProfilKurirModal">
+
+                        <i class="bi bi-pencil-square"></i>
+                        Ubah Profil
+
+                    </button>
+
+                    <button
+                        class="btn btn-outline-secondary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editPasswordKurirModal">
+
+                        <i class="bi bi-key"></i>
+                        Ubah Kata Sandi
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
 @endsection
 
 {{-- MODAL EDIT PROFIL --}}

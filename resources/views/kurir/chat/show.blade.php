@@ -70,7 +70,7 @@
 
     @if($isReadOnly)
         <div class="alert alert-secondary">
-            🔒 Chat ditutup karena sudah melewati 24 jam setelah pesanan selesai.
+            🔒 Pesan ditutup karena sudah melewati 24 jam setelah pesanan selesai.
         </div>
     @else
         @if(!$isReadOnly && $pesanan->status === 'selesai')
@@ -84,7 +84,7 @@
                 <input type="text"
                     name="message"
                     class="form-control"
-                    placeholder="Ketik pesan ke customer..."
+                    placeholder="Ketik pesan ke pembeli..."
                     required>
                 <button class="btn btn-success">Kirim</button>
             </div>

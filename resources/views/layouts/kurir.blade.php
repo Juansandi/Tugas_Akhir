@@ -11,23 +11,97 @@
     <style>
         body {
             background-color: #f8f9fa;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
         .sidebar {
+            width: 250px;
             min-height: 100vh;
             background: #198754;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.08);
         }
-        .sidebar a {
+
+        .sidebar h5 {
             color: #fff;
-            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: .3px;
         }
-        .sidebar a.active, .sidebar a:hover {
-            background: rgba(255,255,255,0.15);
-        }
+        /* ===========================
+        Profil
+        =========================== */
         .profile-box {
-            background: rgba(255,255,255,0.15);
-            border-radius: 8px;
-            padding: 10px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 10px;
+            padding: 12px;
             color: #fff;
+        }
+
+        .profile-box strong{
+            font-size: 1rem;
+        }
+
+        .profile-box small{
+            opacity: .85;
+        }
+
+        /* ===========================
+        Menu
+        =========================== */
+        .sidebar .nav-link{
+            color:#fff;
+            border-radius:8px;
+            padding:10px 14px;
+            transition:all .2s ease;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            font-weight:500;
+        }
+
+        /* Hover */
+        .sidebar .nav-link:hover{
+            background:rgba(255,255,255,.10);
+            color:#fff;
+        }
+
+        /* Menu aktif */
+        .sidebar .nav-link.active{
+            background:rgba(255,255,255,.18);
+            color:#fff;
+            font-weight:600;
+        }
+
+        /* Ikon menu */
+        .sidebar .nav-link i{
+            width:20px;
+            text-align:center;
+        }
+
+        /* ===========================
+        Garis sebelum logout
+        =========================== */
+        .sidebar hr{
+            border-color:rgba(255,255,255,.25);
+        }
+
+        /* ===========================
+        Tombol Logout
+        =========================== */
+        .logout-btn{
+            color:#ffb3b3 !important;
+        }
+
+        .logout-btn:hover{
+            background:rgba(255,255,255,.15);
+            color:#fff !important;
+        }
+
+        /* ===========================
+        Area Content
+        =========================== */
+        .content-area{
+            flex:1;
+            padding:30px;
         }
     </style>
 </head>
@@ -37,8 +111,8 @@
 
     {{-- SIDEBAR --}}
     <div class="sidebar p-3">
-        <h5 class="text-white mb-4">
-            <i class="bi bi-truck"></i> Kurir Panel
+        <h5 class="mb-4">
+            <i class="bi bi-truck"></i> Panel Kurir
         </h5>
 
         {{-- Profile --}}
@@ -75,11 +149,13 @@
                     <i class="bi bi-clock-history"></i> Riwayat
                 </a>
             </li>
-
-            <li class="nav-item mt-3">
+            <li class="mt-3">
+                <hr>
+            </li>
+            <li class="nav-item">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button class="nav-link btn btn-link text-start text-danger">
+                    <button class="nav-link btn btn-link text-start logout-btn">
                         <i class="bi bi-box-arrow-right"></i> Keluar
                     </button>
                 </form>
@@ -88,7 +164,7 @@
     </div>
 
     {{-- CONTENT --}}
-    <div class="flex-fill p-4">
+    <div class="content-area">
         @yield('content')
     </div>
 

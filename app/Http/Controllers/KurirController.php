@@ -169,7 +169,8 @@ class KurirController extends Controller
             ->where('user_id', Auth::id())
             ->where('status', 'selesai')
             ->orderBy('updated_at', 'desc')
-            ->get();
+            ->latest('updated_at')
+            ->paginate(10);
 
         return view('kurir.riwayat', compact('tugas'));
     }
