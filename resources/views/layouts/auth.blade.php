@@ -13,134 +13,156 @@
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f8f9fa, #eef1f4);
-            color: #212529;
+        body{
+            min-height:100vh;
+            background:#f4f6f9;
+            color:#212529;
         }
 
-        /* ===== AUTH CONTAINER ===== */
-        .auth-container {
-            max-width: 1000px;
-            margin: 3rem auto;
+        /* ===========================
+        CONTAINER
+        =========================== */
+        .auth-container{
+            max-width:1100px;
+            margin:60px auto;
+        }
+        .auth-card{
+            background:#fff;
+            border:none;
+            border-radius:20px;
+            overflow:hidden;
+            min-height:620px;
+            box-shadow:
+                0 20px 45px rgba(0,0,0,.08);
         }
 
-        .auth-card {
-            background: #ffffff;
-            border-radius: 12px;
+        /* ===========================
+        FORM
+        =========================== */
+        .form-label{
+            font-weight:500;
+            margin-bottom:.5rem;
+        }
+        .form-control-lg{
+            height:55px;
+            border-radius:10px;
+        }
+        .form-control:focus{
+            box-shadow:none;
+        }
+        .input-group-text{
+            background:#fff;
+            border-right:none;
+        }
+        .input-group .form-control{
+            border-left:none;
+        }
+        .input-group:focus-within .input-group-text{
+            border-color:#86b7fe;
+        }
+        .form-control:focus{
+            border-color:#86b7fe;
         }
 
-        /* ===== FORM ===== */
-        .form-label {
-            font-size: 0.85rem;
+        /* ===========================
+        BUTTON
+        =========================== */
+        .btn-dark{
+            border-radius:10px;
+            height:55px;
+            transition:.25s;
+        }
+        .btn-dark:hover{
+            transform:translateY(-2px);
         }
 
-        .form-control-lg {
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            border: 1px solid #dee2e6;
+        /* ===========================
+        IMAGE
+        =========================== */
+        .auth-image{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+        }
+        .image-overlay{
+            position:absolute;
+            inset:0;
+            display:flex;
+            align-items:flex-end;
+            padding:50px;
+            background:linear-gradient(
+                rgba(0,0,0,.15),
+                rgba(0,0,0,.45)
+            );
         }
 
-        .form-control-lg:focus {
-            border-color: #212529;
-            box-shadow: none;
+        /* ===========================
+        HEADER
+        =========================== */
+        header{
+            background:#fff;
+            border-bottom:1px solid #ececec;
+        }
+        .navbar-brand{
+            font-size:1.55rem;
+        }
+        .nav-link{
+            font-weight:500;
+            transition:.25s;
+        }
+        .nav-link:hover{
+            color:#198754 !important;
         }
 
-        /* ===== BUTTON ===== */
-        .btn-dark {
-            border-radius: 8px;
-            padding: 0.75rem;
-            transition: all 0.3s ease;
+        /* ===========================
+        FOOTER
+        =========================== */
+        footer{
+            background:#212529;
+            color:#fff;
+            padding:40px 0;
+            margin-top:80px;
+        }
+        footer a{
+            color:#fff;
+        }
+        footer a:hover{
+            color:#adb5bd;
         }
 
-        .btn-dark:hover {
-            background-color: #000;
+        /* ===========================
+        PLACEHOLDER
+        ========================== */
+        ::placeholder{
+            color:#adb5bd !important;
+            font-size:.95rem;
         }
 
-        /* ===== PASSWORD TOGGLE ===== */
-        .password-container {
-            position: relative;
+        /* ===========================
+        PASSWORD
+        =========================== */
+        .password-toggle:hover{
+            color:#212529;
         }
 
-        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 55%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #6c757d;
+        /* ===========================
+        VALIDATION
+        =========================== */
+        .was-validated .form-control:valid,
+        .form-control.is-valid{
+            border-color:#dee2e6 !important;
+            background-image:none !important;
+            box-shadow:none !important;
         }
-
-        .password-toggle:hover {
-            color: #212529;
+        .was-validated .form-control:invalid,
+        .form-control.is-invalid{
+            background-image:none !important;
+            box-shadow:none !important;
         }
-
-        /* ===== LINKS ===== */
-        .auth-link {
-            font-size: 0.9rem;
-            color: #212529;
-            text-decoration: none;
-        }
-
-        .auth-link:hover {
-            text-decoration: underline;
-        }
-
-        /* ===== IMAGE ===== */
-        .auth-image {
-            object-fit: cover;
-            height: 100%;
-        }
-
-        /* ===== HEADER ===== */
-        header {
-            background: #fff;
-            border-bottom: 1px solid #eaeaea;
-        }
-
-        /* ===== FOOTER ===== */
-        footer {
-            background-color: #212529;
-            color: #f8f9fa;
-            padding: 2rem 0;
-            margin-top: 4rem;
-        }
-
-        footer a {
-            color: #f8f9fa;
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        ::placeholder {
-            font-size:0.9rem;
-            color: #adb5bd;
-        }
-
-        /* Field valid tetap normal */
-.was-validated .form-control:valid,
-.form-control.is-valid {
-    border-color: #dee2e6 !important;
-    background-image: none !important;
-    box-shadow: none !important;
-}
-
-/* Field tidak valid */
-.was-validated .form-control:invalid,
-.form-control.is-invalid {
-    background-image: none !important;
-    box-shadow: none !important;
-}
     </style>
 </head>
 
 <body>
-
 {{-- ================= HEADER ================= --}}
 <header class="py-3">
     <div class="container">
@@ -205,10 +227,22 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    function togglePassword(id) {
-        const input = document.getElementById(id);
-        input.type = input.type === "password" ? "text" : "password";
+    function togglePassword(id, button) {
+
+    const input = document.getElementById(id);
+
+    const icon = button.querySelector('i');
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("bi-eye");
+        icon.classList.add("bi-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.remove("bi-eye-slash");
+        icon.classList.add("bi-eye");
     }
+}
 </script>
 <script>
 (() => {

@@ -2,34 +2,71 @@
 
 @section('content')
 <div class="container py-4">
-    <h4>Proses Pembayaran</h4>
-
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="bi bi-credit-card text-success me-2"></i>
+                Proses Pembayaran
+            </h2>
+            <p class="text-muted mb-0">
+                Periksa kembali pesanan Anda sebelum melakukan pembayaran.
+            </p>
+        </div>
+    </div>
     @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
-
     <form action="{{ route('pesanan.store') }}" method="POST" id="checkoutForm">
         @csrf
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-geo-alt-fill text-success me-2"></i>
+            Alamat Pengiriman
+        </h4>
 
-        <h5>Alamat Pengiriman</h5>
         @forelse ($alamatList as $alamat)
-            <div class="form-check mb-2">
-                <input type="radio"
-                    name="alamat_id"
-                    value="{{ $alamat->id }}"
-                    class="form-check-input"
-                    {{ $alamat->is_default ? 'checked' : '' }}>
-                <label class="form-check-label">
-                    <strong>{{ $alamat->label }}</strong><br>
-                    {{ $alamat->alamat }}
-                </label>
+        <div class="card border-0 shadow-sm rounded-4 mb-3">
+            <div class="card-body">
+                <div class="form-check">
+                    <input
+                        class="form-check-input mt-1"
+                        type="radio"
+                        name="alamat_id"
+                        value="{{ $alamat->id }}"
+                        {{ $alamat->is_default ? 'checked' : '' }}>
+
+                    <label class="form-check-label w-100">
+                        <div class="d-flex justify-content-between">
+                            <strong>
+                                <i class="bi bi-house-door text-success me-1"></i>
+                                {{ $alamat->label }}
+                            </strong>
+
+                            @if($alamat->is_default)
+                                <span class="badge bg-success">
+                                    Utama
+                                </span>
+                            @endif
+                        </div>
+
+                        <div class="text-muted mt-2">
+                            {{ $alamat->alamat }}
+                        </div>
+                    </label>
+                </div>
             </div>
+        </div>
+
         @empty
-            <p class="text-muted">Belum ada alamat pengiriman.</p>
+        <div class="alert alert-warning">
+            Belum ada alamat pengiriman.
+        </div>
         @endforelse
 
-        {{-- ITEM --}}
-        <h5>Barang dalam Keranjang</h5>
+        {{-- ================= BARANG DALAM KERANJANG ================= --}}
+        <h4 class="fw-bold mt-5 mb-3">
+            <i class="bi bi-cart-check text-success me-2"></i>
+            Barang dalam Keranjang
+        </h4>
 
         @php
             $subtotal = 0;
@@ -42,13 +79,46 @@
                     $subtotal += $totalPerItem;
                 @endphp
 
-                <div class="card mb-2 p-3">
-                    <strong>{{ $item->paket->nama_paket }}</strong><br>
-                    <span class="text-muted">Paket Produk</span><br>
-                    {{ $item->quantity }} ×
-                    Rp {{ number_format($item->paket->harga_paket,0,',','.') }}
-                    =
-                    <strong>Rp {{ number_format($totalPerItem,0,',','.') }}</strong>
+                <div class="card border-0 shadow-sm rounded-4 mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            {{-- Gambar --}}
+                            <div class="col-md-2 text-center">
+                                <img
+                                    src="{{ asset('storage/'.$item->paket->image) }}"
+                                    class="img-fluid rounded-3"
+                                    style="height:90px;width:90px;object-fit:cover;">
+                            </div>
+
+                            {{-- Informasi --}}
+                            <div class="col-md-7">
+                                <span class="badge bg-success mb-2">
+                                    Paket Hemat
+                                </span>
+
+                                <h5 class="fw-bold mb-1">
+                                    {{ $item->paket->nama_paket }}
+                                </h5>
+
+                                <div class="text-muted">
+                                    {{ $item->quantity }}
+                                    Paket ×
+                                    Rp {{ number_format($item->paket->harga_paket,0,',','.') }}
+                                </div>
+                            </div>
+
+                            {{-- Total --}}
+                            <div class="col-md-3 text-md-end">
+                                <div class="text-muted small">
+                                    Subtotal
+                                </div>
+
+                                <h5 class="fw-bold text-success mb-0">
+                                    Rp {{ number_format($totalPerItem,0,',','.') }}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             @else
@@ -56,123 +126,250 @@
                     $totalPerItem = $item->size->harga * $item->quantity;
                     $subtotal += $totalPerItem;
                 @endphp
+                <div class="card border-0 shadow-sm rounded-4 mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            {{-- Gambar --}}
+                            <div class="col-md-2 text-center">
+                                <img
+                                    src="{{ asset('storage/'.$item->produk->image) }}"
+                                    class="img-fluid rounded-3"
+                                    style="height:90px;width:90px;object-fit:cover;">
+                            </div>
 
-                <div class="card mb-2 p-3">
-                    <strong>{{ $item->produk->nama_produk }}</strong><br>
-                    <span class="text-muted">Ukuran: {{ $item->size->size }}</span><br>
-                    {{ $item->quantity }} ×
-                    Rp {{ number_format($item->size->harga,0,',','.') }}
-                    =
-                    <strong>Rp {{ number_format($totalPerItem,0,',','.') }}</strong>
+                            {{-- Informasi --}}
+                            <div class="col-md-7">
+                                <h5 class="fw-bold mb-1">
+                                    {{ $item->produk->nama_produk }}
+                                </h5>
+                                <div class="text-muted mb-1">
+                                    Ukuran :
+                                    {{ $item->size->size }}
+                                </div>
+                                <div class="text-muted">
+                                    {{ $item->quantity }}
+                                    ×
+                                    Rp {{ number_format($item->size->harga,0,',','.') }}
+                                </div>
+                            </div>
+
+                            {{-- Total --}}
+                            <div class="col-md-3 text-md-end">
+                                <div class="text-muted small">
+                                    Subtotal
+                                </div>
+
+                                <h5 class="fw-bold text-success mb-0">
+                                    Rp {{ number_format($totalPerItem,0,',','.') }}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @endif
         @endforeach
+        <h5 class="fw-bold mt-4 mb-3">
+            <i class="bi bi-clock-history text-success me-2"></i>
+            Waktu Pengantaran
+        </h5>
 
-        {{-- ========================= --}}
-        {{-- SLOT PENGANTARAN --}}
-        {{-- ========================= --}}
-        <div class="card mb-4">
-            <div class="card-header fw-bold">
-                Pilih Waktu Pengantaran
-            </div>
-            <div class="card-body">
+        <div class="list-group shadow-sm rounded-3">
+            <label class="list-group-item list-group-item-action">
+                <input
+                    class="form-check-input me-2"
+                    type="radio"
+                    name="delivery_slot_id"
+                    value=""
+                    checked>
+                <i class="bi bi-lightning-charge-fill text-warning me-2"></i>
+                Secepatnya
+            </label>
 
-                {{-- OPSI SECEPATNYA --}}
-                <div class="form-check mb-2">
-                    <input class="form-check-input"
+            @forelse($deliverySlots as $slot)
+                <label class="list-group-item list-group-item-action">
+                    <input
+                        class="form-check-input me-2"
                         type="radio"
                         name="delivery_slot_id"
-                        id="slot_now"
-                        value=""
-                        checked>
-                    <label class="form-check-label" for="slot_now">
-                        Secepatnya
+                        value="{{ $slot->id }}">
+                    <i class="bi bi-clock text-success me-2"></i>
+                    {{ substr($slot->waktu_mulai,0,5) }}
+                    -
+                    {{ substr($slot->waktu_selesai,0,5) }}
+                </label>
+
+            @empty
+                <div class="list-group-item text-muted">
+                    Tidak ada slot tersedia.
+                    Pesanan akan dikirim secepatnya.
+                </div>
+            @endforelse
+        </div>
+
+        {{-- ================= PEMBAYARAN ================= --}}
+        <div class="card border-0 shadow-sm rounded-4 mt-4">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-4">
+                    <i class="bi bi-wallet2 text-success me-2"></i>
+                    Pembayaran & Promo
+                </h4>
+
+                {{-- ================= METODE PEMBAYARAN ================= --}}
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Metode Pembayaran
                     </label>
+                    <select
+                        name="metode_pembayaran"
+                        class="form-select">
+                        <option value="transfer">
+                            💳 Transfer Bank
+                        </option>
+                        <option value="cod">
+                            🚚 Bayar di Tempat (COD)
+                        </option>
+                    </select>
                 </div>
 
-                {{-- OPSI SLOT --}}
-                @forelse ($deliverySlots as $slot)
-                    <div class="form-check mb-2">
-                        <input class="form-check-input"
-                            type="radio"
-                            name="delivery_slot_id"
-                            id="slot_{{ $slot->id }}"
-                            value="{{ $slot->id }}">
-                        <label class="form-check-label" for="slot_{{ $slot->id }}">
-                            {{ substr($slot->waktu_mulai,0,5) }} –
-                            {{ substr($slot->waktu_selesai,0,5) }}
-                        </label>
-                    </div>
-                @empty
-                    <p class="text-muted mb-0">
-                        Tidak ada slot waktu tersisa hari ini.
-                        Pesanan akan dikirim secepatnya.
-                    </p>
-                @endforelse
+                {{-- ================= PROMO ================= --}}
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Gunakan Promo
+                    </label>
+                    <select
+                        name="promo_id"
+                        id="promoSelect"
+                        class="form-select">
+                        <option
+                            value=""
+                            data-diskon="0"
+                            data-tipe="">
+                            Tidak menggunakan promo
+                        </option>
+                        @foreach($promos as $promo)
+                        <option
+                            value="{{ $promo->id }}"
+                            data-diskon="{{ $promo->diskon }}"
+                            data-tipe="persen">
+                            {{ $promo->nama_promo }}
+                            ({{ $promo->diskon }}%)
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
 
+                {{-- ================= POIN ================= --}}
+                <div>
+                    <label class="form-label fw-semibold">
+                        Gunakan Poin
+                    </label>
+
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            ⭐
+                        </span>
+
+                        <input
+                            type="number"
+                            id="poinInput"
+                            name="poin"
+                            min="0"
+                            max="{{ Auth::user()->jumlah_poin }}"
+                            class="form-control"
+                            placeholder="Maksimal {{ Auth::user()->jumlah_poin }} poin">
+                        <span class="input-group-text">
+                            Poin
+                        </span>
+                    </div>
+                    <small class="text-muted">
+                        1 poin = Rp100
+                    </small>
+                </div>
             </div>
         </div>
 
+       {{-- ================= RINGKASAN PEMBAYARAN ================= --}}
+        <div class="card border-0 shadow-sm rounded-4 mt-4">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-4">
+                    <i class="bi bi-receipt-cutoff text-success me-2"></i>
+                    Ringkasan Pembayaran
+                </h4>
 
-        {{-- PEMBAYARAN --}}
-        <h5 class="mt-4">Metode Pembayaran</h5>
-        <select name="metode_pembayaran" class="form-select mb-3" required>
-            <option value="transfer">Transfer</option>
-            <option value="cod">Bayar di Tempat (COD)</option>
-        </select>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">
+                        Subtotal
+                    </span>
 
-        {{-- PROMO --}}
-        <h5>Gunakan Promo</h5>
-        <select name="promo_id" id="promoSelect" class="form-select mb-3">
-            <option value="" data-diskon="0" data-tipe="">-- Tidak Menggunakan Promo --</option>
-            @foreach ($promos as $promo)
-                <option
-                    value="{{ $promo->id }}"
-                    data-diskon="{{ $promo->diskon }}"
-                    data-tipe="persen"
-                >
-                    {{ $promo->nama_promo }} - {{ $promo->diskon }}%
-                </option>
-            @endforeach
-        </select>
+                    <strong>
+                        Rp
+                        <span id="subtotalText">
+                            {{ number_format($subtotal,0,',','.') }}
+                        </span>
+                    </strong>
+                </div>
 
-        {{-- POIN --}}
-        <h5>Gunakan Poin</h5>
-        <input type="number"
-               name="poin"
-               id="poinInput"
-               min="0"
-               max="{{ Auth::user()->jumlah_poin }}"
-               class="form-control mb-3"
-               placeholder="Maks {{ Auth::user()->jumlah_poin }} poin">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">
+                        Diskon Promo
+                    </span>
 
-        {{-- RINGKASAN --}}
-        <h5>Ringkasan</h5>
-        <div class="border rounded p-3 mb-4">
-            <p>Subtotal:
-                <strong>Rp <span id="subtotalText">{{ number_format($subtotal, 0, ',', '.') }}</span></strong>
-            </p>
-            <p>Diskon Promo:
-                Rp <span id="diskonPromoText">0</span>
-            </p>
-            <p>Diskon Poin:
-                Rp <span id="diskonPoinText">0</span>
-            </p>
-            <h5>
-                Total Bayar:
-                <strong>Rp <span id="totalBayarText">{{ number_format($subtotal, 0, ',', '.') }}</span></strong>
-            </h5>
+                    <span class="text-danger">
+                        - Rp
+                        <span id="diskonPromoText">
+                            0
+                        </span>
+                    </span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="text-muted">
+                        Diskon Poin
+                    </span>
+
+                    <span class="text-danger">
+                        - Rp
+                        <span id="diskonPoinText">
+                            0
+                        </span>
+                    </span>
+                </div>
+
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <div class="text-muted">
+                            Total Pembayaran
+                        </div>
+
+                        <small class="text-muted">
+                            Sudah termasuk seluruh potongan
+                        </small>
+
+                    </div>
+                    <h3 class="fw-bold text-success mb-0">
+                        Rp
+                        <span id="totalBayarText">
+                            {{ number_format($subtotal,0,',','.') }}
+                        </span>
+                    </h3>
+                </div>
+                <input
+                    type="hidden"
+                    name="total_terhitung"
+                    id="totalHidden"
+                    value="{{ $subtotal }}">
+
+                <div class="d-grid">
+                    <button
+                        type="submit"
+                        class="btn btn-success btn-lg rounded-pill">
+                        <i class="bi bi-credit-card me-2"></i>
+                        Bayar Sekarang
+                    </button>
+                </div>
+            </div>
         </div>
-
-        {{-- TOTAL TERHITUNG (UX ONLY) --}}
-        <input type="hidden" name="total_terhitung" id="totalHidden" value="{{ $subtotal }}">
-
-        <button type="submit" class="btn btn-success w-100">
-            Bayar Sekarang
-        </button>
-    </form>
-</div>
-
 {{-- SCRIPT DISKON --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {

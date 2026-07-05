@@ -79,13 +79,6 @@
                     <a class="nav-link" href="{{ route('paket.index') }}">Paket</a>
                 </li>
 
-                {{-- WISHLIST --}}
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('wishlist.index') }}">
-                        <i class="bi bi-heart"></i>
-                    </a>
-                </li>
-
                 {{-- CART --}}
                 <li class="nav-item">
                     <a class="nav-link position-relative" href="{{ route('cart.index') }}">

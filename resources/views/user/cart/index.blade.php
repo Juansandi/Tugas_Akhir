@@ -3,7 +3,20 @@
 @section('content')
 <div class="container py-4">
 
-    <h4 class="mb-3">Keranjang Saya</h4>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="bi bi-cart3 text-success me-2"></i>
+                Keranjang Belanja
+            </h2>
+
+            <p class="text-muted mb-0">
+                {{ $cartItems->count() }} item di dalam keranjang
+            </p>
+        </div>
+
+    </div>
 
     {{-- ALERT ERROR STOK --}}
     @if(session('error'))
@@ -45,132 +58,207 @@
             $subtotal += $itemTotal;
         @endphp
 
-        <div class="card mb-3 shadow-sm {{ ($stokHabis || $stokKurang) ? 'border-warning' : '' }}">
-            <div class="card-body">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 {{ ($stokHabis || $stokKurang) ? 'border-warning' : '' }}">
+            <div class="card-body p-4">
 
                 <div class="d-flex justify-content-between align-items-start flex-wrap">
 
-                    {{-- INFO ITEM --}}
-                    <div class="d-flex align-items-start">
+                    {{-- ================= INFO ITEM ================= --}}
+<div class="d-flex align-items-start flex-grow-1">
 
-                        @if($item->type === 'paket')
-                            {{-- ===================== --}}
-                            {{-- ITEM PAKET --}}
-                            {{-- ===================== --}}
+    {{-- ================= PAKET ================= --}}
+    @if($item->type === 'paket')
 
-                            @if($item->type === 'paket' && $item->paket)
-                                <img src="{{ asset('storage/'.$item->paket->image) }}"
-                                    class="img-fluid rounded me-3"
-                                    style="width:120px; object-fit:cover;">
+        <img src="{{ asset('storage/'.$item->paket->image) }}"
+            class="img-fluid rounded-3 shadow-sm me-4"
+            style="width:140px;height:140px;object-fit:cover;">
+
+        <div class="flex-grow-1">
+
+            <span class="badge bg-success mb-2">
+                <i class="bi bi-box-seam me-1"></i>
+                Paket Hemat
+            </span>
+
+            <h4 class="fw-bold mb-2">
+                {{ $item->paket->nama_paket }}
+            </h4>
+
+            <div class="mb-2">
+
+                <small class="text-muted">
+                    Harga Paket
+                </small>
+
+                <h5 class="fw-bold text-success mb-0">
+                    Rp {{ number_format($item->paket->harga_paket,0,',','.') }}
+                </h5>
+
+            </div>
+
+            <div class="mb-3">
+
+                <span class="badge bg-light text-dark border">
+                    Jumlah Paket :
+                    {{ $item->quantity }}
+                </span>
+
+            </div>
+
+            {{-- ISI PAKET --}}
+            <div class="border rounded-3 bg-light p-3 mb-3">
+
+                <div class="fw-semibold mb-2">
+                    Isi Paket
+                </div>
+
+                @foreach($item->paket->detailPakets as $detail)
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+
+                        <div>
+
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+
+                            {{ $detail->produk->nama_produk }}
+
+                            @if($detail->size)
+                                <small class="text-muted">
+                                    ({{ $detail->size->size }})
+                                </small>
                             @endif
 
+                        </div>
 
-                            <div>
-                                <h5 class="mb-1">{{ $item->paket->nama_paket }}</h5>
-                                <p class="text-muted small mb-1">Paket Produk</p>
+                        <strong>
 
-                                <p class="mb-1">
-                                    Harga Paket:
-                                    <strong>
-                                        Rp {{ number_format($item->paket->harga_paket,0,',','.') }}
-                                    </strong>
-                                </p>
+                            × {{ $detail->quantity * $item->quantity }}
 
-                                <p class="mb-1">
-                                    Jumlah Paket: {{ $item->quantity }}
-                                </p>
-                                {{-- ISI PAKET --}}
-                                <ul class="small text-muted mb-2">
-                                    @if($item->paket)
-                                        <ul class="small text-muted mb-2">
-                                            @foreach($item->paket->detailPakets as $detail)
-                                                <li>
-                                                    {{ $detail->produk->nama_produk }}
-                                                    @if($detail->size)
-                                                        ({{ $detail->size->size }})
-                                                    @endif
-                                                    × {{ $detail->quantity * $item->quantity }}
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    @endif
-                                </ul>
+                        </strong>
 
-                                <p class="mb-1">
-                                    Subtotal:
-                                    <strong>
-                                        Rp {{ number_format(
-                                            $item->paket->harga_paket * $item->quantity,
-                                            0, ',', '.'
-                                        ) }}
-                                    </strong>
-                                </p>
-                            </div>
-
-                        @else
-                            {{-- ===================== --}}
-                            {{-- PRODUK SATUAN --}}
-                            {{-- ===================== --}}
-
-                            <img src="{{ asset('storage/' . $item->produk->image) }}"
-                                class="img-fluid rounded me-3"
-                                style="width:120px; object-fit:cover;">
-
-                            <div>
-                                <h5 class="mb-1">{{ $item->produk->nama_produk }}</h5>
-
-                                <p class="mb-1 text-muted">
-                                    Ukuran: <strong>{{ $item->size->size }}</strong>
-                                </p>
-
-                                <p class="mb-1">
-                                    Harga:
-                                    Rp {{ number_format($item->size->harga, 0, ',', '.') }}
-                                </p>
-
-                                {{-- QTY --}}
-                                <div class="d-flex align-items-center my-2">
-                                    <button class="btn btn-outline-secondary btn-sm btn-minus"
-                                        data-id="{{ $item->id }}"
-                                        data-stock="{{ $item->size->stok }}">
-                                        −
-                                    </button>
-
-                                    <input type="number"
-                                        id="qty-{{ $item->id }}"
-                                        value="{{ $item->quantity }}"
-                                        class="form-control text-center mx-2"
-                                        style="width:70px;"
-                                        readonly>
-
-                                    <button class="btn btn-outline-secondary btn-sm btn-plus"
-                                        data-id="{{ $item->id }}"
-                                        data-stock="{{ $item->size->stok }}">
-                                        +
-                                    </button>
-                                </div>
-
-                                <p class="mb-1">
-                                    Subtotal:
-                                    <strong>
-                                        Rp {{ number_format(
-                                            $item->size->harga * $item->quantity,
-                                            0, ',', '.'
-                                        ) }}
-                                    </strong>
-                                </p>
-                            </div>
-                        @endif
                     </div>
 
-                    {{-- HAPUS --}}
-                    <form action="{{ route('cart.destroy', $item->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-danger btn-sm">
-                            Hapus
-                        </button>
-                    </form>
+                @endforeach
+
+            </div>
+
+            <h5 class="fw-bold text-success">
+
+                Subtotal :
+                Rp {{ number_format(
+                    $item->paket->harga_paket * $item->quantity,
+                    0,
+                    ',',
+                    '.'
+                ) }}
+
+            </h5>
+
+        </div>
+
+    @else
+
+    {{-- ================= PRODUK ================= --}}
+
+        <img src="{{ asset('storage/'.$item->produk->image) }}"
+            class="img-fluid rounded-3 shadow-sm me-4"
+            style="width:140px;height:140px;object-fit:cover;">
+
+        <div class="flex-grow-1">
+
+            <h4 class="fw-bold mb-2">
+                {{ $item->produk->nama_produk }}
+            </h4>
+
+            <div class="mb-3">
+
+                <span class="badge bg-light text-dark border px-3 py-2">
+                    <i class="bi bi-box me-1"></i>
+
+                    {{ $item->size->size }}
+
+                </span>
+
+            </div>
+
+            <small class="text-muted">
+                Harga
+            </small>
+
+            <h5 class="fw-bold text-success mb-3">
+
+                Rp {{ number_format($item->size->harga,0,',','.') }}
+
+            </h5>
+
+            {{-- QUANTITY --}}
+            <div class="d-inline-flex align-items-center border rounded-pill overflow-hidden mb-3">
+
+                <button
+                    class="btn btn-light btn-minus"
+                    data-id="{{ $item->id }}"
+                    data-stock="{{ $item->size->stok }}">
+
+                    <i class="bi bi-dash"></i>
+
+                </button>
+
+                <input
+                    type="number"
+                    id="qty-{{ $item->id }}"
+                    value="{{ $item->quantity }}"
+                    readonly
+                    class="border-0 text-center"
+                    style="width:65px;">
+
+                <button
+                    class="btn btn-light btn-plus"
+                    data-id="{{ $item->id }}"
+                    data-stock="{{ $item->size->stok }}">
+
+                    <i class="bi bi-plus"></i>
+
+                </button>
+
+            </div>
+
+            <h5 class="fw-bold text-success">
+
+                Subtotal :
+                Rp {{ number_format(
+                    $item->size->harga * $item->quantity,
+                    0,
+                    ',',
+                    '.'
+                ) }}
+
+            </h5>
+
+        </div>
+
+    @endif
+
+</div>
+
+                    <div class="ms-3 d-flex align-items-start">
+
+    <form action="{{ route('cart.destroy', $item->id) }}" method="POST">
+        @csrf
+        @method('DELETE')
+
+        <button
+            type="submit"
+            class="btn btn-outline-danger rounded-pill px-3"
+            onclick="return confirm('Hapus item dari keranjang?')">
+
+            <i class="bi bi-trash3 me-1"></i>
+            Hapus
+
+        </button>
+
+    </form>
+
+</div>
 
                 </div>
             </div>
@@ -179,23 +267,83 @@
         <p class="text-muted">Keranjang kosong.</p>
     @endforelse
 
-    {{-- TOTAL & CHECKOUT --}}
-    @if($cartItems->count())
-        <div class="card p-3 shadow-sm mt-4">
-            <h5>Total: Rp {{ number_format($subtotal, 0, ',', '.') }}</h5>
+    {{-- ================= RINGKASAN BELANJA ================= --}}
+@if($cartItems->count())
 
-            @if(isset($stokError) && $stokError)
-                <button class="btn btn-secondary mt-3 w-100" disabled>
-                    Stok Tidak Mencukupi
-                </button>
-            @else
-                <a href="{{ route('pesanan.checkoutForm') }}"
-                   class="btn btn-dark mt-3 w-100">
-                    Lanjut ke Pembayaran
-                </a>
-            @endif
+<div class="card border-0 shadow-sm rounded-4 mt-4">
+
+    <div class="card-body p-4">
+
+        <h4 class="fw-bold mb-4">
+            <i class="bi bi-receipt-cutoff text-success me-2"></i>
+            Ringkasan Belanja
+        </h4>
+
+        <div class="d-flex justify-content-between mb-3">
+            <span class="text-muted">
+                Total Item
+            </span>
+
+            <strong>
+                {{ $cartItems->count() }}
+            </strong>
         </div>
-    @endif
+
+        <div class="d-flex justify-content-between mb-3">
+            <span class="text-muted">
+                Subtotal
+            </span>
+
+            <strong>
+                Rp {{ number_format($subtotal,0,',','.') }}
+            </strong>
+        </div>
+
+        <hr>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <h5 class="mb-0">
+                Total Pembayaran
+            </h5>
+
+            <h3 class="fw-bold text-success mb-0">
+                Rp {{ number_format($subtotal,0,',','.') }}
+            </h3>
+
+        </div>
+
+        @if(isset($stokError) && $stokError)
+
+            <button
+                class="btn btn-secondary btn-lg w-100 rounded-pill"
+                disabled>
+
+                <i class="bi bi-exclamation-triangle me-2"></i>
+
+                Stok Tidak Mencukupi
+
+            </button>
+
+        @else
+
+            <a
+                href="{{ route('pesanan.checkoutForm') }}"
+                class="btn btn-success btn-lg w-100 rounded-pill">
+
+                <i class="bi bi-credit-card me-2"></i>
+
+                Lanjut ke Pembayaran
+
+            </a>
+
+        @endif
+
+    </div>
+
+</div>
+
+@endif
 </div>
 
 {{-- SCRIPT UPDATE QTY --}}

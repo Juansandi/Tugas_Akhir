@@ -8,30 +8,88 @@
     </h4>
 
     {{-- ================= INFO PESANAN ================= --}}
-    <div class="card mb-4 shadow-sm">
-        <div class="card-body">
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-body p-4">
+            <div class="row">
+                {{-- STATUS --}}
+                <div class="col-lg-6">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-box-seam text-success me-2"></i>
+                        Status Pesanan
+                    </h5>
 
-            {{-- STATUS --}}
-            <h6>Status Pesanan</h6>
-            <span class="badge {{ $pesanan->status_badge }} px-4 py-2 fs-6">
-                {{ $pesanan->status_label }}
-            </span>
-
-            {{-- ================= WAKTU PENGANTARAN ================= --}}
-            <div class="mt-3">
-                <h6>Waktu Pengantaran</h6>
-
-                @if ($pesanan->deliverySlot)
-                    <span class="badge bg-info px-3 py-2">
-                        {{ substr($pesanan->deliverySlot->waktu_mulai,0,5) }}
-                        –
-                        {{ substr($pesanan->deliverySlot->waktu_selesai,0,5) }}
+                    <span class="badge {{ $pesanan->status_badge }} px-4 py-3 fs-6 rounded-pill">
+                        {{ $pesanan->status_label }}
                     </span>
-                @else
-                    <span class="text-muted">
-                        Secepatnya
-                    </span>
-                @endif
+
+                    <div class="mt-4">
+                        <h6 class="fw-semibold">
+                            <i class="bi bi-clock-history me-2 text-success"></i>
+                            Waktu Pengantaran
+                        </h6>
+
+                        @if ($pesanan->deliverySlot)
+                            <span class="badge bg-info rounded-pill px-3 py-2">
+                                {{ substr($pesanan->deliverySlot->waktu_mulai,0,5) }}
+                                -
+                                {{ substr($pesanan->deliverySlot->waktu_selesai,0,5) }}
+                            </span>
+
+                        @else
+                            <span class="text-muted">
+                                Secepatnya
+                            </span>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- INFO PESANAN --}}
+                <div class="col-lg-6">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-receipt text-success me-2"></i>
+                        Informasi Pesanan
+                    </h5>
+
+                    <table class="table table-borderless mb-0">
+
+                        <tr>
+                            <td width="170" class="text-muted">Nomor Pesanan</td>
+                            <td><strong>#{{ $pesanan->id }}</strong></td>
+                        </tr>
+
+                        <tr>
+                            <td class="text-muted">Tanggal Pesanan</td>
+                            <td>{{ $pesanan->created_at->format('d M Y H:i') }}</td>
+                        </tr>
+
+                        <tr>
+                            <td class="text-muted">Metode Pembayaran</td>
+                            <td>{{ strtoupper($pesanan->metode_pembayaran) }}</td>
+                        </tr>
+
+                        <tr>
+                            <td class="text-muted">Kurir</td>
+                            <td>
+                                @if($pesanan->tugasKurir && $pesanan->tugasKurir->kurir)
+                                    <strong>
+                                        {{ $pesanan->tugasKurir->kurir->username }}
+                                    </strong>
+
+                                    @if($pesanan->tugasKurir->kurir->no_telp)
+                                        <span class="text-muted ms-2">
+                                            <i class="bi bi-telephone-fill me-1"></i>
+                                            {{ $pesanan->tugasKurir->kurir->no_telp }}
+                                        </span>
+                                    @endif
+                                @else
+                                    <span class="text-muted">
+                                        Belum ditugaskan
+                                    </span>
+                                @endif
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
 
             {{-- ================= AKSI ================= --}}
@@ -129,7 +187,6 @@
                             Lihat Detail Pengembalian Dana
                         </a>
                     @endif
-
                 </div>
             @endif
 
@@ -147,101 +204,193 @@
                         🎉 Anda mendapatkan <strong>{{ $pesanan->poin_diperoleh }}</strong> poin dari pesanan ini.
                     </div>
                 @endif
-
             @endif
 
-            {{-- ================= RINCIAN HARGA ================= --}}
-            <hr>
-            <h5>Perincian Harga</h5>
+           {{-- ================= RINGKASAN PEMBAYARAN ================= --}}
+            <hr class="my-4">
+
             @php
                 $subtotal = $pesanan->detail->sum(fn($i) => $i->price * $i->quantity);
             @endphp
-            <ul class="list-unstyled">
-                <li>Subtotal: <strong>Rp {{ number_format($subtotal,0,',','.') }}</strong></li>
-                <li>Diskon Promo: -Rp {{ number_format($pesanan->diskon_dari_promo ?? 0,0,',','.') }}</li>
-                <li>Diskon Poin: -Rp {{ number_format($pesanan->diskon_dari_poin ?? 0,0,',','.') }}</li>
-                <li>
-                    <strong>Total Dibayar:</strong>
-                    <span class="fw-bold text-success">
-                        Rp {{ number_format($pesanan->total, 0, ',', '.') }}
-                    </span>
-                </li>
-            </ul>
 
-            {{-- ================= ALAMAT ================= --}}
-            <h5 class="mt-4">Alamat Pengiriman</h5>
-            <div class="border rounded p-3 bg-light">
-                {{ $pesanan->alamat_pengiriman }}
-                @if($pesanan->no_telp_pengiriman)
-                    <br><small class="text-muted">No. Telp: {{ $pesanan->no_telp_pengiriman }}</small>
-                @endif
+            <div class="card border-0 bg-light rounded-4 mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-4">
+                        <i class="bi bi-receipt-cutoff text-success me-2"></i>
+                        Ringkasan Pembayaran
+                    </h5>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">
+                            Subtotal
+                        </span>
+
+                        <strong>
+                            Rp {{ number_format($subtotal,0,',','.') }}
+                        </strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">
+                            Diskon Promo
+                        </span>
+                        <span class="text-danger">
+                            - Rp {{ number_format($pesanan->diskon_dari_promo ?? 0,0,',','.') }}
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">
+                            Diskon Poin
+                        </span>
+                        <span class="text-danger">
+                            - Rp {{ number_format($pesanan->diskon_dari_poin ?? 0,0,',','.') }}
+                        </span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-muted">
+                                Total Pembayaran
+                            </div>
+
+                            <small class="text-muted">
+                                Total yang telah dibayarkan
+                            </small>
+                        </div>
+
+                        <h3 class="fw-bold text-success mb-0">
+                            Rp {{ number_format($pesanan->total,0,',','.') }}
+                        </h3>
+                    </div>
+                </div>
             </div>
 
+            {{-- ================= ALAMAT PENGIRIMAN ================= --}}
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-4">
+                        <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+                        Alamat Pengiriman
+                    </h5>
+
+                    <div class="mb-3">
+                        <div class="fw-semibold mb-2">
+                            Tujuan Pengiriman
+                        </div>
+                        <div class="text-muted lh-lg">
+                            {{ $pesanan->alamat_pengiriman }}
+                        </div>
+                    </div>
+
+                    @if($pesanan->no_telp_pengiriman)
+                        <hr>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-telephone-fill text-success me-2"></i>
+                            <span>{{ $pesanan->no_telp_pengiriman }}</span>
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 
     {{-- ================= DETAIL PRODUK ================= --}}
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h5>Produk dalam Pesanan</h5>
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+            <h4 class="fw-bold mb-4">
+                <i class="bi bi-bag-check text-success me-2"></i>
+                Produk dalam Pesanan
+            </h4>
 
             @foreach($pesanan->detail as $item)
-                <div class="d-flex justify-content-between align-items-center border-bottom py-3">
+            <div class="card border-0 shadow-sm rounded-4 mb-3">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        {{-- FOTO --}}
+                        <div class="col-md-2 text-center">
+                            @php
+                                $image = $item->type === 'paket'
+                                    ? optional($item->paket)->image
+                                    : optional($item->produk)->image;
+                            @endphp
 
-                    <div class="d-flex align-items-center">
-                        @php
-                            $image = $item->type === 'paket'
-                                ? optional($item->paket)->image
-                                : optional($item->produk)->image;
-                        @endphp
+                            @if($image)
+                                <img
+                                    src="{{ asset('storage/'.$image) }}"
+                                    class="img-fluid rounded"
+                                    style="height:90px;width:90px;object-fit:cover;">
+                            @endif
+                        </div>
 
-                        @if($image)
-                            <img src="{{ asset('storage/'.$image) }}"
-                                style="width:64px;height:64px;object-fit:cover;border-radius:8px"
-                                class="me-3">
-                        @endif
-
-                        <div>
-                            <div class="fw-bold">
+                        {{-- INFO --}}
+                        <div class="col-md-6">
+                            <h5 class="fw-bold mb-1">
                                 {{ $item->type === 'paket'
                                     ? $item->paket->nama_paket
                                     : $item->produk->nama_produk }}
+                            </h5>
+
+                            @if($item->type == 'produk')
+                                <span class="badge bg-light text-dark border mb-2">
+                                    {{ optional($item->size)->size }}
+                                </span>
+
+                            @else
+                                <span class="badge bg-success">
+                                    Paket Produk
+                                </span>
+                            @endif
+
+                            <div class="text-muted small">
+                                Jumlah :
+                                <strong>{{ $item->quantity }}</strong>
                             </div>
 
-                            <small class="text-muted">
-                                Jumlah: {{ $item->quantity }}
-                                @if($item->type === 'produk')
-                                    | Ukuran: {{ optional($item->size)->size }}
+                            <div class="text-muted small">
+                                Harga Satuan :
+                                Rp {{ number_format($item->price,0,',','.') }}
+                            </div>
+                        </div>
+
+                        {{-- SUBTOTAL --}}
+                        <div class="col-md-2 text-center">
+                            <div class="small text-muted">
+                                Subtotal
+                            </div>
+
+                            <h5 class="fw-bold text-success mb-0">
+                                Rp {{ number_format($item->price * $item->quantity,0,',','.') }}
+                            </h5>
+                        </div>
+
+                        {{-- AKSI --}}
+                        <div class="col-md-2 text-end">
+                            @if($pesanan->status === 'selesai'
+                                && $item->type === 'produk'
+                                && !$pesanan->refund)
+
+                                @if(in_array($item->produk_id,$reviewedProdukIds))
+                                    <span class="badge bg-success px-3 py-2">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Sudah Diulas
+                                    </span>
+                                @else
+                                    <a
+                                        href="{{ route('review.form',[
+                                            'produk'=>$item->produk_id,
+                                            'pesanan'=>$pesanan->id
+                                        ]) }}"
+                                        class="btn btn-outline-success btn-sm rounded-pill">
+                                        <i class="bi bi-pencil-square me-1"></i>
+                                        Beri Ulasan
+                                    </a>
                                 @endif
-                            </small>
-                        </div>
-                    </div>
-
-                    <div class="text-end">
-
-                        <div class="fw-semibold mb-2">
-                            Rp {{ number_format($item->price * $item->quantity,0,',','.') }}
-                        </div>
-
-                        @if($pesanan->status === 'selesai' && $item->type === 'produk' && !$pesanan->refund)
-                            @if(in_array($item->produk_id, $reviewedProdukIds))
-                                <span class="badge bg-success">
-                                    Sudah diulas
-                                </span>
-                            @else
-                                <a href="{{ route('review.form', [
-                                        'produk' => $item->produk_id,
-                                        'pesanan' => $pesanan->id
-                                    ]) }}"
-                                class="btn btn-sm btn-outline-success">
-                                    ✍️ Beri Ulasan
-                                </a>
                             @endif
-                        @endif
-
+                        </div>
                     </div>
-
                 </div>
+            </div>
             @endforeach
         </div>
     </div>
