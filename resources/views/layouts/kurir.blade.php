@@ -106,7 +106,18 @@
     </style>
 </head>
 <body>
+@php
+use App\Models\UserNotification;
 
+$notifications = UserNotification::where('user_id', auth()->id())
+    ->latest()
+    ->take(5)
+    ->get();
+
+$unreadNotifications = UserNotification::where('user_id', auth()->id())
+    ->where('is_read', false)
+    ->count();
+@endphp
 <div class="d-flex">
 
     {{-- SIDEBAR --}}
@@ -165,8 +176,68 @@
 
     {{-- CONTENT --}}
     <div class="content-area">
-        @yield('content')
+    {{-- TOP BAR --}}
+    <div class="d-flex justify-content-end mb-4">
+        <div class="dropdown">
+            <button class="btn btn-success position-relative shadow-sm"
+                    data-bs-toggle="dropdown">
+                <i class="bi bi-bell fs-5"></i>
+                @if($unreadNotifications > 0)
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ $unreadNotifications }}
+                    </span>
+                @endif
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow" style="width:380px">
+                <li class="dropdown-header fw-bold">
+                    Notifikasi
+                </li>
+                @forelse($notifications as $notif)
+                    <li>
+                        <a class="dropdown-item"
+                           href="{{ route('user.notifications.read', $notif->id) }}">
+                            <div class="d-flex">
+                                <div class="me-2">
+                                    @switch($notif->tipe)
+                                        @case('tugas_pengiriman')
+                                            📦
+                                            @break
+                                        @case('chat_baru')
+                                            💬
+                                            @break
+                                        @case('pesanan_dikirim')
+                                            🚚
+                                            @break
+                                        @default
+                                            🔔
+                                    @endswitch
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">
+                                        {{ ucfirst(str_replace('_',' ',$notif->tipe)) }}
+                                    </div>
+                                    <small class="text-muted">
+                                        {{ $notif->pesan }}
+                                    </small>
+                                    <br>
+                                    <small class="text-secondary">
+                                        {{ $notif->created_at->diffForHumans() }}
+                                    </small>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                @empty
+                    <li class="dropdown-item text-center text-muted">
+                        Tidak ada notifikasi
+                    </li>
+                @endforelse
+            </ul>
+        </div>
     </div>
+    @yield('content')
+</div>
 
 </div>
 

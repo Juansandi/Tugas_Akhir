@@ -140,13 +140,21 @@ class AdminPesananController extends Controller
                 return back()->with('error', 'Kurir tidak valid atau sudah dinonaktifkan.');
             }
 
-            TugasKurir::firstOrCreate(
+            $tugasKurir = TugasKurir::firstOrCreate(
                 ['pesanan_id' => $pesanan->id],
                 [
                     'user_id' => $kurir->id,
                     'status'  => 'aktif'
                 ]
             );
+             if ($tugasKurir->wasRecentlyCreated) {
+                UserNotification::create([
+                    'user_id' => $kurir->id,
+                    'tipe'    => 'tugas_pengiriman',
+                    'pesan'   => 'Anda mendapatkan tugas pengiriman untuk pesanan #' . $pesanan->id . '.',
+                    'url'     => route('kurir.pesanan.detail', $pesanan->id), // Sesuaikan dengan route Anda
+                ]);
+            }
         }
 
         if ($target === 'selesai') {
@@ -180,4 +188,6 @@ class AdminPesananController extends Controller
 
         return back()->with('success', 'Status pesanan diperbarui.');
     }
+
+    
 }
