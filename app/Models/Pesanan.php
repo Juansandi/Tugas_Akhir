@@ -153,7 +153,7 @@ class Pesanan extends Model
 
             $pesanans = self::with('detail.size', 'detail.paket.detailPakets.size')
                 ->where('status', 'belum_dibayar')
-                ->where('created_at', '<=', now()->subHours(24))
+                ->where('created_at', '<=', now()->subHours())
                 ->get();
 
             foreach ($pesanans as $pesanan) {
