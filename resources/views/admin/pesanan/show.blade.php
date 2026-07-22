@@ -107,7 +107,7 @@
     @if($pesanan->status === 'belum_dibayar')
         <div class="alert alert-danger">
             ⚠ Batas unggah bukti bayar:
-            <strong>{{ $pesanan->created_at->addHours(24)->format('d M Y H:i') }}</strong>
+            <strong>{{ $pesanan->created_at->addHours(1)->format('d M Y H:i') }}</strong>
         </div>
     @endif
 
