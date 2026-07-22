@@ -151,8 +151,8 @@ class AdminPesananController extends Controller
                 UserNotification::create([
                     'user_id' => $kurir->id,
                     'tipe'    => 'tugas_pengiriman',
-                    'pesan'   => 'Anda mendapatkan tugas pengiriman untuk pesanan #' . $pesanan->id . '.',
-                    'url'     => route('kurir.pesanan.detail', $pesanan->id), // Sesuaikan dengan route Anda
+                    'pesan'   => 'Tugas pengiriman untuk pesanan #' . $pesanan->id,
+                    'url'     => route('kurir.pesanan.detail', $tugasKurir->id),
                 ]);
             }
         }
