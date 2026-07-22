@@ -342,11 +342,15 @@ class ProdukController extends Controller
             $salesDataFull[] = $kotor - $refund;
         }
 
-        $pesananTerbaru = Pesanan::where('status', '!=', 'selesai')
-            ->with(['pengguna', 'detail.produk', 'detail.paket'])
-            ->latest()
-            ->limit(5)
-            ->get();
+       $pesananTerbaru = Pesanan::with([
+            'pengguna',
+            'detail.produk',
+            'detail.paket'
+        ])
+        ->whereNotIn('status', ['selesai', 'dibatalkan'])
+        ->latest('created_at')
+        ->take(5)
+        ->get();
 
         $produkTerlaris = DetailPesanan::join('pesanans', 'detail_pesanans.pesanan_id', '=', 'pesanans.id')
             ->where('pesanans.status', 'selesai')

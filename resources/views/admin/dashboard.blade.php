@@ -92,25 +92,35 @@
                         <tr>
                             <th>#</th>
                             <th>Pembeli</th>
+                            <th>Tanggal</th>
                             <th>Total</th>
                             <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @forelse($pesananTerbaru as $i => $pesanan)
                             <tr>
-                                <td>{{ $i+1 }}</td>
-                                <td>{{ $pesanan->pengguna->username ?? 'Guest' }}</td>
-                                <td>Rp {{ number_format($pesanan->total,0,',','.') }}</td>
+                                <td>{{ $pesanan->id }}</td>
+                                <td>{{ $pesanan->pengguna->username ?? '-' }}</td>
+                                <td>{{ $pesanan->created_at->format('d-m-Y H:i') }}</td>
+                                <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
                                 <td>
                                     <span class="badge {{ $pesanan->status_badge }}">
                                         {{ $pesanan->status_label }}
                                     </span>
                                 </td>
+                                <td>
+                                    <a href="{{ route('admin.pesanan.show', $pesanan->id) }}"
+                                    class="btn btn-sm btn-outline-primary">
+                                        Detail
+                                    </a>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center text-muted">
+                                <td colspan="6" class="text-center text-muted">
                                     Tidak ada data
                                 </td>
                             </tr>
