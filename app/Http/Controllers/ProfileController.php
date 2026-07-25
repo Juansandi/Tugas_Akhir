@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Pengguna;
 use App\Models\AlamatPengguna;
+use App\Models\Pesanan;
 use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
@@ -82,5 +83,18 @@ class ProfileController extends Controller
 
         return redirect()->back()->with('success', 'Password berhasil diperbarui');
     } 
+
+    public function riwayatPoin()
+    {
+        $riwayat = Pesanan::where('user_id', auth()->id())
+            ->where(function ($query) {
+                $query->where('poin_diperoleh', '>', 0)
+                    ->orWhere('poin_digunakan', '>', 0);
+            })
+            ->latest()
+            ->paginate(5);
+
+        return view('user.profile.riwayat_poin', compact('riwayat'));
+    }
 
 }

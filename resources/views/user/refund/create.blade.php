@@ -116,7 +116,7 @@
             {{-- NOMOR TUJUAN --}}
             <div class="mb-4">
                 <label class="form-label fw-semibold">
-                    Nomor Rekening / Dompet Digital <span class="text-danger">*</span>
+                    Nomor Rekening / Dompet Digital - Nama Penerima <span class="text-danger">*</span>
                 </label>
                 <input type="text"
                        name="nomor_tujuan"

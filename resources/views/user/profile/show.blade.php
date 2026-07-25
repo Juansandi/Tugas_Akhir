@@ -46,11 +46,17 @@
         @endforeach
     </ul>
 @endif
-<a href="{{ route('alamat.index') }}" class="btn btn-sm btn-outline-success mt-2">
+<a href="{{ route('alamat.index') }}" class="btn btn-sm btn-outline-success mt-2 mb-3">
     <i class="bi bi-geo-alt me-1"></i> Kelola Alamat
 </a>
 
         <p><strong>Jumlah Poin:</strong> {{ $user->jumlah_poin }}</p>
+        
+            <a href="{{ route('profile.riwayat-poin') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-clock-history me-2"></i>
+                Riwayat Poin
+            </a>
+        
 
         <div class="d-flex gap-2 mt-4">
             <button type="button" class="btn btn-outline-primary flex-grow-1" data-bs-toggle="modal" data-bs-target="#editProfileModal">

@@ -60,18 +60,18 @@
             <div class="card border-danger shadow-sm h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-arrow-counterclockwise fs-2 text-danger mb-2"></i>
-                    <h6 class="text-danger mb-1">Pengembalian Dana Bulan Ini</h6>
+                    <h6 class="text-danger mb-1">Pengembalian Dana Disetujui Bulan Ini</h6>
                     <h4 class="fw-bold text-danger">- Rp {{ number_format($totalRefundBulanIni,0,',','.') }}</h4>
                 </div>
             </div>
         </div>
 
-        {{-- PENJUALAN BERSIH --}}
+        {{-- PENJUALAN KOTOR SETELAH DIKURANGI REFUND --}}
         <div class="col-md-4">
             <div class="card border-dark shadow-sm h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-wallet2 fs-2 text-dark mb-2"></i>
-                    <h6 class="text-dark mb-1">Total Penjualan Bersih</h6>
+                    <h6 class="text-dark mb-1">Total Penjualan Kotor Setelah Dikurangi Pengembalian Dana</h6>
                     <h4 class="fw-bold text-dark">Rp {{ number_format($totalPenjualanBulanIni,0,',','.') }}</h4>
                 </div>
             </div>
@@ -104,7 +104,7 @@
                             <tr>
                                 <td>{{ $pesanan->id }}</td>
                                 <td>{{ $pesanan->pengguna->username ?? '-' }}</td>
-                                <td>{{ $pesanan->created_at->format('d-m-Y H:i') }}</td>
+                                <td>{{ $pesanan->created_at->format('d M Y H:i') }}</td>
                                 <td>Rp {{ number_format($pesanan->total, 0, ',', '.') }}</td>
                                 <td>
                                     <span class="badge {{ $pesanan->status_badge }}">
@@ -156,7 +156,7 @@
         data: {
             labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
             datasets: [{
-                label: 'Penjualan Bersih',
+                label: 'Penjualan Kotor Setelah Dikurangi Refund',
                 data: @json($salesDataFull),
                 backgroundColor: 'rgba(25, 135, 84, 0.7)'
             }]

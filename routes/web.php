@@ -65,6 +65,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::get('/profile/password', [ProfileController::class, 'editPassword'])->name('profile.editPassword');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+    Route::get('/profile/riwayat-poin', [ProfileController::class, 'riwayatPoin'])->name('profile.riwayat-poin');
 
     Route::get('/alamat', [AlamatController::class, 'index'])->name('alamat.index');
     Route::post('/alamat', [AlamatController::class, 'store'])->name('alamat.store');
