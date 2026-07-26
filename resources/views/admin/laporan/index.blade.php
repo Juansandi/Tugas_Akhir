@@ -56,7 +56,7 @@
                         Rp {{ number_format($totalPenjualanKotor, 0, ',', '.') }}
                     </h4>
                     <small class="text-muted">
-                        Total sebelum pengembalian dana
+                        Total sebelum pengembalian dana disetujui
                     </small>
                 </div>
             </div>
@@ -66,7 +66,7 @@
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
-                    <h6 class="text-muted">Total Pengembalian Dana</h6>
+                    <h6 class="text-muted">Total Pengembalian Dana Disetujui</h6>
                     <h4 class="fw-bold text-danger">
                         - Rp {{ number_format($totalRefund, 0, ',', '.') }}
                     </h4>
@@ -81,13 +81,10 @@
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm h-100 border-success">
                 <div class="card-body">
-                    <h6 class="text-muted">Penjualan Bersih</h6>
+                    <h6 class="text-muted">Total Penjualan Setelah Dikurangi Pengembalian Dana</h6>
                     <h4 class="fw-bold text-success">
                         Rp {{ number_format($totalPenjualanBersih, 0, ',', '.') }}
                     </h4>
-                    <small class="text-muted">
-                        Setelah dikurangi pengembalian dana
-                    </small>
                 </div>
             </div>
         </div>
